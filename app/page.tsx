@@ -5,6 +5,8 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import { FormEvent, Fragment, useEffect, useRef, useState } from "react";
+import type { User } from "@supabase/supabase-js";
+import { getSupabaseClient } from "@/lib/supabase";
 import SequenceScroll from "@/components/SequenceScroll";
 
 const menuItems = [
@@ -131,7 +133,27 @@ function MenuIcon({ open }: { open: boolean }) {
 function Navigation() {
   const [open, setOpen] = useState(false);
   const [lightSurface, setLightSurface] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const close = () => setOpen(false);
+  useEffect(() => {
+    let active = true;
+    let supabase: ReturnType<typeof getSupabaseClient> | null = null;
+    try {
+      supabase = getSupabaseClient();
+      supabase.auth.getUser().then(({ data }) => {
+        if (active) setUser(data.user);
+      });
+      const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (active) setUser(session?.user ?? null);
+      });
+      return () => {
+        active = false;
+        listener.subscription.unsubscribe();
+      };
+    } catch {
+      return () => { active = false; };
+    }
+  }, []);
   useEffect(() => {
     document.body.classList.toggle("menu-is-open", open);
     return () => document.body.classList.remove("menu-is-open");
@@ -163,12 +185,15 @@ function Navigation() {
     };
   }, []);
 
+  const accountName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Loca member";
+  const accountInitials = accountName.split(/\s+/).filter(Boolean).slice(0, 2).map((part: string) => part[0]).join("").toUpperCase() || "L";
+
   return (
     <>
       <header className={`site-header${lightSurface || open ? " header-on-light" : ""}`}>
         <Wordmark inverse />
         <div className="header-actions">
-          <a className="header-account-link" href="/login">LOGIN <span className="arrow-icon" aria-hidden="true" /></a>
+          {user ? <a className="header-profile-link" href="/profile" aria-label={`Buka profil ${accountName}`} title={accountName}>{user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : <span>{accountInitials}</span>}</a> : <a className="header-account-link" href="/login">LOGIN <span className="arrow-icon" aria-hidden="true" /></a>}
           <button className={`menu-toggle${open ? " is-open" : ""}`} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={open ? "Tutup navigasi" : "Buka navigasi"}>
             <MenuIcon open={open} />
           </button>
@@ -189,7 +214,7 @@ function Navigation() {
                 </nav>
               </div>
               <div className="menu-bottom">
-                <div className="menu-account"><span className="eyebrow">AREA MEMBER</span><a href="/login" onClick={close}>LOGIN / REGISTER <i className="arrow-icon" aria-hidden="true" /></a></div>
+                <div className="menu-account"><span className="eyebrow">AREA MEMBER</span><a href={user ? "/profile" : "/login"} onClick={close}>{user ? "LIHAT PROFILE" : "LOGIN / REGISTER"} <i className="arrow-icon" aria-hidden="true" /></a></div>
                 <div><span className="eyebrow">SAPA KAMI</span><a href="mailto:hello@coffeeloca.id">hello@coffeeloca.id <i className="arrow-icon" aria-hidden="true" /></a></div>
                 <div><span className="eyebrow">IKUTI CERITA</span><div className="social-links"><a href="https://instagram.com" target="_blank" rel="noreferrer">INSTAGRAM</a><a href="https://tiktok.com" target="_blank" rel="noreferrer">TIKTOK</a></div></div>
                 <p><span>COFFE LOCA · MEDAN</span><br />KOPI YANG BAIK. TEMAN YANG BAIK.</p>
