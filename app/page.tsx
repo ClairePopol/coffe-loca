@@ -4,13 +4,14 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import SequenceScroll from "@/components/SequenceScroll";
 
 const menuItems = [
   { title: "Awal cerita", href: "#cerita", number: "01", note: "KENALI CERITA KAMI" },
   { title: "Menu kami", href: "#menu", number: "02", note: "PILIH YANG KAMU SUKA" },
-  { title: "Lokasi & jam buka", href: "#lokasi-loca", number: "03", note: "TEMUKAN COFFEE LOCA" },
+  { title: "Reservation", href: "#reservation", number: "03", note: "SIAPKAN JEDA TERBAIKMU" },
+  { title: "Lokasi & jam buka", href: "#lokasi-loca", number: "04", note: "TEMUKAN COFFEE LOCA" },
 ];
 
 type Dish = { name: string; detail?: string; price: string };
@@ -326,6 +327,48 @@ function LocationSection() {
   );
 }
 
+function ReservationSection() {
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleReservation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitted(true);
+  }
+
+  return (
+    <section className="reservation-section section-pad" id="reservation" data-nav-theme="light" aria-labelledby="reservation-title">
+      <div className="section-kicker reservation-kicker"><span>03 / RESERVATION</span><span>SIAPKAN JEDA TERBAIKMU</span></div>
+      <div className="reservation-layout">
+        <div className="reservation-copy">
+          <span className="eyebrow"><i /> MEJA UNTUK CERITA YANG BAIK</span>
+          <h2 id="reservation-title">Simpan tempat<br /><em>untuk nanti.</em></h2>
+          <p>Datang dengan tenang. Pilih waktu yang kamu suka, biar kami siapkan ruang untuk kopi dan cerita yang ingin kamu bagi.</p>
+          <div className="reservation-stamp" aria-hidden="true"><span>LOCA</span><small>RESERVE<br />A LITTLE<br />MOMENT</small><i>✳</i></div>
+          <div className="reservation-meta"><span><b>01</b> KIRIM PERMINTAAN</span><span><b>02</b> KAMI KONFIRMASI</span></div>
+        </div>
+        <div className="reservation-card">
+          <div className="reservation-card-top"><span>TABLE REQUEST</span><span>COFFE LOCA / MEDAN</span></div>
+          <div className="reservation-card-heading"><span>PILIH WAKTUMU</span><h3>See you at Loca.</h3></div>
+          <form className="reservation-form" onSubmit={handleReservation}>
+            <div className="reservation-field-grid">
+              <label><span>TANGGAL</span><input type="date" name="date" required /></label>
+              <label><span>JAM</span><select name="time" defaultValue="" required><option value="" disabled>Pilih jam</option><option>10:00</option><option>12:00</option><option>14:00</option><option>16:00</option><option>18:00</option><option>20:00</option></select></label>
+            </div>
+            <div className="reservation-field-grid">
+              <label><span>JUMLAH ORANG</span><select name="guests" defaultValue="2" required><option value="1">1 orang</option><option value="2">2 orang</option><option value="3">3 orang</option><option value="4">4 orang</option><option value="5">5 orang</option><option value="6+">6+ orang</option></select></label>
+              <label><span>NAMA</span><input type="text" name="name" placeholder="Nama kamu" required /></label>
+            </div>
+            <label><span>CATATAN KECIL <em>OPSIONAL</em></span><textarea name="note" rows={2} placeholder="Ada yang perlu kami siapkan?"></textarea></label>
+            <button className="reservation-submit" type="submit"><span>{submitted ? "PERMINTAAN TERKIRIM" : "KIRIM PERMINTAAN"}</span><i className="arrow-icon" aria-hidden="true" /></button>
+            {submitted && <p className="reservation-feedback" role="status">Terima kasih. Kami akan menghubungimu untuk konfirmasi meja.</p>}
+          </form>
+          <p className="reservation-note">Reservasi akan dikonfirmasi oleh tim Loca melalui kontak yang tersedia.</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const aboutRef = useRef<HTMLElement>(null);
 
@@ -384,6 +427,8 @@ export default function Home() {
           </section>
 
           <MenuSection />
+
+          <ReservationSection />
 
           <LocationSection />
 
