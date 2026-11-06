@@ -236,13 +236,17 @@ function TextReveal({ children }: { children: string }) {
 }
 
 function MenuCategory({ number, title, subtitle, dishes }: { number: string; title: string; subtitle: string; dishes: Dish[] }) {
+  const orderedDishes = dishes.some((dish) => dish.category)
+    ? Array.from(new Set(dishes.map((dish) => dish.category))).flatMap((category) => dishes.filter((dish) => dish.category === category))
+    : dishes;
+
   return (
     <section className={`menu-list-panel${title === "Coffee & Drinks" ? " menu-list-panel-drinks" : ""}`} data-nav-theme="light" aria-label={title}>
-      <header className="menu-list-heading"><span className="menu-category-number">{number}</span><div><span className="menu-list-subtitle">{subtitle}</span><h3>{title}</h3></div><span className="menu-list-count">{String(dishes.length).padStart(2, "0")} ITEMS</span></header>
+      <header className="menu-list-heading"><span className="menu-category-number">{number}</span><div><span className="menu-list-subtitle">{subtitle}</span><h3>{title}</h3></div><span className="menu-list-count">{String(orderedDishes.length).padStart(2, "0")} ITEMS</span></header>
       <ol className="menu-list">
-        {dishes.map((dish, index) => (
+        {orderedDishes.map((dish, index) => (
           <Fragment key={`${dish.category ?? title}-${dish.name}`}>
-            {dish.category && (index === 0 || dishes[index - 1].category !== dish.category) && <li className="menu-group-label"><span>{dish.category}</span></li>}
+            {dish.category && (index === 0 || orderedDishes[index - 1].category !== dish.category) && <li className="menu-group-label"><span>{dish.category}</span></li>}
             <li className="menu-item-row">
               <span className="menu-item-index">{String(index + 1).padStart(2, "0")}</span><span className="menu-item-copy"><strong>{dish.name}</strong>{dish.detail && <small>{dish.detail}</small>}</span><span className="menu-item-price"><small>{dish.price === "SEASONAL" ? "" : "RP"}</small>{dish.price}</span>
             </li>
