@@ -405,6 +405,32 @@ button { color:inherit; font:inherit; }
 @keyframes reservationMarkFloat { from { transform:rotate(-5deg) translateY(0); } to { transform:rotate(-1deg) translateY(-6px); } }
 
 @media (min-width:1500px) { .section-pad { padding-right:max(9vw,calc((100vw - 1280px)/2)); padding-left:max(9vw,calc((100vw - 1280px)/2)); } }
+@media (min-width:761px) and (max-width:1400px) {
+  .section-kicker { font-size:9px; }
+  .eyebrow { font-size:10px; }
+  .text-reveal { font-size:clamp(25px,3vw,36px); }
+  .underlined-link,.text-link { font-size:9px; }
+  .about-rituals strong { font-size:21px; }
+  .menu-heading>p { font-size:14px; }
+  .menu-tab-copy strong { font-size:29px; }
+  .menu-tab-copy small { font-size:7px; }
+  .menu-tab-count { font-size:9px; }
+  .menu-list-subtitle,.menu-list-count { font-size:8px; }
+  .menu-item-copy strong { font-size:13px; }
+  .menu-item-copy small { font-size:10px; }
+  .menu-item-price { font-size:12px; }
+  .location-copy>p { font-size:14px; }
+  .location-rating>small { font-size:10px; }
+  .location-detail-label { font-size:8px; }
+  .location-detail p { font-size:18px; }
+  .location-detail>a { font-size:8px; }
+  .reservation-copy>p { font-size:14px; }
+  .reservation-meta { font-size:8px; }
+  .reservation-card-top,.reservation-card-heading>span { font-size:8px; }
+  .reservation-form label>span { font-size:8px; }
+  .reservation-form input,.reservation-form select,.reservation-form textarea { font-size:13px; }
+  .reservation-note { font-size:8px; }
+}
 @media (max-width:760px) {
   .sequence-sticky { min-height:500px; }
   .sequence-shade { background:linear-gradient(90deg,rgba(9,5,2,.77),rgba(9,5,2,.23)),linear-gradient(180deg,rgba(9,5,2,.44),transparent 27%,rgba(9,5,2,.08) 58%,rgba(9,5,2,.76)); }
