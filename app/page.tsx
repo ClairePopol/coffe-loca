@@ -260,7 +260,7 @@ function MenuSection() {
       <div className="menu-list-grid" id="menu-panel" aria-live="polite" aria-labelledby={activeCategory === "comfort" ? "menu-tab-comfort" : "menu-tab-snack"}>
         <MenuCategory key={activeCategory} number={activeCategory === "comfort" ? "01" : "02"} title={activeCategory === "comfort" ? "Comfort Food" : "Snack"} subtitle={activeCategory === "comfort" ? "YANG SELALU BIKIN NYAMAN" : "TEMAN NGOBROL & JEDA"} dishes={activeDishes} />
       </div>
-      <div className="menu-footnote"><span>HARGA DALAM RUPIAH</span><span>{String(activeDishes.length).padStart(2, "0")} PILIHAN UNTUK DINIKMATI</span></div>
+      <div className="menu-footnote"><span>{String(activeDishes.length).padStart(2, "0")} PILIHAN UNTUK DINIKMATI</span></div>
     </section>
   );
 }
