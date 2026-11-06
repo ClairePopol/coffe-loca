@@ -128,11 +128,6 @@ function Navigation() {
             <div className="menu-inner">
               <div className="menu-top"><span><i /> NAVIGASI / COFFE LOCA</span></div>
               <div className="menu-content">
-                <div className="menu-intro">
-                  <span className="menu-intro-kicker">SEBUAH JEDA KECIL DI MEDAN</span>
-                  <p>Tempat kecil<br />untuk cerita<br /><em>yang besar.</em></p>
-                  <span className="menu-intro-index">COFFE LOCA <i>·</i> EST. WITH CARE</span>
-                </div>
                 <nav className="menu-links" aria-label="Navigasi utama">
                   {menuItems.map((item, index) => (
                     <motion.a key={item.number} href={item.href} onClick={close} initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 + index * 0.1, duration: 0.62, ease: [0.22, 1, 0.36, 1] }}>
@@ -144,7 +139,7 @@ function Navigation() {
               <div className="menu-bottom">
                 <div className="menu-account"><span className="eyebrow">AREA MEMBER</span><a href="/login" onClick={close}>LOGIN / REGISTER <i className="arrow-icon" aria-hidden="true" /></a></div>
                 <div><span className="eyebrow">SAPA KAMI</span><a href="mailto:hello@coffeeloca.id">hello@coffeeloca.id <i className="arrow-icon" aria-hidden="true" /></a></div>
-                <div><span className="eyebrow">IKUTI CERITA</span><div className="social-links"><a href="https://instagram.com" target="_blank" rel="noreferrer">INSTAGRAM <i className="arrow-icon" aria-hidden="true" /></a><a href="https://tiktok.com" target="_blank" rel="noreferrer">TIKTOK <i className="arrow-icon" aria-hidden="true" /></a></div></div>
+                <div><span className="eyebrow">IKUTI CERITA</span><div className="social-links"><a href="https://instagram.com" target="_blank" rel="noreferrer">INSTAGRAM</a><a href="https://tiktok.com" target="_blank" rel="noreferrer">TIKTOK</a></div></div>
                 <p><span>COFFE LOCA · MEDAN</span><br />KOPI YANG BAIK. TEMAN YANG BAIK.</p>
               </div>
             </div>

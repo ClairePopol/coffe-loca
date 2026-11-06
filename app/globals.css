@@ -97,6 +97,7 @@ button { color:inherit; font:inherit; }
 .menu-intro p em { color:#a44e37; font-weight:400; }
 .menu-intro-index i { color:#a44e37; font-style:normal; }
 .menu-links { display:flex; flex-direction:column; justify-content:center; padding:4vh 0; }
+.menu-content>.menu-links { grid-column:1 / -1; }
 .menu-links>a { position:relative; display:grid; grid-template-columns:54px minmax(0,1fr) 44px; align-items:center; width:100%; padding:16px 7px 20px 0; border-bottom:1px solid rgba(32,37,30,.16); transition:border-color .3s ease; }
 .menu-links>a::before { position:absolute; right:0; bottom:-1px; left:0; height:1px; content:""; transform:scaleX(0); transform-origin:left; background:#a44e37; transition:transform .5s cubic-bezier(.22,1,.36,1); }
 .menu-links>a:hover::before,.menu-links>a:focus-visible::before { transform:scaleX(1); }
