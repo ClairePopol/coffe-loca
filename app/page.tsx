@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, Fragment, useEffect, useRef, useState } from "react";
 import SequenceScroll from "@/components/SequenceScroll";
 
 const menuItems = [
@@ -14,7 +14,7 @@ const menuItems = [
   { title: "Lokasi & jam buka", href: "#lokasi-loca", number: "04", note: "TEMUKAN COFFEE LOCA" },
 ];
 
-type Dish = { name: string; detail?: string; price: string };
+type Dish = { name: string; detail?: string; price: string; category?: string };
 
 const comfortFood: Dish[] = [
   { name: "Nasi Goreng Pete Teri Udang", price: "35.000" },
@@ -62,6 +62,57 @@ const snacks: Dish[] = [
   { name: "Rujak Buah", price: "35.000" },
   { name: "Lupis", detail: "Per pc", price: "10.000" },
   { name: "Roti Bakar", price: "25.000" },
+  { name: "Sosis Gulung Mie", price: "30.000" },
+  { name: "Tahu Pop Cabe Garam", price: "27.000" },
+  { name: "Enoki Crispy", price: "27.000" },
+];
+
+const coffeeAndDrinks: Dish[] = [
+  { category: "COFFEE LOCA · KIRI", name: "Sabrina", detail: "Frozen blended mango, straw, pineapple", price: "35.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Mario", detail: "Frozen blended mango, avocado, banana", price: "35.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Esmeralda", detail: "Frozen blended dragon fruit, soursop", price: "35.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Maskel Builder", detail: "Blended banana, avocado, almond, whey protein", price: "37.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Mineral Water", price: "17.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Regular Tea", price: "15.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Artisan Tea", price: "32.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Lemon Tea", price: "25.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Strawberry Tea", price: "30.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Matcha Tea", price: "28.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Sparkling Water", price: "17.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Sparkling Strawberry Lemonade", price: "32.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Lime Coke", price: "25.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Choco Redvelvet", price: "25.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Peanut Butter Charcoal", price: "30.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Classic Matcha Latte", price: "30.000" },
+  { category: "COFFEE LOCA · KIRI", name: "Creamy Chocolate", price: "30.000" },
+  { category: "COFFEE LOCA · TENGAH", name: "Avocado Milo", price: "35.000" },
+  { category: "COFFEE LOCA · TENGAH", name: "Earlgrey Milktea", price: "30.000" },
+  { category: "COFFEE LOCA · TENGAH", name: "Mamatcha", detail: "Double matcha, matcha latte + matcha ice cream", price: "35.000" },
+  { category: "FRESH JUICE", name: "Orange / Watermelon / Pineapple / Strawberry / Guava / Mango", price: "25.000" },
+  { category: "FRESH JUICE", name: "Avocado / Soursop / Dragonfruit", price: "28.000" },
+  { category: "FRESH JUICE", name: "Lemonade", price: "25.000" },
+  { category: "FRESH JUICE", name: "Mix 2 Fruit", price: "32.000" },
+  { category: "COFFEE", name: "Black", detail: "Americano, espresso", price: "25.000" },
+  { category: "COFFEE", name: "White", detail: "Latte, cappuccino, piccolo, mocha", price: "27.000" },
+  { category: "COFFEE", name: "Manual Brew & Cold Brew", detail: "Seasonal · ask our staff", price: "SEASONAL" },
+  { category: "COFFEE LOCA · KANAN", name: "Coffee Bonbon (Sanger)", detail: "Espresso + condensed milk", price: "25.000" },
+  { category: "COFFEE LOCA · KANAN", name: "Pump It Up!", detail: "Espresso + salt + lemon + sugar", price: "25.000" },
+  { category: "COFFEE LOCA · KANAN", name: "Shaken Tropical", detail: "Espresso + orange juice + mint", price: "27.000" },
+  { category: "COFFEE LOCA · KANAN", name: "Honey I'm Home", detail: "Shaken americano + honey", price: "27.000" },
+  { category: "COFFEE LOCA · KANAN", name: "Coffee COLA", detail: "Espresso + COLA + lemon", price: "27.000" },
+  { category: "COFFEE LOCA · KANAN", name: "Avocado Coffee", price: "32.000" },
+  { category: "COFFEE LOCA · KANAN", name: "Banana Macchiato", price: "32.000" },
+  { category: "COFFEE LOCA · KANAN", name: "Coconut Macchiato", price: "32.000" },
+  { category: "COFFEE LOCA · KANAN", name: "Choco Macchiato", price: "32.000" },
+  { category: "COFFEE LOCA · KANAN", name: "Peanutbutter Macchiato", price: "32.000" },
+  { category: "COFFEE LOCA · KANAN", name: "Matcha Macchiato", price: "35.000" },
+  { category: "COFFEE LOCA · KANAN", name: "Milktea Coffee", price: "32.000" },
+  { category: "COFFEE LOCA · KANAN", name: "Coffee Cream Unsweetened", price: "27.000" },
+  { category: "FAVORIT KOPI SUSU", name: "Eskobar", price: "27.000" },
+  { category: "FAVORIT KOPI SUSU", name: "Amazing", price: "27.000" },
+  { category: "FAVORIT KOPI SUSU", name: "Traditional", price: "27.000" },
+  { category: "FAVORIT KOPI SUSU", name: "Capheda", price: "27.000" },
+  { category: "FAVORIT KOPI SUSU", name: "Cadocado", price: "27.000" },
 ];
 
 function Wordmark({ inverse = false }: { inverse?: boolean }) {
@@ -186,13 +237,16 @@ function TextReveal({ children }: { children: string }) {
 
 function MenuCategory({ number, title, subtitle, dishes }: { number: string; title: string; subtitle: string; dishes: Dish[] }) {
   return (
-    <section className="menu-list-panel" data-nav-theme="light" aria-label={title}>
+    <section className={`menu-list-panel${title === "Coffee & Drinks" ? " menu-list-panel-drinks" : ""}`} data-nav-theme="light" aria-label={title}>
       <header className="menu-list-heading"><span className="menu-category-number">{number}</span><div><span className="menu-list-subtitle">{subtitle}</span><h3>{title}</h3></div><span className="menu-list-count">{String(dishes.length).padStart(2, "0")} ITEMS</span></header>
       <ol className="menu-list">
         {dishes.map((dish, index) => (
-          <li className="menu-item-row" key={dish.name}>
-            <span className="menu-item-index">{String(index + 1).padStart(2, "0")}</span><span className="menu-item-copy"><strong>{dish.name}</strong>{dish.detail && <small>{dish.detail}</small>}</span><span className="menu-item-price"><small>RP</small>{dish.price}</span>
-          </li>
+          <Fragment key={`${dish.category ?? title}-${dish.name}`}>
+            {dish.category && (index === 0 || dishes[index - 1].category !== dish.category) && <li className="menu-group-label"><span>{dish.category}</span></li>}
+            <li className="menu-item-row">
+              <span className="menu-item-index">{String(index + 1).padStart(2, "0")}</span><span className="menu-item-copy"><strong>{dish.name}</strong>{dish.detail && <small>{dish.detail}</small>}</span><span className="menu-item-price"><small>{dish.price === "SEASONAL" ? "" : "RP"}</small>{dish.price}</span>
+            </li>
+          </Fragment>
         ))}
       </ol>
     </section>
@@ -201,7 +255,7 @@ function MenuCategory({ number, title, subtitle, dishes }: { number: string; tit
 
 function MenuSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [activeCategory, setActiveCategory] = useState<"comfort" | "snack">("comfort");
+  const [activeCategory, setActiveCategory] = useState<"comfort" | "snack" | "drinks">("comfort");
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -243,7 +297,7 @@ function MenuSection() {
     return () => context.revert();
   }, [activeCategory]);
 
-  const activeDishes = activeCategory === "comfort" ? comfortFood : snacks;
+  const activeDishes = activeCategory === "comfort" ? comfortFood : activeCategory === "snack" ? snacks : coffeeAndDrinks;
 
   return (
     <section ref={sectionRef} className="menu-section section-pad" id="menu">
@@ -256,9 +310,12 @@ function MenuSection() {
         <button className={activeCategory === "snack" ? "is-active" : ""} id="menu-tab-snack" aria-pressed={activeCategory === "snack"} aria-controls="menu-panel" onClick={() => setActiveCategory("snack")}>
           <span className="menu-tab-number">02</span><span className="menu-tab-copy"><strong>Snack</strong><small>TEMAN NGOBROL &amp; JEDA</small></span><span className="menu-tab-count">{String(snacks.length).padStart(2, "0")}</span>
         </button>
+        <button className={activeCategory === "drinks" ? "is-active" : ""} id="menu-tab-drinks" aria-pressed={activeCategory === "drinks"} aria-controls="menu-panel" onClick={() => setActiveCategory("drinks")}>
+          <span className="menu-tab-number">03</span><span className="menu-tab-copy"><strong>Coffee &amp; Drinks</strong><small>KOPI, JUICE &amp; SIGNATURE LOCA</small></span><span className="menu-tab-count">{String(coffeeAndDrinks.length).padStart(2, "0")}</span>
+        </button>
       </div>
-      <div className="menu-list-grid" id="menu-panel" aria-live="polite" aria-labelledby={activeCategory === "comfort" ? "menu-tab-comfort" : "menu-tab-snack"}>
-        <MenuCategory key={activeCategory} number={activeCategory === "comfort" ? "01" : "02"} title={activeCategory === "comfort" ? "Comfort Food" : "Snack"} subtitle={activeCategory === "comfort" ? "YANG SELALU BIKIN NYAMAN" : "TEMAN NGOBROL & JEDA"} dishes={activeDishes} />
+      <div className="menu-list-grid" id="menu-panel" aria-live="polite" aria-labelledby={activeCategory === "comfort" ? "menu-tab-comfort" : activeCategory === "snack" ? "menu-tab-snack" : "menu-tab-drinks"}>
+        <MenuCategory key={activeCategory} number={activeCategory === "comfort" ? "01" : activeCategory === "snack" ? "02" : "03"} title={activeCategory === "comfort" ? "Comfort Food" : activeCategory === "snack" ? "Snack" : "Coffee & Drinks"} subtitle={activeCategory === "comfort" ? "YANG SELALU BIKIN NYAMAN" : activeCategory === "snack" ? "TEMAN NGOBROL & JEDA" : "KOPI, JUICE & SIGNATURE LOCA"} dishes={activeDishes} />
       </div>
       <div className="menu-footnote"><span>{String(activeDishes.length).padStart(2, "0")} PILIHAN UNTUK DINIKMATI</span></div>
     </section>

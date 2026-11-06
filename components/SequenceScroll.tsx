@@ -150,7 +150,11 @@ export default function SequenceScroll() {
               <h2>Temui sudut<br /><em>favoritmu.</em></h2>
               <a className="pill-button pill-button-light" href="#reservation" onClick={(event) => {
                 event.preventDefault();
-                document.getElementById("reservation")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                const reservation = document.getElementById("reservation");
+                if (!reservation) return;
+                const targetTop = reservation.getBoundingClientRect().top + window.scrollY - 18;
+                window.history.replaceState(null, "", "#reservation");
+                window.scrollTo({ top: targetTop, behavior: "smooth" });
               }}><span>RESERVASI SEKARANG</span><span className="arrow-icon" aria-hidden="true" /></a>
             </motion.div>
           </div>
