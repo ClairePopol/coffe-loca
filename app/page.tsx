@@ -186,7 +186,7 @@ function TextReveal({ children }: { children: string }) {
 
 function MenuCategory({ number, title, subtitle, dishes }: { number: string; title: string; subtitle: string; dishes: Dish[] }) {
   return (
-    <section className="menu-list-panel" aria-label={title}>
+    <section className="menu-list-panel" data-nav-theme="light" aria-label={title}>
       <header className="menu-list-heading"><span className="menu-category-number">{number}</span><div><span className="menu-list-subtitle">{subtitle}</span><h3>{title}</h3></div><span className="menu-list-count">{String(dishes.length).padStart(2, "0")} ITEMS</span></header>
       <ol className="menu-list">
         {dishes.map((dish, index) => (
