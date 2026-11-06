@@ -534,7 +534,7 @@ button { color:inherit; font:inherit; }
   .reservation-mark-ring::after { width:89px; height:89px; }
   .reservation-mark-ring img { width:47px; height:47px; }
   .reservation-meta { gap:12px; flex-wrap:wrap; font-size:6px; }
-  .reservation-card { width:100%; padding:23px 19px 21px; }
+  .reservation-card { width:100%; margin-top:-90px; margin-bottom:-90px; padding:23px 19px 21px; }
   .reservation-card-top { font-size:5px; }
   .reservation-card-heading { margin:23px 0 21px; }
   .reservation-card-heading h3 { font-size:36px; }
