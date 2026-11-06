@@ -288,15 +288,11 @@ button { color:inherit; font:inherit; }
 .reservation-section::after { position:absolute; z-index:-1; right:7%; bottom:9%; width:180px; height:1px; content:""; background:rgba(232,189,119,.55); transform:rotate(-35deg); transform-origin:right; }
 .reservation-kicker { color:rgba(255,244,233,.62); }
 .reservation-layout { display:grid; grid-template-columns:.82fr 1.18fr; align-items:center; gap:9vw; margin-top:11vh; }
-.reservation-copy { position:relative; min-height:530px; padding-top:14px; }
+.reservation-copy { position:relative; min-height:410px; padding-top:14px; }
 .reservation-copy>.eyebrow { color:#e2bd93; }
 .reservation-copy h2 { margin:27px 0 21px; color:#f3eddf; font-family:Manrope,sans-serif; font-size:clamp(65px,8.3vw,112px); font-weight:400; letter-spacing:-.09em; line-height:.81; }
 .reservation-copy h2 em { color:#e8bd77; font-family:"Instrument Serif",serif; font-weight:400; }
 .reservation-copy>p { max-width:340px; margin:0; color:rgba(255,244,233,.7); font-size:12px; line-height:1.85; }
-.reservation-aside { position:absolute; right:0; bottom:53px; width:205px; padding-top:14px; border-top:1px solid rgba(232,189,119,.55); }
-.reservation-aside>span { color:#e8bd77; font-size:7px; font-weight:700; letter-spacing:.16em; }
-.reservation-aside strong { display:block; margin:10px 0 8px; color:#f3eddf; font-family:"Instrument Serif",serif; font-size:25px; font-weight:400; }
-.reservation-aside p { margin:0; color:rgba(255,244,233,.58); font-size:9px; line-height:1.6; }
 .reservation-meta { position:absolute; right:0; bottom:0; left:0; display:flex; gap:22px; padding-top:15px; border-top:1px solid rgba(255,244,233,.2); color:rgba(255,244,233,.58); font-size:7px; font-weight:700; letter-spacing:.13em; }
 .reservation-meta span { display:inline-flex; align-items:center; gap:7px; }
 .reservation-meta b { color:#e8bd77; font-family:"Instrument Serif",serif; font-size:15px; font-weight:400; }
@@ -490,13 +486,10 @@ button { color:inherit; font:inherit; }
   .menu-footnote { gap:12px; flex-direction:column; font-size:6px; }
   .reservation-section { min-height:auto; padding-top:91px; padding-bottom:72px; }
   .reservation-layout { grid-template-columns:1fr; gap:36px; margin-top:9vh; }
-  .reservation-copy { min-height:390px; padding-top:0; }
+  .reservation-copy { min-height:300px; padding-top:0; }
   .reservation-copy h2 { margin-top:23px; font-size:clamp(62px,15vw,99px); }
   .reservation-copy>p { max-width:280px; font-size:11px; }
   .reservation-section::after { right:-30px; bottom:12%; width:130px; }
-  .reservation-aside { right:auto; bottom:56px; left:0; width:min(205px,58vw); }
-  .reservation-aside strong { font-size:22px; }
-  .reservation-aside p { font-size:8px; }
   .reservation-meta { gap:12px; flex-wrap:wrap; font-size:6px; }
   .reservation-card { width:100%; padding:23px 19px 21px; }
   .reservation-card-top { font-size:5px; }

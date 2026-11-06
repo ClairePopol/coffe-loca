@@ -343,7 +343,6 @@ function ReservationSection() {
           <span className="eyebrow"><i /> MEJA UNTUK CERITA YANG BAIK</span>
           <h2 id="reservation-title">Simpan tempat<br /><em>untuk nanti.</em></h2>
           <p>Datang dengan tenang. Pilih waktu yang kamu suka, biar kami siapkan ruang untuk kopi dan cerita yang ingin kamu bagi.</p>
-          <div className="reservation-aside"><span>RESERVATIONS</span><strong>12:00 — 22:00</strong><p>Untuk grup 6 orang atau lebih, hubungi kami langsung agar kami bisa menyiapkan meja terbaik.</p></div>
           <div className="reservation-meta"><span><b>01</b> KIRIM PERMINTAAN</span><span><b>02</b> KAMI KONFIRMASI</span></div>
         </div>
         <div className="reservation-card">
