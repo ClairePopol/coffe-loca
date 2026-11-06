@@ -298,6 +298,13 @@ button { color:inherit; font:inherit; }
 .reservation-stamp>span { font-family:"Instrument Serif",serif; font-size:41px; letter-spacing:-.06em; }
 .reservation-stamp small { margin-left:7px; font-size:6px; font-weight:700; letter-spacing:.12em; line-height:1.6; }
 .reservation-stamp>i { position:absolute; right:20px; bottom:22px; color:#d09558; font-size:15px; font-style:normal; }
+.reservation-mark { width:190px; height:110px; align-items:center; justify-content:flex-start; gap:13px; border:0; border-radius:0; transform:rotate(-5deg); animation:reservationMarkFloat 5s ease-in-out infinite alternate; }
+.reservation-mark::before { display:none; }
+.reservation-mark-ring { display:grid; width:94px; height:94px; place-items:center; border:1px solid rgba(164,78,55,.42); border-radius:50%; background:rgba(232,189,119,.12); }
+.reservation-mark-ring::after { position:absolute; width:106px; height:106px; content:""; border:1px solid rgba(232,189,119,.34); border-radius:50%; }
+.reservation-mark-ring img { width:57px; height:57px; object-fit:contain; opacity:.82; filter:brightness(0) saturate(100%) invert(32%) sepia(17%) saturate(926%) hue-rotate(76deg) brightness(84%); }
+.reservation-mark small { color:#a44e37; font-size:7px; font-weight:700; letter-spacing:.16em; line-height:1.7; }
+.reservation-mark small b { color:#354537; font-size:14px; letter-spacing:.04em; }
 .reservation-meta { position:absolute; right:0; bottom:0; left:0; display:flex; gap:22px; padding-top:15px; border-top:1px solid rgba(53,69,55,.18); color:#858174; font-size:7px; font-weight:700; letter-spacing:.13em; }
 .reservation-meta span { display:inline-flex; align-items:center; gap:7px; }
 .reservation-meta b { color:#a44e37; font-family:"Instrument Serif",serif; font-size:15px; font-weight:400; }
@@ -395,6 +402,7 @@ button { color:inherit; font:inherit; }
 @keyframes authBeanFloat { from { transform:translate(-50%,-50%) rotate(-18deg) translateY(-5px); } to { transform:translate(-50%,-50%) rotate(-8deg) translateY(8px); } }
 @keyframes reservationGlow { from { transform:translate3d(3%,0,0) scale(.9); opacity:.65; } to { transform:translate3d(-6%,-5%,0) scale(1.1); opacity:1; } }
 @keyframes stampFloat { from { transform:rotate(12deg) translateY(0); } to { transform:rotate(4deg) translateY(-9px); } }
+@keyframes reservationMarkFloat { from { transform:rotate(-5deg) translateY(0); } to { transform:rotate(-1deg) translateY(-6px); } }
 
 @media (min-width:1500px) { .section-pad { padding-right:max(9vw,calc((100vw - 1280px)/2)); padding-left:max(9vw,calc((100vw - 1280px)/2)); } }
 @media (max-width:760px) {
@@ -494,9 +502,12 @@ button { color:inherit; font:inherit; }
   .reservation-copy { min-height:390px; padding-top:0; }
   .reservation-copy h2 { margin-top:23px; font-size:clamp(62px,15vw,99px); }
   .reservation-copy>p { max-width:280px; font-size:11px; }
-  .reservation-stamp { right:-15px; bottom:56px; width:135px; height:135px; }
-  .reservation-stamp>span { font-size:32px; }
-  .reservation-stamp small { font-size:5px; }
+  .reservation-mark { right:-15px; bottom:56px; width:165px; height:96px; gap:9px; }
+  .reservation-mark-ring { width:78px; height:78px; }
+  .reservation-mark-ring::after { width:89px; height:89px; }
+  .reservation-mark-ring img { width:47px; height:47px; }
+  .reservation-mark small { font-size:5px; }
+  .reservation-mark small b { font-size:11px; }
   .reservation-meta { gap:12px; flex-wrap:wrap; font-size:6px; }
   .reservation-card { width:100%; padding:23px 19px 21px; }
   .reservation-card-top { font-size:5px; }

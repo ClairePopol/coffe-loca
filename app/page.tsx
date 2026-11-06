@@ -343,7 +343,7 @@ function ReservationSection() {
           <span className="eyebrow"><i /> MEJA UNTUK CERITA YANG BAIK</span>
           <h2 id="reservation-title">Simpan tempat<br /><em>untuk nanti.</em></h2>
           <p>Datang dengan tenang. Pilih waktu yang kamu suka, biar kami siapkan ruang untuk kopi dan cerita yang ingin kamu bagi.</p>
-          <div className="reservation-stamp" aria-hidden="true"><span>LOCA</span><small>RESERVE<br />A LITTLE<br />MOMENT</small><i>✳</i></div>
+          <div className="reservation-stamp reservation-mark" aria-hidden="true"><span className="reservation-mark-ring"><img src="/white-coffee-bean.png" alt="" /></span><small>COFFE<br /><b>LOCA</b><br />MEDAN</small></div>
           <div className="reservation-meta"><span><b>01</b> KIRIM PERMINTAAN</span><span><b>02</b> KAMI KONFIRMASI</span></div>
         </div>
         <div className="reservation-card">
