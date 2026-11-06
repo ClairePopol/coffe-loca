@@ -392,6 +392,20 @@ button { color:inherit; font:inherit; }
 @keyframes stampFloat { from { transform:rotate(12deg) translateY(0); } to { transform:rotate(4deg) translateY(-9px); } }
 
 @media (min-width:1500px) { .section-pad { padding-right:max(9vw,calc((100vw - 1280px)/2)); padding-left:max(9vw,calc((100vw - 1280px)/2)); } }
+@media (min-width:761px) and (max-width:1200px) {
+  .reservation-layout { gap:5vw; }
+  .reservation-copy h2 { font-size:clamp(62px,7.7vw,88px); }
+  .reservation-copy>p { max-width:370px; font-size:14px; line-height:1.75; }
+  .reservation-meta { gap:17px; font-size:8px; }
+  .reservation-meta b { font-size:17px; }
+  .reservation-card { padding-inline:32px; }
+  .reservation-card-top { font-size:7px; }
+  .reservation-card-heading>span { font-size:8px; }
+  .reservation-card-heading h3 { font-size:47px; }
+  .reservation-form label>span { font-size:8px; }
+  .reservation-form input,.reservation-form select,.reservation-form textarea { font-size:13px; }
+  .reservation-note { font-size:8px; }
+}
 @media (max-width:760px) {
   .sequence-sticky { min-height:500px; }
   .sequence-shade { background:linear-gradient(90deg,rgba(9,5,2,.77),rgba(9,5,2,.23)),linear-gradient(180deg,rgba(9,5,2,.44),transparent 27%,rgba(9,5,2,.08) 58%,rgba(9,5,2,.76)); }
