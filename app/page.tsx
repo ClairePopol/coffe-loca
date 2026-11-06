@@ -288,7 +288,7 @@ function LocationSection() {
 
   return (
     <section ref={sectionRef} className="location-section section-pad" id="lokasi-loca" data-nav-theme="light" aria-labelledby="location-title">
-      <div className="section-kicker location-kicker"><span>03 / LOKASI &amp; JAM BUKA</span><span>SEMPATKAN JEDA DI LOCA</span></div>
+      <div className="section-kicker location-kicker"><span>04 / LOKASI &amp; JAM BUKA</span><span>SEMPATKAN JEDA DI LOCA</span></div>
       <div className="location-layout">
         <div className="location-copy">
           <span className="eyebrow"><i /> KAMI SIAP MENYAMBUTMU</span>
