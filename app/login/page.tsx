@@ -29,7 +29,7 @@ export default function LoginPage() {
           <img className="wordmark-logo" src="/white-coffee-bean.png" alt="" />
           <span className="wordmark-type"><span>COFFE <b>LOCA</b></span><small>GOOD COFFEE, GOOD COMPANY</small></span>
         </a>
-        <a className="auth-back-link" href="/">KEMBALI KE BERANDA <span>↗</span></a>
+        <a className="auth-back-link" href="/">KEMBALI KE BERANDA <span className="arrow-icon" aria-hidden="true" /></a>
       </header>
 
       <section className="auth-layout" aria-labelledby="auth-title">
@@ -64,10 +64,10 @@ export default function LoginPage() {
             <label><span>PASSWORD</span><div className="auth-password"><input name="password" type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete={isRegister ? "new-password" : "current-password"} minLength={6} required /><button type="button" onClick={() => setShowPassword((value) => !value)}>{showPassword ? "SEMBUNYIKAN" : "LIHAT"}</button></div></label>
             {isRegister && <label><span>KONFIRMASI PASSWORD</span><input name="password-confirmation" type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="new-password" minLength={6} required /></label>}
             {!isRegister && <div className="auth-form-meta"><label className="auth-check"><input type="checkbox" name="remember" /><span>INGAT AKU</span></label><a href="mailto:hello@coffeeloca.id?subject=Lupa%20password">LUPA PASSWORD?</a></div>}
-            <button className="auth-submit" type="submit"><span>{isRegister ? "BUAT AKUN" : "MASUK KE LOCA"}</span><span>↗</span></button>
+            <button className="auth-submit" type="submit"><span>{isRegister ? "BUAT AKUN" : "MASUK KE LOCA"}</span><span className="arrow-icon" aria-hidden="true" /></button>
             {submitted && <p className="auth-feedback" role="status">Form sudah siap. Sambungkan ke layanan autentikasi untuk mengaktifkan akun.</p>}
           </form>
-          <p className="auth-switch">{isRegister ? "Sudah punya akun?" : "Belum punya akun?"} <button type="button" onClick={() => switchMode(isRegister ? "login" : "register")}>{isRegister ? "LOGIN" : "REGISTER"} <span>↗</span></button></p>
+          <p className="auth-switch">{isRegister ? "Sudah punya akun?" : "Belum punya akun?"} <button type="button" onClick={() => switchMode(isRegister ? "login" : "register")}>{isRegister ? "LOGIN" : "REGISTER"} <span className="arrow-icon" aria-hidden="true" /></button></p>
         </div>
       </section>
       <footer className="auth-footer"><span>COFFE LOCA · MEDAN</span><span>EST. WITH CARE</span><span>© 2026</span></footer>

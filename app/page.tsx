@@ -116,7 +116,7 @@ function Navigation() {
       <header className={`site-header${lightSurface || open ? " header-on-light" : ""}`}>
         <Wordmark inverse />
         <div className="header-actions">
-          <a className="header-account-link" href="/login">LOGIN <span>↗</span></a>
+          <a className="header-account-link" href="/login">LOGIN <span className="arrow-icon" aria-hidden="true" /></a>
           <button className={`menu-toggle${open ? " is-open" : ""}`} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={open ? "Tutup navigasi" : "Buka navigasi"}>
             <MenuIcon open={open} />
           </button>
@@ -136,15 +136,15 @@ function Navigation() {
                 <nav className="menu-links" aria-label="Navigasi utama">
                   {menuItems.map((item, index) => (
                     <motion.a key={item.number} href={item.href} onClick={close} initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 + index * 0.1, duration: 0.62, ease: [0.22, 1, 0.36, 1] }}>
-                      <span className="menu-number">{item.number}</span><span className="menu-title-wrap"><span className="menu-title">{item.title}</span><small>{item.note}</small></span><span className="menu-arrow">↗</span>
+                      <span className="menu-number">{item.number}</span><span className="menu-title-wrap"><span className="menu-title">{item.title}</span><small>{item.note}</small></span><span className="menu-arrow"><i className="arrow-icon" aria-hidden="true" /></span>
                     </motion.a>
                   ))}
                 </nav>
               </div>
               <div className="menu-bottom">
-                <div className="menu-account"><span className="eyebrow">AREA MEMBER</span><a href="/login" onClick={close}>LOGIN / REGISTER <i>↗</i></a></div>
-                <div><span className="eyebrow">SAPA KAMI</span><a href="mailto:hello@coffeeloca.id">hello@coffeeloca.id <i>↗</i></a></div>
-                <div><span className="eyebrow">IKUTI CERITA</span><div className="social-links"><a href="https://instagram.com" target="_blank" rel="noreferrer">INSTAGRAM ↗</a><a href="https://tiktok.com" target="_blank" rel="noreferrer">TIKTOK ↗</a></div></div>
+                <div className="menu-account"><span className="eyebrow">AREA MEMBER</span><a href="/login" onClick={close}>LOGIN / REGISTER <i className="arrow-icon" aria-hidden="true" /></a></div>
+                <div><span className="eyebrow">SAPA KAMI</span><a href="mailto:hello@coffeeloca.id">hello@coffeeloca.id <i className="arrow-icon" aria-hidden="true" /></a></div>
+                <div><span className="eyebrow">IKUTI CERITA</span><div className="social-links"><a href="https://instagram.com" target="_blank" rel="noreferrer">INSTAGRAM <i className="arrow-icon" aria-hidden="true" /></a><a href="https://tiktok.com" target="_blank" rel="noreferrer">TIKTOK <i className="arrow-icon" aria-hidden="true" /></a></div></div>
                 <p><span>COFFE LOCA · MEDAN</span><br />KOPI YANG BAIK. TEMAN YANG BAIK.</p>
               </div>
             </div>
@@ -303,17 +303,17 @@ function LocationSection() {
             <article className="location-detail">
               <span className="location-detail-label"><i>01</i> ALAMAT KAMI</span>
               <p>Coffee LOCA Cafe Pokemon Boardgame<br />Jl. T. Amir Hamzah No. 11, Sei Agul, Medan Barat, Kota Medan, Sumatera Utara 20114</p>
-              <a href="https://www.google.com/maps/search/?api=1&query=Coffee+LOCA+Cafe+Pokemon+Boardgame%2C+Jl.+T.+Amir+Hamzah+No.11%2C+Sei+Agul%2C+Medan" target="_blank" rel="noreferrer">LIHAT RUTE <span>↗</span></a>
+              <a href="https://www.google.com/maps/search/?api=1&query=Coffee+LOCA+Cafe+Pokemon+Boardgame%2C+Jl.+T.+Amir+Hamzah+No.11%2C+Sei+Agul%2C+Medan" target="_blank" rel="noreferrer">LIHAT RUTE <span className="arrow-icon" aria-hidden="true" /></a>
             </article>
             <article className="location-detail">
               <span className="location-detail-label"><i>02</i> JAM OPERASIONAL</span>
               <p>Cek jam buka terbaru langsung di Google Maps.</p>
-              <a href="https://www.google.com/maps/search/?api=1&query=Coffee+LOCA+Cafe+Pokemon+Boardgame%2C+Jl.+T.+Amir+Hamzah+No.11%2C+Sei+Agul%2C+Medan" target="_blank" rel="noreferrer">CEK JAM BUKA <span>↗</span></a>
+              <a href="https://www.google.com/maps/search/?api=1&query=Coffee+LOCA+Cafe+Pokemon+Boardgame%2C+Jl.+T.+Amir+Hamzah+No.11%2C+Sei+Agul%2C+Medan" target="_blank" rel="noreferrer">CEK JAM BUKA <span className="arrow-icon" aria-hidden="true" /></a>
             </article>
           </div>
         </div>
         <figure className="location-map">
-          <div className="location-map-top"><span>COFFEE LOCA / MEDAN</span><a href="https://www.google.com/maps/search/?api=1&query=Coffee+LOCA+Cafe+Pokemon+Boardgame%2C+Jl.+T.+Amir+Hamzah+No.11%2C+Sei+Agul%2C+Medan" target="_blank" rel="noreferrer">BUKA DI GOOGLE MAPS ↗</a></div>
+          <div className="location-map-top"><span>COFFEE LOCA / MEDAN</span><a href="https://www.google.com/maps/search/?api=1&query=Coffee+LOCA+Cafe+Pokemon+Boardgame%2C+Jl.+T.+Amir+Hamzah+No.11%2C+Sei+Agul%2C+Medan" target="_blank" rel="noreferrer">BUKA DI GOOGLE MAPS <i className="arrow-icon" aria-hidden="true" /></a></div>
           <div className="location-map-orbit" aria-hidden="true"><span /><span /><span /></div>
           <iframe
             className="location-map-frame"
@@ -377,7 +377,7 @@ export default function Home() {
               <div className="about-heading"><span className="eyebrow"><i /> HALO, KAMU.</span><h2>Kopi enak.<br /><em>Hari yang baik.</em></h2></div>
               <div className="about-text">
                 <TextReveal>Kami percaya hal sederhana bisa membuat hari terasa lebih baik. Secangkir kopi yang diracik dengan teliti. Sudut nyaman untuk menarik napas. Dan waktu yang tidak perlu diburu-buru.</TextReveal>
-                <a className="underlined-link" href="#menu">LIHAT YANG KAMI SAJIKAN <span>↗</span></a>
+                <a className="underlined-link" href="#menu">LIHAT YANG KAMI SAJIKAN <span className="arrow-icon" aria-hidden="true" /></a>
               </div>
             </div>
             <div className="about-rituals" aria-label="Hal sederhana di Coffe Loca">
@@ -393,8 +393,8 @@ export default function Home() {
           <LocationSection />
 
           <footer className="site-footer">
-            <div className="footer-top"><Wordmark /><span className="footer-thanks">THANK YOU FOR TAKING A MOMENT.</span><a href="#beranda" className="back-top">BACK TO TOP ↑</a></div>
-            <div className="footer-bottom"><span>© COFFE LOCA 2026 — GOOD COFFEE, GOOD COMPANY.</span><span>MADE WITH CARE <i>✳</i></span><a href="#beranda">TO THE TOP ↑</a></div>
+            <div className="footer-top"><Wordmark /><span className="footer-thanks">THANK YOU FOR TAKING A MOMENT.</span><a href="#beranda" className="back-top">BACK TO TOP <i className="arrow-icon arrow-up" aria-hidden="true" /></a></div>
+            <div className="footer-bottom"><span>© COFFE LOCA 2026 — GOOD COFFEE, GOOD COMPANY.</span><span>MADE WITH CARE <i>✳</i></span><a href="#beranda">TO THE TOP <i className="arrow-icon arrow-up" aria-hidden="true" /></a></div>
           </footer>
         </div>
       </main>
