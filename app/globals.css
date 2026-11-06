@@ -525,7 +525,7 @@ button { color:inherit; font:inherit; }
   .menu-item-price small { font-size:5px; }
   .menu-footnote { gap:12px; flex-direction:column; font-size:6px; }
   .reservation-section { min-height:auto; padding-top:91px; padding-bottom:72px; }
-  .reservation-layout { grid-template-columns:1fr; gap:20px; margin-top:6vh; }
+  .reservation-layout { grid-template-columns:1fr; gap:28px; margin-top:6vh; }
   .reservation-copy { min-height:245px; padding-top:0; }
   .reservation-copy h2 { margin-top:23px; font-size:clamp(62px,15vw,99px); }
   .reservation-copy>p { max-width:280px; font-size:11px; }
@@ -534,14 +534,16 @@ button { color:inherit; font:inherit; }
   .reservation-mark-ring::after { width:89px; height:89px; }
   .reservation-mark-ring img { width:47px; height:47px; }
   .reservation-meta { gap:12px; flex-wrap:wrap; font-size:6px; }
-  .reservation-card { width:100%; margin-top:-90px; margin-bottom:-90px; padding:23px 19px 21px; }
+  .reservation-card { width:100%; min-width:0; max-width:100%; margin:0; padding:23px 19px 21px; }
   .reservation-card-top { font-size:5px; }
   .reservation-card-heading { margin:23px 0 21px; }
   .reservation-card-heading h3 { font-size:36px; }
-  .reservation-field-grid { grid-template-columns:1fr; gap:14px; }
+  .reservation-field-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+  .reservation-field-grid>* { min-width:0; }
   .reservation-form { gap:14px; }
-  .reservation-form input,.reservation-form select { min-width:0; max-width:100%; height:42px; padding-inline:9px; font-size:10px; }
-  .reservation-form input[type="date"] { display:block; width:100%; min-width:0; max-width:100%; box-sizing:border-box; padding-right:6px; padding-left:6px; font-size:9px; letter-spacing:-.04em; }
+  .reservation-form label { min-width:0; }
+  .reservation-form input,.reservation-form select { display:block; width:100%; min-width:0; max-width:100%; height:42px; box-sizing:border-box; padding-inline:9px; font-size:10px; }
+  .reservation-form input[type="date"] { width:100%; min-width:0; max-width:100%; box-sizing:border-box; padding-right:6px; padding-left:6px; font-size:9px; letter-spacing:-.04em; -webkit-appearance:none; appearance:none; }
   .reservation-form input[type="date"]::-webkit-calendar-picker-indicator { width:13px; margin:0; padding:0; }
   .reservation-form textarea { font-size:10px; }
   .reservation-note { font-size:6px; }
