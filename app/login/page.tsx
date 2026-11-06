@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { getSupabaseClient } from "@/lib/supabase";
 
 type AuthMode = "login" | "register";
 
@@ -8,16 +9,51 @@ export default function LoginPage() {
   const [mode, setMode] = useState<AuthMode>("login");
   const [showPassword, setShowPassword] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const isRegister = mode === "register";
 
   function switchMode(nextMode: AuthMode) {
     setMode(nextMode);
     setSubmitted(false);
+    setErrorMessage("");
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+    setSubmitted(false);
+    setErrorMessage("");
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+
+    if (isRegister) {
+      const name = String(formData.get("name") ?? "").trim();
+      const confirmation = String(formData.get("password-confirmation") ?? "");
+      if (password !== confirmation) {
+        setErrorMessage("Konfirmasi password belum sama.");
+        return;
+      }
+      if (!name) {
+        setErrorMessage("Nama lengkap wajib diisi.");
+        return;
+      }
+    }
+
+    setLoading(true);
+    try {
+      const supabase = getSupabaseClient();
+      const result = isRegister
+        ? await supabase.auth.signUp({ email, password, options: { data: { full_name: String(formData.get("name") ?? "").trim() } } })
+        : await supabase.auth.signInWithPassword({ email, password });
+
+      if (result.error) throw result.error;
+      setSubmitted(true);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Terjadi kesalahan. Coba lagi.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -64,8 +100,9 @@ export default function LoginPage() {
             <label><span>PASSWORD</span><div className="auth-password"><input name="password" type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete={isRegister ? "new-password" : "current-password"} minLength={6} required /><button type="button" onClick={() => setShowPassword((value) => !value)}>{showPassword ? "SEMBUNYIKAN" : "LIHAT"}</button></div></label>
             {isRegister && <label><span>KONFIRMASI PASSWORD</span><input name="password-confirmation" type={showPassword ? "text" : "password"} placeholder="••••••••" autoComplete="new-password" minLength={6} required /></label>}
             {!isRegister && <div className="auth-form-meta"><label className="auth-check"><input type="checkbox" name="remember" /><span>INGAT AKU</span></label><a href="mailto:hello@coffeeloca.id?subject=Lupa%20password">LUPA PASSWORD?</a></div>}
-            <button className="auth-submit" type="submit"><span>{isRegister ? "BUAT AKUN" : "MASUK KE LOCA"}</span><span className="arrow-icon" aria-hidden="true" /></button>
-            {submitted && <p className="auth-feedback" role="status">Form sudah siap. Sambungkan ke layanan autentikasi untuk mengaktifkan akun.</p>}
+            <button className="auth-submit" type="submit" disabled={loading}><span>{loading ? "MENGHUBUNGKAN..." : isRegister ? "BUAT AKUN" : "MASUK KE LOCA"}</span><span className="arrow-icon" aria-hidden="true" /></button>
+            {errorMessage && <p className="auth-feedback auth-feedback-error" role="alert">{errorMessage}</p>}
+            {submitted && <p className="auth-feedback" role="status">{isRegister ? "Akun dibuat. Cek email untuk konfirmasi sebelum login." : "Berhasil masuk. Selamat datang di Loca."}</p>}
           </form>
           <p className="auth-switch">{isRegister ? "Sudah punya akun?" : "Belum punya akun?"} <button type="button" onClick={() => switchMode(isRegister ? "login" : "register")}>{isRegister ? "LOGIN" : "REGISTER"} <span className="arrow-icon" aria-hidden="true" /></button></p>
         </div>
