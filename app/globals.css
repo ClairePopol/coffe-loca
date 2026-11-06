@@ -26,13 +26,13 @@ button { color:inherit; font:inherit; }
 .hero-copy h1 em,.story-copy h2 em,.hero-cta-copy h2 em { color:#e8bd77; font-family:"Instrument Serif",serif; font-weight:400; }
 .hero-copy p,.story-copy p,.hero-cta-copy p { max-width:365px; margin:0; color:rgba(248,244,235,.77); font-size:13px; line-height:1.8; }
 .text-link { display:inline-flex; align-items:center; gap:20px; padding:0 0 9px; border-bottom:1px solid rgba(248,244,235,.45); font-size:9px; font-weight:600; letter-spacing:.16em; }
-.arrow-icon { position:relative; display:inline-block; width:13px; height:13px; flex:none; color:currentColor; font-size:0 !important; line-height:0; transform:translateZ(0); transition:transform .35s ease; }
-.arrow-icon::before { position:absolute; top:6px; left:1px; width:10px; height:1px; content:""; background:currentColor; }
-.arrow-icon::after { position:absolute; top:3px; right:1px; width:6px; height:6px; content:""; border-top:1px solid currentColor; border-right:1px solid currentColor; }
-.arrow-up { transform:rotate(-45deg); }
-.arrow-down-right { transform:rotate(45deg); }
+.arrow-icon { position:relative; display:inline-block; width:15px; height:15px; flex:none; color:currentColor; font-size:0 !important; line-height:0; transform:rotate(-45deg) translateZ(0); transform-origin:center; transition:transform .35s cubic-bezier(.22,1,.36,1); }
+.arrow-icon::before { position:absolute; top:7px; left:1px; width:12px; height:1.5px; content:""; border-radius:2px; background:currentColor; }
+.arrow-icon::after { position:absolute; top:3px; right:1px; width:7px; height:7px; content:""; border-top:1.5px solid currentColor; border-right:1.5px solid currentColor; border-radius:0 2px 0 0; }
+.arrow-up { transform:rotate(-90deg) translateZ(0); }
+.arrow-down-right { transform:rotate(45deg) translateZ(0); }
 .text-link span,.underlined-link span { color:var(--gold); transition:transform .35s ease; }
-.text-link:hover .arrow-icon,.underlined-link:hover .arrow-icon { transform:translate(3px,-3px); }
+.text-link:hover .arrow-icon,.underlined-link:hover .arrow-icon { transform:translate(3px,-3px) rotate(-45deg); }
 .text-link:hover .arrow-down-right { transform:translate(3px,-3px) rotate(45deg); }
 .hero-link { margin-top:34px; }
 .story-copy { top:50%; text-align:left; translate:0 -44%; }
@@ -105,11 +105,11 @@ button { color:inherit; font:inherit; }
 .menu-title-wrap { display:flex; flex-direction:column; align-items:flex-start; gap:6px; transition:transform .42s cubic-bezier(.22,1,.36,1); }
 .menu-title { font-family:"Instrument Serif",serif; font-size:clamp(43px,6.5vw,88px); font-weight:400; letter-spacing:-.045em; line-height:.95; transition:color .35s; }
 .menu-title-wrap small { color:#9c9688; font-size:6px; font-weight:600; letter-spacing:.15em; transition:color .35s; }
-.menu-arrow { justify-self:end; display:grid; width:38px; height:38px; place-items:center; border:1px solid rgba(164,78,55,.25); border-radius:50%; color:#a44e37; font-size:17px; opacity:.45; transform:rotate(-45deg); transition:all .35s; }
+.menu-arrow { justify-self:end; display:grid; width:38px; height:38px; place-items:center; border:1px solid rgba(164,78,55,.25); border-radius:50%; color:#a44e37; font-size:17px; opacity:.45; transform:none; transition:all .35s; }
 .menu-links>a:hover .menu-title-wrap,.menu-links>a:focus-visible .menu-title-wrap { transform:translateX(12px); }
 .menu-links>a:hover .menu-title,.menu-links>a:focus-visible .menu-title { color:#a44e37; }
 .menu-links>a:hover .menu-title-wrap small,.menu-links>a:focus-visible .menu-title-wrap small { color:#716d60; }
-.menu-links>a:hover .menu-arrow,.menu-links>a:focus-visible .menu-arrow { opacity:1; transform:rotate(0); background:#a44e37; color:#f8f4eb; }
+.menu-links>a:hover .menu-arrow,.menu-links>a:focus-visible .menu-arrow { opacity:1; transform:translateX(2px); background:#a44e37; color:#f8f4eb; }
 .menu-bottom { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:24px; align-items:end; padding-top:22px; border-top:1px solid rgba(32,37,30,.13); color:#625f54; font-size:10px; }
 .menu-bottom>div { display:flex; flex-direction:column; gap:11px; }
 .menu-bottom .eyebrow { color:#858272; font-size:8px; }
@@ -123,7 +123,7 @@ button { color:inherit; font:inherit; }
 .header-account-link { min-height:38px; padding:0 13px 0 15px; border:1px solid rgba(255,255,255,.28); border-radius:999px; background:linear-gradient(145deg,rgba(255,255,255,.16),rgba(255,255,255,.035)); box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 8px 24px rgba(0,0,0,.1); backdrop-filter:blur(18px) saturate(145%); -webkit-backdrop-filter:blur(18px) saturate(145%); transition:transform .3s ease,background .3s ease,border-color .3s ease; }
 .header-account-link:hover { transform:translateY(-2px); border-color:rgba(232,189,119,.75); background:linear-gradient(145deg,rgba(232,189,119,.35),rgba(232,189,119,.1)); }
 .header-account-link span,.auth-back-link span { color:var(--gold); font-size:13px; transition:transform .3s ease; }
-.header-account-link:hover span,.auth-back-link:hover span { transform:translate(3px,-3px); }
+.header-account-link:hover .arrow-icon,.auth-back-link:hover .arrow-icon { transform:translate(3px,-3px) rotate(-45deg); }
 .site-header.header-on-light .header-account-link { color:var(--ink); }
 
 /* Member access */
@@ -183,7 +183,7 @@ button { color:inherit; font:inherit; }
 .auth-submit { display:flex; align-items:center; justify-content:space-between; min-height:49px; margin-top:5px; padding:0 17px; border:1px solid rgba(255,255,255,.2); border-radius:14px; color:#f8f4eb; background:linear-gradient(145deg,rgba(53,69,55,.84),rgba(35,50,40,.68)); box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 12px 28px rgba(53,69,55,.18); font-size:8px; font-weight:700; letter-spacing:.15em; cursor:pointer; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); transition:background .3s,transform .3s,box-shadow .3s; }
 .auth-submit span:last-child { color:#e8bd77; transition:transform .3s; }
 .auth-submit:hover { background:linear-gradient(145deg,rgba(164,78,55,.9),rgba(130,58,45,.72)); transform:translateY(-2px); box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 16px 32px rgba(130,58,45,.2); }
-.auth-submit:hover .arrow-icon { transform:translate(3px,-3px); }
+.auth-submit:hover .arrow-icon { transform:translate(3px,-3px) rotate(-45deg); }
 .auth-feedback { margin:0; padding:10px; color:#59654f; background:rgba(138,147,101,.12); font-size:9px; line-height:1.5; }
 .auth-switch { margin:23px 0 0; color:#858174; text-align:center; font-size:10px; }
 .auth-switch button { padding:0; border:0; color:#a44e37; background:none; font-size:inherit; font-weight:700; cursor:pointer; }
