@@ -231,12 +231,10 @@ function EntryChoice() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (window.localStorage.getItem("loca-entry-choice")) return;
     setVisible(true);
   }, []);
 
   function choose(path: string) {
-    window.localStorage.setItem("loca-entry-choice", path);
     if (path === "coffee") setVisible(false);
     else window.location.href = "/store";
   }
