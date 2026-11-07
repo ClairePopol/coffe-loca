@@ -227,6 +227,40 @@ function Navigation() {
   );
 }
 
+function EntryChoice() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (window.localStorage.getItem("loca-entry-choice")) return;
+    setVisible(true);
+  }, []);
+
+  function choose(path: string) {
+    window.localStorage.setItem("loca-entry-choice", path);
+    if (path === "coffee") setVisible(false);
+    else window.location.href = "/store";
+  }
+
+  if (!visible) return null;
+  return (
+    <motion.div className="entry-choice" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <div className="entry-choice-orbit" aria-hidden="true" />
+      <div className="entry-choice-top"><span>LOCA / EST. WITH CARE</span><span>MEDAN · 2026</span></div>
+      <div className="entry-choice-content">
+        <div className="entry-choice-mark"><img src="/white-coffee-bean.png" alt="" /><span>LOCA</span></div>
+        <span className="eyebrow"><i /> WHERE DO YOU WANT TO GO?</span>
+        <h1>Pilih ruang<br /><em>untuk jedamu.</em></h1>
+        <p>Satu rumah, dua cara menikmati Loca.</p>
+        <div className="entry-choice-actions">
+          <button type="button" onClick={() => choose("coffee")}><span><small>01 / COFFEE HOUSE</small><strong>Loca Coffee</strong><em>Good coffee, good company.</em></span><i className="arrow-icon" aria-hidden="true" /></button>
+          <button type="button" onClick={() => choose("store")}><span><small>02 / ONLINE STORE</small><strong>Loca Store</strong><em>Coming soon, take Loca home.</em></span><i className="arrow-icon" aria-hidden="true" /></button>
+        </div>
+      </div>
+      <div className="entry-choice-bottom"><span>TAKE YOUR TIME</span><span>COFFEE · STORE · COMMUNITY</span></div>
+    </motion.div>
+  );
+}
+
 function SmoothScroll() {
   useEffect(() => {
     const lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.88, anchors: true });
@@ -491,6 +525,7 @@ export default function Home() {
   return (
     <>
       <SmoothScroll />
+      <EntryChoice />
       <Navigation />
       <main>
         <SequenceScroll />
