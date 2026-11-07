@@ -750,10 +750,14 @@ button { color:inherit; font:inherit; }
 .profile-cup svg { width:54px; height:54px; fill:none; stroke:#9c4a32; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.4; }
 .profile-cup small { max-width:98px; color:#9c4a32; font-size:6px; font-weight:700; letter-spacing:.1em; line-height:1.5; }
 .stamp-row { display:grid; grid-template-columns:repeat(8,1fr); gap:7px; margin:14px 0 9px; }
+.stamp-row-ten { grid-template-columns:repeat(5,1fr); gap:8px; }
 .stamp-row span { display:grid; aspect-ratio:1; place-items:center; border:1px solid rgba(156,74,50,.22); border-radius:50%; background:rgba(255,255,255,.3); }
 .stamp-row img { width:48%; opacity:.18; filter:brightness(0) saturate(100%) invert(31%) sepia(13%) saturate(750%) hue-rotate(76deg); }
 .stamp-row span.is-filled { border-color:#d9b77a; background:rgba(217,183,122,.2); animation:stampPop .45s both cubic-bezier(.22,1,.36,1); }
 .stamp-row span.is-filled img { opacity:.85; }
+.stamp-row span.is-free-coffee { position:relative; border-color:#d9b77a; background:rgba(217,183,122,.12); }
+.stamp-row span.is-free-coffee img { opacity:.3; }
+.stamp-row span.is-free-coffee b { position:absolute; color:#9c4a32; font-size:5px; font-weight:700; letter-spacing:.08em; line-height:1.1; text-align:center; }
 .profile-stamps>small,.profile-tier>small { color:#858174; font-size:7px; letter-spacing:.08em; }
 .profile-tier { margin-top:18px; }
 .profile-tier-track { height:5px; margin:10px 0 7px; overflow:hidden; border-radius:99px; background:rgba(58,66,54,.12); }
@@ -807,6 +811,7 @@ button { color:inherit; font:inherit; }
   .profile-qr svg { width:76px; height:76px; }
   .profile-cup svg { width:45px; height:45px; }
   .stamp-row { gap:5px; }
+  .stamp-row-ten { gap:6px; }
   .profile-actions { flex-wrap:wrap; }
   .profile-actions .profile-reserve-button { flex:1 0 100%; justify-content:center; }
   .profile-bean-one { top:29%; left:-4%; width:54px; }
