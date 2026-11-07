@@ -26,8 +26,8 @@ export default function ProfilePage() {
         if (!authData.user) { window.location.href = "/login"; return; }
         if (!active) return;
         setUser(authData.user);
-        const { data } = await supabase.from("profiles").select("points, role").eq("id", authData.user.id).maybeSingle();
-        if (active && data) setProfile({ stamps: data.points ?? 0, role: data.role ?? "member" });
+        const { data } = await supabase.from("profiles").select("stamps, role").eq("id", authData.user.id).maybeSingle();
+        if (active && data) setProfile({ stamps: data.stamps ?? 0, role: data.role ?? "member" });
       } finally { if (active) setLoading(false); }
     }
     loadProfile();
