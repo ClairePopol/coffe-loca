@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { getSupabaseClient } from "@/lib/supabase";
+import { QRCodeSVG } from "qrcode.react";
 
-type Profile = { points: number };
+type Profile = { points: number; role: string };
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile>({ points: 0 });
+  const [profile, setProfile] = useState<Profile>({ points: 0, role: "member" });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,8 +24,8 @@ export default function ProfilePage() {
         }
         if (!active) return;
         setUser(authData.user);
-        const { data } = await supabase.from("profiles").select("points").eq("id", authData.user.id).maybeSingle();
-        if (active && data) setProfile({ points: data.points ?? 0 });
+        const { data } = await supabase.from("profiles").select("points, role").eq("id", authData.user.id).maybeSingle();
+        if (active && data) setProfile({ points: data.points ?? 0, role: data.role ?? "member" });
       } catch {
         // The profile page still works with a zero point balance before the table is created.
       } finally {
@@ -59,8 +60,9 @@ export default function ProfilePage() {
           <div className="profile-card-top"><span>YOUR LOCA PROFILE</span><span>MEDAN / 2026</span></div>
           {loading ? <div className="profile-loading">MEMBUKA PROFILE...</div> : <>
             <div className="profile-identity"><div className="profile-avatar">{user?.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : initials}</div><div><span className="profile-kicker">MEMBER COFFE LOCA</span><h2 id="profile-title">{displayName}</h2><p>{user?.email}</p></div></div>
+            <div className="profile-member-code"><div><span>MEMBER CODE</span><strong>SCAN UNTUK POINTS</strong><small>TUNJUKKAN KE CASHIER COFFE LOCA</small></div>{user && <div className="profile-qr"><QRCodeSVG value={user.id} size={92} bgColor="#f8f4eb" fgColor="#354537" level="M" /></div>}</div>
             <div className="profile-points"><div><span>LOCA POINTS</span><strong>{profile.points.toLocaleString("id-ID")}</strong><small>POINTS YANG KAMU KUMPULKAN</small></div><span className="profile-points-mark">✳</span></div>
-            <div className="profile-actions"><a href="#reservation">BUAT RESERVASI <span className="arrow-icon" aria-hidden="true" /></a><button type="button" onClick={signOut}>KELUAR <span className="arrow-icon arrow-up" aria-hidden="true" /></button></div>
+            <div className="profile-actions"><a href="/#reservation">BUAT RESERVASI <span className="arrow-icon" aria-hidden="true" /></a>{["admin", "owner"].includes(profile.role) && <a href="/admin">ADMIN PANEL <span className="arrow-icon" aria-hidden="true" /></a>}<button type="button" onClick={signOut}>KELUAR <span className="arrow-icon arrow-up" aria-hidden="true" /></button></div>
           </>}
         </div>
       </section>

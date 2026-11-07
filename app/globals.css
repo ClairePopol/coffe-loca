@@ -160,16 +160,59 @@ button { color:inherit; font:inherit; }
 .profile-identity h2 { margin:8px 0 5px; color:#354537; font-family:"Instrument Serif",serif; font-size:32px; font-weight:400; line-height:.9; }
 .profile-identity p { margin:0; color:#858174; font-size:10px; }
 .profile-points { display:flex; align-items:flex-end; justify-content:space-between; padding:20px 0 18px; border-top:1px solid rgba(53,69,55,.15); border-bottom:1px solid rgba(53,69,55,.15); }
+.profile-member-code { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:18px 0; border-top:1px solid rgba(53,69,55,.15); }
+.profile-member-code>div:first-child { display:flex; flex-direction:column; }
+.profile-member-code span { color:#a44e37; font-size:7px; font-weight:700; letter-spacing:.15em; }
+.profile-member-code strong { margin:8px 0 5px; color:#354537; font-size:11px; letter-spacing:.08em; }
+.profile-member-code small { color:#858174; font-size:6px; letter-spacing:.1em; }
+.profile-qr { display:grid; padding:6px; border:1px solid rgba(53,69,55,.16); background:#f8f4eb; }
 .profile-points div { display:flex; flex-direction:column; }
 .profile-points span { color:#a44e37; font-size:7px; font-weight:700; letter-spacing:.15em; }
 .profile-points strong { margin:8px 0 5px; color:#354537; font-family:Manrope,sans-serif; font-size:46px; font-weight:400; letter-spacing:-.08em; line-height:.8; }
 .profile-points small { color:#858174; font-size:6px; letter-spacing:.12em; }
 .profile-points-mark { color:#d09a5e !important; font-size:29px !important; }
-.profile-actions { display:flex; align-items:center; justify-content:space-between; margin-top:23px; }
+.profile-actions { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:23px; }
 .profile-actions a,.profile-actions button { display:inline-flex; align-items:center; gap:8px; padding:0; border:0; color:#a44e37; background:none; font-size:8px; font-weight:700; letter-spacing:.13em; cursor:pointer; }
 .profile-actions button { color:#858174; }
 .profile-actions .arrow-icon { width:11px; height:11px; }
 .profile-footer { display:flex; justify-content:space-between; padding:0 7vw 22px; color:rgba(241,234,219,.62); font-size:7px; font-weight:600; letter-spacing:.15em; }
+
+/* Admin */
+.admin-page { min-height:100svh; color:#354537; background:#e9dfcf; }
+.admin-page::before { position:fixed; z-index:0; inset:0 0 0 48%; content:""; background:#354537; clip-path:polygon(14% 0,100% 0,100% 100%,0 100%); pointer-events:none; }
+.admin-header,.admin-layout { position:relative; z-index:1; }
+.admin-header { display:flex; align-items:center; justify-content:space-between; padding:30px 7vw; }
+.admin-wordmark { color:#354537; }
+.admin-back { color:#f1eadb; font-size:8px; font-weight:700; letter-spacing:.15em; }
+.admin-layout { display:grid; width:min(1120px,86vw); grid-template-columns:.72fr 1.28fr; align-items:start; gap:8vw; margin:0 auto; padding:90px 0 80px; }
+.admin-heading { padding-top:18px; }
+.admin-heading .eyebrow { color:#8d6955; }
+.admin-heading h1 { margin:28px 0 22px; color:#354537; font-family:Manrope,sans-serif; font-size:clamp(64px,8vw,108px); font-weight:400; letter-spacing:-.09em; line-height:.8; }
+.admin-heading h1 em { color:#a44e37; font-family:"Instrument Serif",serif; font-weight:400; }
+.admin-heading p { max-width:280px; color:#777465; font-size:12px; line-height:1.8; }
+.admin-role { display:inline-block; margin-top:56px; padding-top:14px; border-top:1px solid rgba(53,69,55,.2); color:#a44e37; font-size:7px; font-weight:700; letter-spacing:.15em; }
+.admin-content { display:flex; flex-direction:column; gap:18px; }
+.admin-award-card,.admin-members { padding:25px clamp(22px,3.3vw,38px); border:1px solid rgba(232,189,119,.55); background:rgba(250,246,235,.9); box-shadow:0 20px 50px rgba(10,20,14,.14); backdrop-filter:blur(12px); }
+.admin-card-label,.admin-list-heading { display:flex; justify-content:space-between; color:#9b573e; font-size:6px; font-weight:700; letter-spacing:.16em; }
+.admin-award-card h2 { margin:22px 0; color:#354537; font-family:"Instrument Serif",serif; font-size:38px; font-weight:400; }
+.admin-award-card form { display:grid; grid-template-columns:1fr 120px; gap:13px; align-items:end; }
+.admin-award-card label { display:block; }
+.admin-award-card label span { display:block; margin-bottom:7px; color:#777465; font-size:7px; font-weight:700; letter-spacing:.13em; }
+.admin-award-card input { width:100%; height:43px; min-width:0; padding:0 11px; border:1px solid rgba(53,69,55,.18); outline:0; color:#354537; background:rgba(255,255,255,.42); font:inherit; font-size:11px; }
+.admin-award-card button { grid-column:1 / -1; display:flex; min-height:47px; align-items:center; justify-content:space-between; padding:0 15px; border:0; color:#f8f4eb; background:#354537; font-size:8px; font-weight:700; letter-spacing:.14em; cursor:pointer; }
+.admin-scan-toggle { width:100%; min-height:38px !important; justify-content:center !important; margin-bottom:14px; color:#354537 !important; border:1px solid rgba(53,69,55,.2) !important; background:rgba(255,255,255,.35) !important; }
+.admin-qr-reader { margin-bottom:14px; overflow:hidden; border:1px solid rgba(53,69,55,.15); background:#f8f4eb; }
+.admin-qr-reader video { width:100% !important; height:auto !important; }
+.admin-award-card button .arrow-icon { color:#e8bd77; }
+.admin-status { margin:14px 0 0; padding:9px; color:#59654f; background:rgba(138,147,101,.12); font-size:9px; }
+.admin-members { padding-top:20px; }
+.admin-empty { color:#858174; font-size:9px; }
+.admin-member-list { margin-top:14px; }
+.admin-member-list article { display:flex; align-items:center; justify-content:space-between; gap:15px; padding:13px 0; border-top:1px solid rgba(53,69,55,.14); }
+.admin-member-list article div { display:flex; min-width:0; flex-direction:column; gap:5px; }
+.admin-member-list strong { color:#354537; font-size:12px; }
+.admin-member-list small { overflow:hidden; color:#999183; font-size:7px; text-overflow:ellipsis; }
+.admin-member-list article>span { color:#a44e37; font-size:10px; font-weight:700; white-space:nowrap; }
 
 /* Member access */
 .auth-page { position:relative; isolation:isolate; display:flex; min-height:100svh; flex-direction:column; overflow:hidden; color:var(--ink); background:#26372d; }
@@ -655,5 +698,20 @@ button { color:inherit; font:inherit; }
   .profile-points strong { font-size:42px; }
   .profile-footer { padding:0 7vw 18px; font-size:6px; }
   .profile-footer span:nth-child(2) { display:none; }
+  .profile-member-code { gap:10px; }
+  .profile-member-code strong { font-size:10px; }
+  .profile-qr svg { width:76px; height:76px; }
+  .admin-page::before { display:none; }
+  .admin-header { padding:20px 7vw; }
+  .admin-back { color:#777465; font-size:6px; }
+  .admin-layout { display:flex; width:86vw; flex-direction:column; gap:30px; padding:48px 0 45px; }
+  .admin-heading { padding-top:10px; }
+  .admin-heading h1 { margin-top:23px; font-size:clamp(59px,15vw,92px); }
+  .admin-heading p { font-size:11px; }
+  .admin-role { margin-top:26px; }
+  .admin-award-card,.admin-members { padding:22px 19px; }
+  .admin-award-card h2 { font-size:34px; }
+  .admin-award-card form { grid-template-columns:1fr 92px; gap:9px; }
+  .admin-award-card input { font-size:10px; }
 }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } }
