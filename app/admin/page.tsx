@@ -35,23 +35,46 @@ export default function AdminPage() {
 
   useEffect(() => {
     let active = true;
+    const pause = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms));
     async function load() {
       try {
         const supabase = getSupabaseClient();
-        const { data: auth } = await supabase.auth.getUser();
-        if (!auth.user) {
+        let authUser: User | null = null;
+        for (let attempt = 0; attempt < 3 && !authUser; attempt += 1) {
+          const { data: sessionData } = await supabase.auth.getSession();
+          authUser = sessionData.session?.user ?? null;
+          if (!authUser) {
+            const { data: authData } = await supabase.auth.getUser();
+            authUser = authData.user ?? null;
+          }
+          if (!authUser) await pause(350);
+        }
+        if (!authUser) {
           window.location.href = "/login";
           return;
         }
-        const { data: current } = await supabase.from("profiles").select("role").eq("id", auth.user.id).maybeSingle();
-        if (!current || !["admin", "owner"].includes(current.role)) {
+        let current: { role: string } | null = null;
+        let profileError: Error | null = null;
+        for (let attempt = 0; attempt < 3 && !current; attempt += 1) {
+          const result = await supabase.from("profiles").select("role").eq("id", authUser.id).maybeSingle();
+          if (result.error) profileError = new Error(result.error.message);
+          current = result.data;
+          if (!current) await pause(350);
+        }
+        if (profileError && !current) throw profileError;
+        if (!current) {
+          setStatus("Profile akun belum siap. Jalankan trigger profiles di Supabase, lalu refresh.");
+          return;
+        }
+        if (!["admin", "owner"].includes(current.role)) {
           window.location.href = "/profile";
           return;
         }
         if (!active) return;
-        setUser(auth.user);
-        const { data } = await supabase.from("profiles").select("id, full_name, points, role, created_at").order("created_at", { ascending: false });
-        if (data) setMembers(data as Member[]);
+        setUser(authUser);
+        const membersResult = await supabase.from("profiles").select("id, full_name, points, role, created_at").order("created_at", { ascending: false });
+        if (membersResult.error) throw new Error(membersResult.error.message);
+        setMembers((membersResult.data ?? []) as Member[]);
       } catch (error) {
         if (active) setStatus(error instanceof Error ? error.message : "Gagal membuka admin panel.");
       } finally {
