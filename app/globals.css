@@ -136,21 +136,21 @@ button { color:inherit; font:inherit; }
 
 /* Profile */
 .profile-page { position:relative; isolation:isolate; display:flex; min-height:100svh; flex-direction:column; overflow:hidden; color:#354537; background:#e9dfcf; }
-.profile-page::before { position:absolute; z-index:-1; inset:0 0 0 47%; content:""; background:#354537; clip-path:polygon(13% 0,100% 0,100% 100%,0 100%); }
-.profile-page::after { position:absolute; z-index:-1; right:-11vw; bottom:-25vw; width:60vw; height:60vw; content:"LOCA"; color:rgba(241,234,219,.06); font-family:"Instrument Serif",serif; font-size:clamp(240px,35vw,580px); line-height:.7; pointer-events:none; }
+.profile-page::before { position:absolute; z-index:-1; inset:0; content:""; background:radial-gradient(circle at 82% 18%,rgba(232,189,119,.2),transparent 28%),linear-gradient(125deg,#f5eee1 0%,#ebe0ce 100%); }
+.profile-page::after { position:absolute; z-index:-1; right:-12vw; bottom:-30vw; width:60vw; height:60vw; content:"LOCA"; color:rgba(53,69,55,.045); font-family:"Instrument Serif",serif; font-size:clamp(240px,35vw,580px); line-height:.7; pointer-events:none; }
 .profile-header,.profile-layout,.profile-footer { position:relative; z-index:1; }
 .profile-header { display:flex; align-items:center; justify-content:space-between; padding:30px 7vw; }
 .profile-wordmark { color:#354537; }
-.profile-back { display:inline-flex; align-items:center; gap:7px; color:#f1eadb; font-size:8px; font-weight:700; letter-spacing:.15em; }
-.profile-layout { display:grid; width:min(1120px,86vw); flex:1; grid-template-columns:.9fr 1.1fr; align-items:center; gap:clamp(50px,10vw,150px); margin:0 auto; padding:50px 0 70px; }
-.profile-intro { padding-top:24px; }
+.profile-back { display:inline-flex; align-items:center; gap:7px; color:#777465; font-size:8px; font-weight:700; letter-spacing:.15em; }
+.profile-layout { display:grid; width:min(560px,86vw); flex:1; grid-template-columns:1fr; align-items:center; margin:0 auto; padding:50px 0 70px; }
+.profile-intro { display:none; }
 .profile-intro .eyebrow { color:#8d6955; }
 .profile-intro h1 { margin:28px 0 22px; color:#354537; font-family:Manrope,sans-serif; font-size:clamp(63px,8vw,111px); font-weight:400; letter-spacing:-.09em; line-height:.82; }
 .profile-intro h1 em { color:#a44e37; font-family:"Instrument Serif",serif; font-weight:400; }
 .profile-intro>p { max-width:330px; color:#777465; font-size:12px; line-height:1.85; }
 .profile-index { display:flex; justify-content:space-between; max-width:380px; margin-top:70px; padding-top:15px; border-top:1px solid rgba(53,69,55,.2); color:#858174; font-size:7px; font-weight:700; letter-spacing:.14em; }
 .profile-index span:first-child { color:#a44e37; }
-.profile-card { width:min(100%,470px); justify-self:end; padding:28px clamp(24px,4vw,48px) 25px; border:1px solid rgba(232,189,119,.65); background:rgba(250,246,235,.9); box-shadow:0 28px 85px rgba(10,20,14,.28),0 0 0 8px rgba(241,234,219,.08); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+.profile-card { width:100%; justify-self:center; padding:28px clamp(24px,4vw,48px) 25px; border:1px solid rgba(232,189,119,.65); background:rgba(250,246,235,.9); box-shadow:0 20px 55px rgba(56,48,34,.12),0 0 0 8px rgba(255,250,239,.28); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
 .profile-card-top { display:flex; justify-content:space-between; padding-bottom:18px; border-bottom:1px solid rgba(53,69,55,.16); color:#9b573e; font-size:6px; font-weight:700; letter-spacing:.16em; }
 .profile-loading { padding:72px 0; color:#858174; font-size:8px; letter-spacing:.15em; text-align:center; }
 .profile-identity { display:flex; align-items:center; gap:15px; margin:30px 0; }

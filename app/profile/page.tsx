@@ -55,17 +55,10 @@ export default function ProfilePage() {
       </header>
 
       <section className="profile-layout" aria-labelledby="profile-title">
-        <div className="profile-intro">
-          <span className="eyebrow"><i /> COFFE LOCA / MEMBER SPACE</span>
-          <h1 id="profile-title">Ruang kecil<br /><em>milikmu.</em></h1>
-          <p>Tempat untuk menyimpan cerita, melihat points, dan menikmati lebih banyak momen di Loca.</p>
-          <div className="profile-index"><span>MEMBER / 01</span><span>GOOD COFFEE, GOOD COMPANY</span></div>
-        </div>
-
         <div className="profile-card">
           <div className="profile-card-top"><span>YOUR LOCA PROFILE</span><span>MEDAN / 2026</span></div>
           {loading ? <div className="profile-loading">MEMBUKA PROFILE...</div> : <>
-            <div className="profile-identity"><div className="profile-avatar">{user?.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : initials}</div><div><span className="profile-kicker">SELAMAT DATANG</span><h2>{displayName}</h2><p>{user?.email}</p></div></div>
+            <div className="profile-identity"><div className="profile-avatar">{user?.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : initials}</div><div><span className="profile-kicker">MEMBER COFFE LOCA</span><h2 id="profile-title">{displayName}</h2><p>{user?.email}</p></div></div>
             <div className="profile-points"><div><span>LOCA POINTS</span><strong>{profile.points.toLocaleString("id-ID")}</strong><small>POINTS YANG KAMU KUMPULKAN</small></div><span className="profile-points-mark">✳</span></div>
             <div className="profile-actions"><a href="#reservation">BUAT RESERVASI <span className="arrow-icon" aria-hidden="true" /></a><button type="button" onClick={signOut}>KELUAR <span className="arrow-icon arrow-up" aria-hidden="true" /></button></div>
           </>}

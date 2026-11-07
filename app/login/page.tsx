@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase";
 
 type AuthMode = "login" | "register";
@@ -11,6 +12,7 @@ export default function LoginPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
   const isRegister = mode === "register";
 
   function switchMode(nextMode: AuthMode) {
@@ -48,7 +50,12 @@ export default function LoginPage() {
         : await supabase.auth.signInWithPassword({ email, password });
 
       if (result.error) throw result.error;
-      setSubmitted(true);
+      if (!isRegister) {
+        router.push("/");
+        router.refresh();
+      } else {
+        setSubmitted(true);
+      }
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Terjadi kesalahan. Coba lagi.");
     } finally {
