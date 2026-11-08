@@ -5,6 +5,7 @@ import type { User } from "@supabase/supabase-js";
 import { getSupabaseClient } from "@/lib/supabase";
 import { PageHeader } from "@/components/PageShell";
 import QrScanner from "@/components/QrScanner";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Member = { id: string; full_name: string | null; stamps: number; role: string; created_at: string };
 type StampLog = { id: number; created_at: string; action: "add" | "redeem"; amount: number; stamps_before: number; stamps_after: number; member_id: string; member_name: string | null; admin_id: string | null; admin_name: string | null };
@@ -14,6 +15,8 @@ type LogFilter = "all" | "add" | "redeem";
 const STAMP_GOAL = 10;
 const MEMBER_FIELDS = "id, full_name, stamps, role, created_at";
 const LOG_FIELDS = "id, created_at, action, amount, stamps_before, stamps_after, member_id, member_name, admin_id, admin_name";
+const MEMBER_PAGE = 10;
+const LOG_PAGE = 15;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const errorText = (error: unknown, fallback: string) => {
@@ -43,7 +46,11 @@ export default function AdminPage() {
   const [query, setQuery] = useState("");
   const [logFilter, setLogFilter] = useState<LogFilter>("all");
   const [logDay, setLogDay] = useState("");
+  const [tab, setTab] = useState<"members" | "logs">("members");
+  const [memberLimit, setMemberLimit] = useState(MEMBER_PAGE);
+  const [logLimit, setLogLimit] = useState(LOG_PAGE);
   const closeScanner = useCallback(() => setScannerOpen(false), []);
+  const [confirm, confirmDialog] = useConfirm();
 
   const selected = members.find((member) => member.id === memberId.trim());
   const selectedStamps = selected ? Math.min(selected.stamps, STAMP_GOAL) : 0;
@@ -112,6 +119,9 @@ export default function AdminPage() {
     return () => { active = false; };
   }, [refresh]);
 
+  useEffect(() => { setMemberLimit(MEMBER_PAGE); }, [query]);
+  useEffect(() => { setLogLimit(LOG_PAGE); }, [logFilter, logDay]);
+
   // Keep the chosen amount within what still fits on the selected card.
   useEffect(() => {
     if (selected && !selectedFull && amount > selectedRemaining) setAmount(selectedRemaining);
@@ -162,7 +172,13 @@ export default function AdminPage() {
   }
 
   async function redeem(member: Member) {
-    if (!window.confirm(`Tukar 1 kopi gratis untuk ${member.full_name || "member ini"}?\n\nStamp akan kembali ke 0/${STAMP_GOAL}.`)) return;
+    const ok = await confirm({
+      title: `Tukar kopi gratis untuk ${member.full_name || "member ini"}?`,
+      message: <>Kartu member <b>{Math.min(member.stamps, STAMP_GOAL)}/{STAMP_GOAL}</b> akan kembali ke <b>0/{STAMP_GOAL}</b> dan tercatat di riwayat.</>,
+      confirmLabel: "☕ YA, TUKAR",
+      icon: <svg viewBox="0 0 24 24"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1 1 1.5 1 2.5M11.5 3.5c0 1 1 1.5 1 2.5" /></svg>,
+    });
+    if (!ok) return;
     setStatus(null);
     setSubmitting(true);
     try {
@@ -265,12 +281,16 @@ export default function AdminPage() {
             {status && <p className={`notice${status.tone === "error" ? " notice-error" : ""}`} role={status.tone === "error" ? "alert" : "status"}>{status.text}</p>}
           </div>
 
-          <div className="admin-members card">
-            <div className="card-topline"><span>ALL MEMBERS</span><span>{String(filtered.length).padStart(2, "0")} / {String(members.length).padStart(2, "0")} ACCOUNTS</span></div>
+          <div className="admin-panel card">
+            <div className="admin-tabs" role="tablist" aria-label="Data admin">
+              <button id="admin-tab-members" type="button" role="tab" aria-selected={tab === "members"} aria-controls="admin-panel-members" className={tab === "members" ? "is-active" : ""} onClick={() => setTab("members")}>Member <span>{members.length}</span></button>
+              <button id="admin-tab-logs" type="button" role="tab" aria-selected={tab === "logs"} aria-controls="admin-panel-logs" className={tab === "logs" ? "is-active" : ""} onClick={() => setTab("logs")}>Riwayat stamp <span>{logs.length}</span></button>
+            </div>
+            <div className="admin-tabpanel" id="admin-panel-members" role="tabpanel" aria-labelledby="admin-tab-members" hidden={tab !== "members"}>
             <label className="field admin-search"><span className="sr-only">Cari member</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari nama atau ID member" /></label>
             {loading ? <p className="admin-empty">Memuat member…</p> : filtered.length === 0 ? <p className="admin-empty">{members.length === 0 ? "Belum ada data profile." : "Tidak ada member yang cocok."}</p> : (
               <ul className="admin-member-list">
-                {filtered.map((member) => {
+                {filtered.slice(0, memberLimit).map((member) => {
                   const stamps = Math.min(member.stamps, STAMP_GOAL);
                   const full = stamps >= STAMP_GOAL;
                   return (
@@ -291,10 +311,10 @@ export default function AdminPage() {
                 })}
               </ul>
             )}
-          </div>
+            {filtered.length > memberLimit && <button type="button" className="admin-more" onClick={() => setMemberLimit((value) => value + MEMBER_PAGE)}>TAMPILKAN LEBIH BANYAK <span>{memberLimit} / {filtered.length}</span></button>}
+            </div>
 
-          <div className="admin-logs card">
-            <div className="card-topline"><span>RIWAYAT STAMP</span><span>{String(visibleLogs.length).padStart(2, "0")} AKTIVITAS</span></div>
+            <div className="admin-tabpanel" id="admin-panel-logs" role="tabpanel" aria-labelledby="admin-tab-logs" hidden={tab !== "logs"}>
             <div className="admin-log-filters">
               <div className="admin-chips" role="group" aria-label="Filter aktivitas">
                 {([["all", "Semua"], ["add", "Tambah stamp"], ["redeem", "Tukar kopi"]] as [LogFilter, string][]).map(([value, label]) => (
@@ -305,7 +325,7 @@ export default function AdminPage() {
             </div>
             {logsError ? <p className="notice notice-error">{logsError}</p> : loading ? <p className="admin-empty">Memuat riwayat…</p> : visibleLogs.length === 0 ? <p className="admin-empty">{logs.length === 0 ? "Belum ada aktivitas stamp." : "Tidak ada aktivitas untuk filter ini."}</p> : (
               <ol className="admin-log-list">
-                {visibleLogs.map((log) => (
+                {visibleLogs.slice(0, logLimit).map((log) => (
                   <li key={log.id} className={`is-${log.action}`}>
                     <span className="admin-log-icon" aria-hidden="true">{log.action === "redeem" ? "☕" : `+${log.amount}`}</span>
                     <div>
@@ -320,10 +340,13 @@ export default function AdminPage() {
                 ))}
               </ol>
             )}
+            {visibleLogs.length > logLimit && <button type="button" className="admin-more" onClick={() => setLogLimit((value) => value + LOG_PAGE)}>TAMPILKAN LEBIH BANYAK <span>{logLimit} / {visibleLogs.length}</span></button>}
+            </div>
           </div>
         </div>
       </section>
       {scannerOpen && <QrScanner onResult={handleScan} onClose={closeScanner} />}
+      {confirmDialog}
     </main>
   );
 }
