@@ -94,3 +94,6 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- Refresh the API schema cache so new columns (e.g. stamps) are visible immediately.
+notify pgrst, 'reload schema';

@@ -110,7 +110,7 @@ function Navigation() {
       </header>
       <AnimatePresence>
         {open && (
-          <motion.div id="site-menu" className="menu-overlay" initial={{ clipPath: "inset(0 0 100% 0)" }} animate={{ clipPath: "inset(0 0 0% 0)" }} exit={{ clipPath: "inset(0 0 100% 0)" }} transition={{ duration: 0.72, ease: [0.76, 0, 0.24, 1] }}>
+          <motion.div id="site-menu" data-lenis-prevent className="menu-overlay" initial={{ clipPath: "inset(0 0 100% 0)" }} animate={{ clipPath: "inset(0 0 0% 0)" }} exit={{ clipPath: "inset(0 0 100% 0)" }} transition={{ duration: 0.72, ease: [0.76, 0, 0.24, 1] }}>
             <div className="menu-inner">
               <div className="menu-top"><span><i /> NAVIGASI / COFFE LOCA</span><span>{pad(menuItems.length)} HALAMAN</span></div>
               <nav className="menu-links" aria-label="Navigasi utama">
@@ -156,11 +156,11 @@ function EntryChoice() {
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div ref={dialogRef} tabIndex={-1} className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
+        <motion.div ref={dialogRef} tabIndex={-1} data-lenis-prevent className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
           <div className="entry-choice-orbit" aria-hidden="true" />
           <div className="entry-choice-top"><span>LOCA / EST. WITH CARE</span><span>MEDAN · 2026</span></div>
           <div className="entry-choice-content">
-            <div className="entry-choice-mark"><img src="/white-coffee-bean.png" alt="" /><span>LOCA</span></div>
+            <div className="entry-choice-mark"><img src="/white-coffee-bean.png" alt="" /><span>COFFE <b>LOCA</b></span></div>
             <span className="eyebrow"><i /> WHERE DO YOU WANT TO GO?</span>
             <h1 id="entry-title">Pilih ruang<br /><em>untuk jedamu.</em></h1>
             <p>Satu rumah, dua cara menikmati Loca.</p>
@@ -185,7 +185,17 @@ function SmoothScroll() {
     lenis.on("scroll", updateScrollTrigger);
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
+    // Freeze page scroll while the entry choice or fullscreen menu is open.
+    const syncLock = () => {
+      const locked = document.body.classList.contains("entry-is-open") || document.body.classList.contains("menu-is-open");
+      if (locked) lenis.stop();
+      else lenis.start();
+    };
+    syncLock();
+    const observer = new MutationObserver(syncLock);
+    observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
     return () => {
+      observer.disconnect();
       lenis.off("scroll", updateScrollTrigger);
       gsap.ticker.remove(raf);
       lenis.destroy();

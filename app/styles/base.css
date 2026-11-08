@@ -15,7 +15,7 @@
 * { box-sizing:border-box; }
 html { background:#090502; scroll-behavior:auto; }
 body { margin:0; color:var(--ink); background:var(--cream); font-family:"DM Sans",sans-serif; font-weight:400; -webkit-font-smoothing:antialiased; }
-body.menu-is-open,body.entry-is-open { overflow:hidden; }
+html:has(body.menu-is-open),html:has(body.entry-is-open),body.menu-is-open,body.entry-is-open { overflow:hidden; overscroll-behavior:none; }
 a { color:inherit; text-decoration:none; }
 button { color:inherit; font:inherit; }
 ::selection { color:var(--paper); background:var(--rust); }
