@@ -5,6 +5,7 @@ import type { User } from "@supabase/supabase-js";
 import { QRCodeSVG } from "qrcode.react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { PageFooter, PageHeader } from "@/components/PageShell";
+import { useConfirm } from "@/components/ConfirmDialog";
 
 type Profile = { stamps: number; role: string };
 const STAMP_GOAL = 10;
@@ -21,6 +22,8 @@ export default function ProfilePage() {
   const flipped = side === "back";
   const cardRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const [confirm, confirmDialog] = useConfirm();
+  const [signingOut, setSigningOut] = useState(false);
   const qrTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -95,9 +98,20 @@ export default function ProfilePage() {
     setTilt({ x: ((event.clientY - bounds.top) / bounds.height - .5) * -6, y: ((event.clientX - bounds.left) / bounds.width - .5) * 6 });
   }
   async function signOut() {
-    if (!window.confirm("Keluar dari profile Coffe Loca?")) return;
-    await getSupabaseClient().auth.signOut();
-    window.location.href = "/";
+    const ok = await confirm({
+      title: "Keluar dari akunmu?",
+      message: "Stamp kamu tetap tersimpan. Login lagi kapan saja untuk melihat kartu member.",
+      confirmLabel: "YA, LOGOUT",
+      tone: "danger",
+      icon: <svg viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 8l-4 4 4 4M6 12h10" /></svg>,
+    });
+    if (!ok) return;
+    setSigningOut(true);
+    try {
+      await getSupabaseClient().auth.signOut();
+    } finally {
+      window.location.href = "/";
+    }
   }
 
   return (
@@ -199,7 +213,7 @@ export default function ProfilePage() {
                 <a className="btn-primary" href="/#reservation"><span>BUAT RESERVASI</span><span className="arrow-icon" aria-hidden="true" /></a>
                 <div className="profile-actions-row">
                   {isStaff && <a className="btn-ghost" href="/admin">ADMIN PANEL <span className="arrow-icon" aria-hidden="true" /></a>}
-                  <button className="btn-ghost profile-logout" type="button" onClick={signOut}>LOGOUT <span className="arrow-icon arrow-up" aria-hidden="true" /></button>
+                  <button className="btn-ghost profile-logout" type="button" onClick={signOut} disabled={signingOut}>{signingOut ? "KELUAR..." : "LOGOUT"} <span className="arrow-icon arrow-up" aria-hidden="true" /></button>
                 </div>
               </div>
             </div>
@@ -207,6 +221,7 @@ export default function ProfilePage() {
         </div>
       </section>
       <PageFooter items={["COFFE LOCA · MEDAN", "TAKE IT EASY", "© 2026"]} />
+      {confirmDialog}
 
       {qrOpen && memberCode && (
         <div className="profile-qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-title" onClick={() => setQrOpen(false)}>
