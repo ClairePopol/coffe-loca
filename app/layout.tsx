@@ -6,6 +6,13 @@ export const metadata: Metadata = {
   title: "COFFE LOCA — Good Coffee, Good Company",
   description:
     "Kopi yang baik, teman yang baik, dan jeda kecil untuk dinikmati pelan-pelan.",
+  openGraph: {
+    title: "COFFE LOCA — Good Coffee, Good Company",
+    description: "Kopi yang baik, teman yang baik, dan jeda kecil untuk dinikmati pelan-pelan. Medan.",
+    siteName: "Coffe Loca",
+    locale: "id_ID",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {

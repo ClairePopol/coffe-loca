@@ -4,10 +4,13 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { FormEvent, Fragment, useEffect, useRef, useState } from "react";
+import { FormEvent, Fragment, KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { getSupabaseClient } from "@/lib/supabase";
+import { coffeeAndDrinks, comfortFood, snacks, type Dish } from "@/lib/menu";
+import { SITE } from "@/lib/site";
 import SequenceScroll from "@/components/SequenceScroll";
+import Wordmark from "@/components/Wordmark";
 
 const menuItems = [
   { title: "Awal cerita", href: "#cerita", number: "01", note: "KENALI CERITA KAMI" },
@@ -16,114 +19,21 @@ const menuItems = [
   { title: "Lokasi & jam buka", href: "#lokasi-loca", number: "04", note: "TEMUKAN COFFEE LOCA" },
 ];
 
-type Dish = { name: string; detail?: string; price: string; category?: string };
+type CategoryId = "comfort" | "snack" | "drinks";
+type Category = { id: CategoryId; number: string; title: string; subtitle: string; dishes: Dish[] };
 
-const comfortFood: Dish[] = [
-  { name: "Nasi Goreng Pete Teri Udang", price: "35.000" },
-  { name: "Nasi Goreng Kampung Ayam Goreng", price: "35.000" },
-  { name: "Nasi Goreng Putih Seafood", price: "42.000" },
-  { name: "Nasi Goreng Gila", detail: "Sosis, bakso, ayam", price: "35.000" },
-  { name: "Nasi Ayam Ricarica / Cabe Hijau / Kecap", price: "35.000" },
-  { name: "Nasi Geprek Komplit", detail: "Crispy chicken, sambel, tahu, tempe, bakso, sayur crispy", price: "30.000" },
-  { name: "Salted Egg", detail: "Chicken, buttered rice, onsen egg", price: "42.000" },
-  { name: "Tongseng Ayam / Sapi", price: "35.000 / 55.000" },
-  { name: "Soto Susu Non-Santan Ayam", price: "35.000" },
-  { name: "Sup Sapi", price: "65.000" },
-  { name: "Mie Rebus", price: "28.000" },
-  { name: "Mie Sop Kampung", detail: "Bakso & ayam", price: "35.000" },
-  { name: "Mie Pecel / Pecel Sayur", detail: "Bumbu kacang & gorengan", price: "28.000" },
-  { name: "Mie Goreng Indonesia", price: "38.000" },
-  { name: "Kwetiau / Bihun Telur", price: "25.000" },
-  { name: "Kwetiau / Bihun Seafood / Ayam", price: "38.000" },
-  { name: "Indomie Bangladesh", price: "22.000" },
-  { name: "Indomie Bangladesh dengan Onsen Egg", price: "28.000" },
-  { name: "Loca Cheese Pasta", detail: "Triple cheese & katsu", price: "65.000" },
-  { name: "Aglio Olio Seafood", price: "55.000" },
-  { name: "Fish & Chips", price: "55.000" },
-  { name: "Chicken Steak Grilled / Deep Fried", detail: "With fries and sauce", price: "50.000" },
-  { name: "Cordon Bleu", detail: "Ayam isi keju, breaded, dengan fries & sauce", price: "65.000" },
+const categories: Category[] = [
+  { id: "comfort", number: "01", title: "Comfort Food", subtitle: "YANG SELALU BIKIN NYAMAN", dishes: comfortFood },
+  { id: "snack", number: "02", title: "Snack", subtitle: "TEMAN NGOBROL & JEDA", dishes: snacks },
+  { id: "drinks", number: "03", title: "Coffee & Drinks", subtitle: "KOPI, JUICE & SIGNATURE LOCA", dishes: coffeeAndDrinks },
 ];
 
-const snacks: Dish[] = [
-  { name: "Aneka Gorengan", detail: "Bakwan, tahu isi, tempe, bakso, pisang, risol · 15 pcs", price: "42.000" },
-  { name: "Dimsum Ayam 4 pcs / Udang 3 pcs / Kepiting 3 pcs / Rumput Laut 3 pcs", price: "25.000" },
-  { name: "Dimsum Platter", detail: "8 pcs", price: "58.000" },
-  { name: "Bubur Sumsum", price: "25.000" },
-  { name: "Telur Ayam Kampung", detail: "2 butir", price: "18.000" },
-  { name: "Taichans", detail: "10 tusuk", price: "45.000" },
-  { name: "Chicken Popcorn", price: "30.000" },
-  { name: "Crispy Chicken Skin", price: "30.000" },
-  { name: "Chicken Tortilla", price: "35.000" },
-  { name: "Seasoned French Fries", price: "30.000" },
-  { name: "Bakwan Saus Kacang", price: "30.000" },
-  { name: "Lobak Goreng", price: "30.000" },
-  { name: "Pisang Goreng", price: "30.000" },
-  { name: "Ubi Kayu / Manis", price: "25.000" },
-  { name: "Tahu Balik", price: "30.000" },
-  { name: "Tahu Isi Udang", price: "30.000" },
-  { name: "Rujak Buah", price: "35.000" },
-  { name: "Lupis", detail: "Per pc", price: "10.000" },
-  { name: "Roti Bakar", price: "25.000" },
-  { name: "Sosis Gulung Mie", price: "30.000" },
-  { name: "Tahu Pop Cabe Garam", price: "27.000" },
-  { name: "Enoki Crispy", price: "27.000" },
-];
+const pad = (value: number) => String(value).padStart(2, "0");
 
-const coffeeAndDrinks: Dish[] = [
-  { category: "COFFEE LOCA", name: "Sabrina", detail: "Frozen blended mango, straw, pineapple", price: "35.000" },
-  { category: "COFFEE LOCA", name: "Mario", detail: "Frozen blended mango, avocado, banana", price: "35.000" },
-  { category: "COFFEE LOCA", name: "Esmeralda", detail: "Frozen blended dragon fruit, soursop", price: "35.000" },
-  { category: "COFFEE LOCA", name: "Maskel Builder", detail: "Blended banana, avocado, almond, whey protein", price: "37.000" },
-  { category: "COFFEE LOCA", name: "Mineral Water", price: "17.000" },
-  { category: "COFFEE LOCA", name: "Regular Tea", price: "15.000" },
-  { category: "COFFEE LOCA", name: "Artisan Tea", price: "32.000" },
-  { category: "COFFEE LOCA", name: "Lemon Tea", price: "25.000" },
-  { category: "COFFEE LOCA", name: "Strawberry Tea", price: "30.000" },
-  { category: "COFFEE LOCA", name: "Matcha Tea", price: "28.000" },
-  { category: "COFFEE LOCA", name: "Sparkling Water", price: "17.000" },
-  { category: "COFFEE LOCA", name: "Sparkling Strawberry Lemonade", price: "32.000" },
-  { category: "COFFEE LOCA", name: "Lime Coke", price: "25.000" },
-  { category: "COFFEE LOCA", name: "Choco Redvelvet", price: "25.000" },
-  { category: "COFFEE LOCA", name: "Peanut Butter Charcoal", price: "30.000" },
-  { category: "COFFEE LOCA", name: "Classic Matcha Latte", price: "30.000" },
-  { category: "COFFEE LOCA", name: "Creamy Chocolate", price: "30.000" },
-  { category: "COFFEE LOCA", name: "Avocado Milo", price: "35.000" },
-  { category: "COFFEE LOCA", name: "Earlgrey Milktea", price: "30.000" },
-  { category: "COFFEE LOCA", name: "Mamatcha", detail: "Double matcha, matcha latte + matcha ice cream", price: "35.000" },
-  { category: "FRESH JUICE", name: "Orange / Watermelon / Pineapple / Strawberry / Guava / Mango", price: "25.000" },
-  { category: "FRESH JUICE", name: "Avocado / Soursop / Dragonfruit", price: "28.000" },
-  { category: "FRESH JUICE", name: "Lemonade", price: "25.000" },
-  { category: "FRESH JUICE", name: "Mix 2 Fruit", price: "32.000" },
-  { category: "COFFEE", name: "Black", detail: "Americano, espresso", price: "25.000" },
-  { category: "COFFEE", name: "White", detail: "Latte, cappuccino, piccolo, mocha", price: "27.000" },
-  { category: "COFFEE", name: "Manual Brew & Cold Brew", detail: "Seasonal · ask our staff", price: "SEASONAL" },
-  { category: "COFFEE LOCA", name: "Coffee Bonbon (Sanger)", detail: "Espresso + condensed milk", price: "25.000" },
-  { category: "COFFEE LOCA", name: "Pump It Up!", detail: "Espresso + salt + lemon + sugar", price: "25.000" },
-  { category: "COFFEE LOCA", name: "Shaken Tropical", detail: "Espresso + orange juice + mint", price: "27.000" },
-  { category: "COFFEE LOCA", name: "Honey I'm Home", detail: "Shaken americano + honey", price: "27.000" },
-  { category: "COFFEE LOCA", name: "Coffee COLA", detail: "Espresso + COLA + lemon", price: "27.000" },
-  { category: "COFFEE LOCA", name: "Avocado Coffee", price: "32.000" },
-  { category: "COFFEE LOCA", name: "Banana Macchiato", price: "32.000" },
-  { category: "COFFEE LOCA", name: "Coconut Macchiato", price: "32.000" },
-  { category: "COFFEE LOCA", name: "Choco Macchiato", price: "32.000" },
-  { category: "COFFEE LOCA", name: "Peanutbutter Macchiato", price: "32.000" },
-  { category: "COFFEE LOCA", name: "Matcha Macchiato", price: "35.000" },
-  { category: "COFFEE LOCA", name: "Milktea Coffee", price: "32.000" },
-  { category: "COFFEE LOCA", name: "Coffee Cream Unsweetened", price: "27.000" },
-  { category: "FAVORIT KOPI SUSU", name: "Eskobar", price: "27.000" },
-  { category: "FAVORIT KOPI SUSU", name: "Amazing", price: "27.000" },
-  { category: "FAVORIT KOPI SUSU", name: "Traditional", price: "27.000" },
-  { category: "FAVORIT KOPI SUSU", name: "Capheda", price: "27.000" },
-  { category: "FAVORIT KOPI SUSU", name: "Cadocado", price: "27.000" },
-];
-
-function Wordmark({ inverse = false }: { inverse?: boolean }) {
-  return (
-    <a className={`wordmark${inverse ? " wordmark-inverse" : ""}`} href="#beranda" aria-label="Coffe Loca, kembali ke beranda">
-      <img className="wordmark-logo" src="/white-coffee-bean.png" alt="" />
-      <span className="wordmark-type"><span>COFFE <b>LOCA</b></span><small>GOOD COFFEE, GOOD COMPANY</small></span>
-    </a>
-  );
+function groupDishes(dishes: Dish[]) {
+  if (!dishes.some((dish) => dish.category)) return [{ label: undefined, items: dishes }];
+  const labels = Array.from(new Set(dishes.map((dish) => dish.category)));
+  return labels.map((label) => ({ label, items: dishes.filter((dish) => dish.category === label) }));
 }
 
 function MenuIcon({ open }: { open: boolean }) {
@@ -137,9 +47,8 @@ function Navigation() {
   const close = () => setOpen(false);
   useEffect(() => {
     let active = true;
-    let supabase: ReturnType<typeof getSupabaseClient> | null = null;
     try {
-      supabase = getSupabaseClient();
+      const supabase = getSupabaseClient();
       supabase.auth.getUser().then(({ data }) => {
         if (active) setUser(data.user);
       });
@@ -191,34 +100,32 @@ function Navigation() {
   return (
     <>
       <header className={`site-header${lightSurface || open ? " header-on-light" : ""}`}>
-        <Wordmark inverse />
+        <Wordmark href="#beranda" inverse />
         <div className="header-actions">
           {user ? <a className="header-profile-link" href="/profile" aria-label={`Buka profil ${accountName}`} title={accountName}>{user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : <span>{accountInitials}</span>}</a> : <a className="header-account-link" href="/login">LOGIN <span className="arrow-icon" aria-hidden="true" /></a>}
-          <button className={`menu-toggle${open ? " is-open" : ""}`} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={open ? "Tutup navigasi" : "Buka navigasi"}>
+          <button className={`menu-toggle${open ? " is-open" : ""}`} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls="site-menu" aria-label={open ? "Tutup navigasi" : "Buka navigasi"}>
             <MenuIcon open={open} />
           </button>
         </div>
       </header>
       <AnimatePresence>
         {open && (
-          <motion.div className="menu-overlay" initial={{ clipPath: "inset(0 0 100% 0)" }} animate={{ clipPath: "inset(0 0 0% 0)" }} exit={{ clipPath: "inset(0 0 100% 0)" }} transition={{ duration: 0.72, ease: [0.76, 0, 0.24, 1] }}>
+          <motion.div id="site-menu" className="menu-overlay" initial={{ clipPath: "inset(0 0 100% 0)" }} animate={{ clipPath: "inset(0 0 0% 0)" }} exit={{ clipPath: "inset(0 0 100% 0)" }} transition={{ duration: 0.72, ease: [0.76, 0, 0.24, 1] }}>
             <div className="menu-inner">
-              <div className="menu-top"><span><i /> NAVIGASI / COFFE LOCA</span></div>
-              <div className="menu-content">
-                <nav className="menu-links" aria-label="Navigasi utama">
-                  {menuItems.map((item, index) => (
-                    <motion.a key={item.number} href={item.href} onClick={close} initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 + index * 0.1, duration: 0.62, ease: [0.22, 1, 0.36, 1] }}>
-                      <span className="menu-number">{item.number}</span><span className="menu-title-wrap"><span className="menu-title">{item.title}</span><small>{item.note}</small></span><span className="menu-arrow"><i className="arrow-icon" aria-hidden="true" /></span>
-                    </motion.a>
-                  ))}
-                </nav>
-              </div>
-              <div className="menu-bottom">
-                <div className="menu-account"><span className="eyebrow">AREA MEMBER</span><a href={user ? "/profile" : "/login"} onClick={close}>{user ? "LIHAT PROFILE" : "LOGIN / REGISTER"} <i className="arrow-icon" aria-hidden="true" /></a></div>
-                <div><span className="eyebrow">SAPA KAMI</span><a href="mailto:hello@coffeeloca.id">hello@coffeeloca.id <i className="arrow-icon" aria-hidden="true" /></a></div>
-                <div><span className="eyebrow">IKUTI CERITA</span><div className="social-links"><a href="https://instagram.com" target="_blank" rel="noreferrer">INSTAGRAM</a><a href="https://tiktok.com" target="_blank" rel="noreferrer">TIKTOK</a></div></div>
-                <p><span>COFFE LOCA · MEDAN</span><br />KOPI YANG BAIK. TEMAN YANG BAIK.</p>
-              </div>
+              <div className="menu-top"><span><i /> NAVIGASI / COFFE LOCA</span><span>{pad(menuItems.length)} HALAMAN</span></div>
+              <nav className="menu-links" aria-label="Navigasi utama">
+                {menuItems.map((item, index) => (
+                  <motion.a key={item.number} href={item.href} onClick={close} initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 + index * 0.1, duration: 0.62, ease: [0.22, 1, 0.36, 1] }}>
+                    <span className="menu-number">{item.number}</span><span className="menu-title-wrap"><span className="menu-title">{item.title}</span><small>{item.note}</small></span><span className="menu-arrow"><i className="arrow-icon" aria-hidden="true" /></span>
+                  </motion.a>
+                ))}
+              </nav>
+              <motion.div className="menu-bottom" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 0.5 }}>
+                <div><span className="menu-bottom-label">AREA MEMBER</span><a href={user ? "/profile" : "/login"} onClick={close}>{user ? "Lihat profile" : "Login / Register"} <i className="arrow-icon" aria-hidden="true" /></a></div>
+                <div><span className="menu-bottom-label">KUNJUNGI KAMI</span><a href={SITE.mapsUrl} target="_blank" rel="noreferrer">{SITE.addressLine} <i className="arrow-icon" aria-hidden="true" /></a></div>
+                <div><span className="menu-bottom-label">SAPA KAMI</span><a href={`mailto:${SITE.email}`}>{SITE.email} <i className="arrow-icon" aria-hidden="true" /></a></div>
+                <div><span className="menu-bottom-label">IKUTI CERITA</span><div className="social-links"><a href={SITE.instagram} target="_blank" rel="noreferrer">Instagram</a><a href={SITE.tiktok} target="_blank" rel="noreferrer">TikTok</a></div></div>
+              </motion.div>
             </div>
           </motion.div>
         )}
@@ -229,33 +136,43 @@ function Navigation() {
 
 function EntryChoice() {
   const [visible, setVisible] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setVisible(true);
   }, []);
 
-  function choose(path: string) {
+  useEffect(() => {
+    document.body.classList.toggle("entry-is-open", visible);
+    if (visible) dialogRef.current?.focus({ preventScroll: true });
+    return () => document.body.classList.remove("entry-is-open");
+  }, [visible]);
+
+  function choose(path: "coffee" | "store") {
     if (path === "coffee") setVisible(false);
     else window.location.href = "/store";
   }
 
-  if (!visible) return null;
   return (
-    <motion.div className="entry-choice" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      <div className="entry-choice-orbit" aria-hidden="true" />
-      <div className="entry-choice-top"><span>LOCA / EST. WITH CARE</span><span>MEDAN · 2026</span></div>
-      <div className="entry-choice-content">
-        <div className="entry-choice-mark"><img src="/white-coffee-bean.png" alt="" /><span>LOCA</span></div>
-        <span className="eyebrow"><i /> WHERE DO YOU WANT TO GO?</span>
-        <h1>Pilih ruang<br /><em>untuk jedamu.</em></h1>
-        <p>Satu rumah, dua cara menikmati Loca.</p>
-        <div className="entry-choice-actions">
-          <button type="button" onClick={() => choose("coffee")}><span><small>01 / COFFEE HOUSE</small><strong>Loca Coffee</strong><em>Good coffee, good company.</em></span><i className="arrow-icon" aria-hidden="true" /></button>
-          <button type="button" onClick={() => choose("store")}><span><small>02 / ONLINE STORE</small><strong>Loca Store</strong><em>Coming soon, take Loca home.</em></span><i className="arrow-icon" aria-hidden="true" /></button>
-        </div>
-      </div>
-      <div className="entry-choice-bottom"><span>TAKE YOUR TIME</span><span>COFFEE · STORE · COMMUNITY</span></div>
-    </motion.div>
+    <AnimatePresence>
+      {visible && (
+        <motion.div ref={dialogRef} tabIndex={-1} className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
+          <div className="entry-choice-orbit" aria-hidden="true" />
+          <div className="entry-choice-top"><span>LOCA / EST. WITH CARE</span><span>MEDAN · 2026</span></div>
+          <div className="entry-choice-content">
+            <div className="entry-choice-mark"><img src="/white-coffee-bean.png" alt="" /><span>LOCA</span></div>
+            <span className="eyebrow"><i /> WHERE DO YOU WANT TO GO?</span>
+            <h1 id="entry-title">Pilih ruang<br /><em>untuk jedamu.</em></h1>
+            <p>Satu rumah, dua cara menikmati Loca.</p>
+            <div className="entry-choice-actions">
+              <button type="button" onClick={() => choose("coffee")}><span><small>01 / COFFEE HOUSE</small><strong>Loca Coffee</strong><em>Good coffee, good company.</em></span><i className="arrow-icon" aria-hidden="true" /></button>
+              <button type="button" onClick={() => choose("store")}><span><small>02 / ONLINE STORE</small><strong>Loca Store</strong><em>Coming soon — take Loca home.</em></span><i className="arrow-icon" aria-hidden="true" /></button>
+            </div>
+          </div>
+          <div className="entry-choice-bottom"><span>TAKE YOUR TIME</span><span>COFFEE · STORE · COMMUNITY</span></div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -289,34 +206,60 @@ function TextReveal({ children }: { children: string }) {
       char.style.transform = `translateY(${(1 - reveal) * 8}px)`;
     });
   });
-  return <p className="text-reveal" ref={textRef}>{Array.from(children).map((char, index) => <span data-char key={`${index}-${char}`}>{char === " " ? "\u00a0" : char}</span>)}</p>;
+  const words = children.split(" ");
+  let charIndex = 0;
+  return (
+    <p className="text-reveal" ref={textRef}>
+      {words.map((word, wordIndex) => (
+        <Fragment key={wordIndex}>
+          <span className="text-reveal-word">{Array.from(word).map((char) => <span data-char key={charIndex++}>{char}</span>)}</span>
+          {wordIndex < words.length - 1 && " "}
+        </Fragment>
+      ))}
+    </p>
+  );
 }
 
-function MenuCategory({ number, title, subtitle, dishes }: { number: string; title: string; subtitle: string; dishes: Dish[] }) {
-  const orderedDishes = dishes.some((dish) => dish.category)
-    ? Array.from(new Set(dishes.map((dish) => dish.category))).flatMap((category) => dishes.filter((dish) => dish.category === category))
-    : dishes;
+function MenuPanel({ category }: { category: Category }) {
+  const groups = groupDishes(category.dishes);
+  let counter = 0;
 
   return (
-    <section className={`menu-list-panel${title === "Coffee & Drinks" ? " menu-list-panel-drinks" : ""}`} data-nav-theme="light" aria-label={title}>
-      <header className="menu-list-heading"><span className="menu-category-number">{number}</span><div><span className="menu-list-subtitle">{subtitle}</span><h3>{title}</h3></div><span className="menu-list-count">{String(orderedDishes.length).padStart(2, "0")} ITEMS</span></header>
-      <ol className="menu-list">
-        {orderedDishes.map((dish, index) => (
-          <Fragment key={`${dish.category ?? title}-${dish.name}`}>
-            {dish.category && (index === 0 || orderedDishes[index - 1].category !== dish.category) && <li className="menu-group-label"><span>{dish.category}</span></li>}
-            <li className="menu-item-row">
-              <span className="menu-item-index">{String(index + 1).padStart(2, "0")}</span><span className="menu-item-copy"><strong>{dish.name}</strong>{dish.detail && <small>{dish.detail}</small>}</span><span className="menu-item-price"><small>{dish.price === "SEASONAL" ? "" : "RP"}</small>{dish.price}</span>
-            </li>
-          </Fragment>
-        ))}
-      </ol>
-    </section>
+    <div className="menu-list-panel" data-nav-theme="light">
+      <header className="menu-list-heading">
+        <span className="menu-category-number">{category.number}</span>
+        <div><span className="menu-list-subtitle">{category.subtitle}</span><h3>{category.title}</h3></div>
+        <span className="menu-list-count">{pad(category.dishes.length)} ITEMS</span>
+      </header>
+      {groups.map((group) => (
+        <section className="menu-group" key={group.label ?? "all"} aria-label={group.label ?? category.title}>
+          {group.label && <h4 className="menu-group-label"><span>{group.label}</span><small>{pad(group.items.length)}</small></h4>}
+          <ol className="menu-list">
+            {group.items.map((dish) => {
+              counter += 1;
+              return (
+                <li className="menu-item-row" key={`${group.label ?? category.id}-${dish.name}`}>
+                  <span className="menu-item-index">{pad(counter)}</span>
+                  <span className="menu-item-copy">
+                    <span className="menu-item-line"><strong>{dish.name}</strong><i className="menu-item-leader" aria-hidden="true" /><span className="menu-item-price">{dish.price === "SEASONAL" ? "Seasonal" : <><small>Rp</small>{dish.price}</>}</span></span>
+                    {dish.detail && <small>{dish.detail}</small>}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      ))}
+    </div>
   );
 }
 
 function MenuSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [activeCategory, setActiveCategory] = useState<"comfort" | "snack" | "drinks">("comfort");
+  const panelRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [activeId, setActiveId] = useState<CategoryId>("comfort");
+  const active = categories.find((category) => category.id === activeId) ?? categories[0];
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -342,43 +285,148 @@ function MenuSection() {
     const context = gsap.context(() => {
       gsap.set(".menu-item-row", { autoAlpha: 0, y: 12 });
       ScrollTrigger.batch(".menu-item-row", {
-        start: "top 90%",
+        start: "top 92%",
         once: true,
-        batchMax: 5,
-        onEnter: (rows) => gsap.to(rows, {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.38,
-          stagger: 0.065,
-          ease: "power3.out",
-          overwrite: "auto",
-        }),
+        batchMax: 6,
+        onEnter: (rows) => gsap.to(rows, { autoAlpha: 1, y: 0, duration: 0.38, stagger: 0.05, ease: "power3.out", overwrite: "auto" }),
       });
+      ScrollTrigger.refresh();
     }, section);
     return () => context.revert();
-  }, [activeCategory]);
+  }, [activeId]);
 
-  const activeDishes = activeCategory === "comfort" ? comfortFood : activeCategory === "snack" ? snacks : coffeeAndDrinks;
+  function select(id: CategoryId) {
+    if (id === activeId) return;
+    setActiveId(id);
+    const panel = panelRef.current;
+    if (!panel) return;
+    const offset = window.matchMedia("(max-width: 760px)").matches ? 150 : 110;
+    const top = panel.getBoundingClientRect().top;
+    if (top < offset) window.scrollTo({ top: top + window.scrollY - offset, behavior: "smooth" });
+  }
+
+  function onTabKey(event: ReactKeyboardEvent<HTMLButtonElement>, index: number) {
+    const keys: Record<string, number> = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+    let next = index;
+    if (event.key in keys) next = (index + keys[event.key] + categories.length) % categories.length;
+    else if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = categories.length - 1;
+    else return;
+    event.preventDefault();
+    select(categories[next].id);
+    tabRefs.current[next]?.focus();
+  }
 
   return (
-    <section ref={sectionRef} className="menu-section section-pad" id="menu">
+    <section ref={sectionRef} className="menu-section section-pad" id="menu" aria-labelledby="menu-title">
       <div className="section-kicker section-kicker-dark menu-kicker"><span>02 / MENU COFFE LOCA</span><span>MAKAN ENAK, JEDA LEBIH LAMA</span></div>
-      <div className="menu-heading"><div><span className="eyebrow"><i /> DARI YANG HANGAT SAMPAI YANG RENYAH</span><h2>Ada yang<br /><em>kamu suka.</em></h2></div><p>Temukan comfort food dan camilan favorit untuk menemani waktu di Loca.</p></div>
-      <div className="menu-category-tabs" role="group" aria-label="Pilih kategori menu">
-        <button className={activeCategory === "comfort" ? "is-active" : ""} id="menu-tab-comfort" aria-pressed={activeCategory === "comfort"} aria-controls="menu-panel" onClick={() => setActiveCategory("comfort")}>
-          <span className="menu-tab-number">01</span><span className="menu-tab-copy"><strong>Comfort food</strong><small>YANG SELALU BIKIN NYAMAN</small></span><span className="menu-tab-count">{String(comfortFood.length).padStart(2, "0")}</span>
-        </button>
-        <button className={activeCategory === "snack" ? "is-active" : ""} id="menu-tab-snack" aria-pressed={activeCategory === "snack"} aria-controls="menu-panel" onClick={() => setActiveCategory("snack")}>
-          <span className="menu-tab-number">02</span><span className="menu-tab-copy"><strong>Snack</strong><small>TEMAN NGOBROL &amp; JEDA</small></span><span className="menu-tab-count">{String(snacks.length).padStart(2, "0")}</span>
-        </button>
-        <button className={activeCategory === "drinks" ? "is-active" : ""} id="menu-tab-drinks" aria-pressed={activeCategory === "drinks"} aria-controls="menu-panel" onClick={() => setActiveCategory("drinks")}>
-          <span className="menu-tab-number">03</span><span className="menu-tab-copy"><strong>Coffee &amp; Drinks</strong><small>KOPI, JUICE &amp; SIGNATURE LOCA</small></span><span className="menu-tab-count">{String(coffeeAndDrinks.length).padStart(2, "0")}</span>
-        </button>
+      <div className="menu-heading">
+        <div><span className="eyebrow"><i /> DARI YANG HANGAT SAMPAI YANG RENYAH</span><h2 id="menu-title">Ada yang<br /><em>kamu suka.</em></h2></div>
+        <p>Comfort food, camilan, dan racikan kopi favorit untuk menemani waktu di Loca. Semua harga dalam Rupiah.</p>
       </div>
-      <div className="menu-list-grid" id="menu-panel" aria-live="polite" aria-labelledby={activeCategory === "comfort" ? "menu-tab-comfort" : activeCategory === "snack" ? "menu-tab-snack" : "menu-tab-drinks"}>
-        <MenuCategory key={activeCategory} number={activeCategory === "comfort" ? "01" : activeCategory === "snack" ? "02" : "03"} title={activeCategory === "comfort" ? "Comfort Food" : activeCategory === "snack" ? "Snack" : "Coffee & Drinks"} subtitle={activeCategory === "comfort" ? "YANG SELALU BIKIN NYAMAN" : activeCategory === "snack" ? "TEMAN NGOBROL & JEDA" : "KOPI, JUICE & SIGNATURE LOCA"} dishes={activeDishes} />
+      <div className="menu-category-tabs" role="tablist" aria-label="Kategori menu">
+        {categories.map((category, index) => {
+          const selected = category.id === activeId;
+          return (
+            <button
+              key={category.id}
+              ref={(node) => { tabRefs.current[index] = node; }}
+              className={selected ? "is-active" : ""}
+              id={`menu-tab-${category.id}`}
+              role="tab"
+              type="button"
+              aria-selected={selected}
+              aria-controls="menu-panel"
+              tabIndex={selected ? 0 : -1}
+              onClick={() => select(category.id)}
+              onKeyDown={(event) => onTabKey(event, index)}
+            >
+              <span className="menu-tab-number">{category.number}</span>
+              <span className="menu-tab-copy"><strong>{category.title}</strong><small>{category.subtitle}</small></span>
+              <span className="menu-tab-count">{pad(category.dishes.length)}</span>
+            </button>
+          );
+        })}
       </div>
-      <div className="menu-footnote"><span>{String(activeDishes.length).padStart(2, "0")} PILIHAN UNTUK DINIKMATI</span></div>
+      <div ref={panelRef} className="menu-list-grid" id="menu-panel" role="tabpanel" aria-labelledby={`menu-tab-${active.id}`} tabIndex={0}>
+        <MenuPanel key={active.id} category={active} />
+      </div>
+      <div className="menu-footnote"><span>{pad(active.dishes.length)} PILIHAN UNTUK DINIKMATI</span><span>HARGA DAPAT BERUBAH SEWAKTU-WAKTU</span></div>
+    </section>
+  );
+}
+
+function ReservationSection() {
+  const [submitted, setSubmitted] = useState<null | { name: string; date: string; time: string; guests: string }>(null);
+  const [minDate, setMinDate] = useState<string>();
+
+  useEffect(() => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    setMinDate(now.toISOString().slice(0, 10));
+  }, []);
+
+  function handleReservation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    setSubmitted({
+      name: String(data.get("name") ?? "").trim(),
+      date: String(data.get("date") ?? ""),
+      time: String(data.get("time") ?? ""),
+      guests: String(data.get("guests") ?? ""),
+    });
+  }
+
+  const formattedDate = submitted?.date
+    ? new Date(`${submitted.date}T00:00:00`).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+    : "";
+
+  return (
+    <section className="reservation-section section-pad" id="reservation" data-nav-theme="light" aria-labelledby="reservation-title">
+      <div className="section-kicker reservation-kicker"><span>03 / RESERVATION</span><span>SIAPKAN JEDA TERBAIKMU</span></div>
+      <div className="reservation-layout">
+        <div className="reservation-copy">
+          <span className="eyebrow"><i /> MEJA UNTUK CERITA YANG BAIK</span>
+          <h2 id="reservation-title">Simpan tempat<br /><em>untuk nanti.</em></h2>
+          <p>Datang dengan tenang. Pilih waktu yang kamu suka, biar kami siapkan ruang untuk kopi dan cerita yang ingin kamu bagi.</p>
+          <div className="reservation-mark" aria-hidden="true"><span className="reservation-mark-ring"><img src="/white-coffee-bean.png" alt="" /></span></div>
+        </div>
+        <div className="reservation-card">
+          <div className="reservation-card-top"><span>TABLE REQUEST</span><span>COFFE LOCA / MEDAN</span></div>
+          {submitted ? (
+            <div className="reservation-success" role="status">
+              <span className="reservation-success-icon" aria-hidden="true"><img src="/white-coffee-bean.png" alt="" /></span>
+              <span className="reservation-card-label">PERMINTAAN DITERIMA</span>
+              <h3>Terima kasih, {submitted.name.split(" ")[0] || "kamu"}.</h3>
+              <p>Kami akan menghubungimu untuk konfirmasi meja.</p>
+              <dl>
+                <div><dt>TANGGAL</dt><dd>{formattedDate}</dd></div>
+                <div><dt>JAM</dt><dd>{submitted.time}</dd></div>
+                <div><dt>TAMU</dt><dd>{submitted.guests} orang</dd></div>
+              </dl>
+              <button className="reservation-reset" type="button" onClick={() => setSubmitted(null)}>BUAT PERMINTAAN LAIN <i className="arrow-icon" aria-hidden="true" /></button>
+            </div>
+          ) : (
+            <>
+              <div className="reservation-card-heading"><span className="reservation-card-label">PILIH WAKTUMU</span><h3>See you at Loca.</h3></div>
+              <form className="reservation-form" onSubmit={handleReservation}>
+                <div className="reservation-field-grid">
+                  <label><span>TANGGAL</span><input type="date" name="date" min={minDate} required /></label>
+                  <label><span>JAM</span><select name="time" defaultValue="" required><option value="" disabled>Pilih jam</option><option>10:00</option><option>12:00</option><option>14:00</option><option>16:00</option><option>18:00</option><option>20:00</option></select></label>
+                </div>
+                <div className="reservation-field-grid">
+                  <label><span>NAMA</span><input type="text" name="name" placeholder="Nama kamu" autoComplete="name" required /></label>
+                  <label><span>JUMLAH ORANG</span><select name="guests" defaultValue="2" required><option value="1">1 orang</option><option value="2">2 orang</option><option value="3">3 orang</option><option value="4">4 orang</option><option value="5">5 orang</option><option value="6+">6+ orang</option></select></label>
+                </div>
+                <label><span>NO. WHATSAPP</span><input type="tel" name="phone" placeholder="08xx xxxx xxxx" autoComplete="tel" inputMode="tel" pattern="[0-9+ \-]{8,}" required /></label>
+                <label><span>CATATAN KECIL <em>OPSIONAL</em></span><textarea name="note" rows={2} placeholder="Ada yang perlu kami siapkan?"></textarea></label>
+                <button className="reservation-submit" type="submit"><span>KIRIM PERMINTAAN</span><i className="arrow-icon" aria-hidden="true" /></button>
+              </form>
+              <p className="reservation-note">Reservasi akan dikonfirmasi oleh tim Loca melalui kontak yang kamu berikan.</p>
+            </>
+          )}
+        </div>
+      </div>
     </section>
   );
 }
@@ -396,7 +444,7 @@ function LocationSection() {
       });
       intro
         .from(".location-kicker > span", { autoAlpha: 0, y: 12, duration: 0.42, stagger: 0.08, ease: "power2.out" })
-        .from(".location-copy > .eyebrow, .location-copy > h2, .location-copy > p", { autoAlpha: 0, y: 20, duration: 0.58, stagger: 0.1, ease: "power3.out" }, "-=0.16")
+        .from(".location-copy > .eyebrow, .location-copy > h2, .location-copy > p, .location-rating", { autoAlpha: 0, y: 20, duration: 0.58, stagger: 0.1, ease: "power3.out" }, "-=0.16")
         .from(".location-map", { autoAlpha: 0, scale: 0.96, y: 22, duration: 0.75, ease: "power3.out" }, "-=0.42")
         .from(".location-detail", { autoAlpha: 0, y: 18, duration: 0.45, stagger: 0.13, ease: "power2.out" }, "-=0.38")
         .from(".location-map-top, .location-map-bottom", { autoAlpha: 0, y: 10, duration: 0.4, stagger: 0.1, ease: "power2.out" }, "-=0.3");
@@ -412,78 +460,72 @@ function LocationSection() {
           <span className="eyebrow"><i /> KAMI SIAP MENYAMBUTMU</span>
           <h2 id="location-title">Mampir ke<br /><em>Loca.</em></h2>
           <p>Temukan kami di Medan, pilih waktu yang pas, lalu nikmati kopi dan jeda kecilmu di sini.</p>
-          <div className="location-rating"><span aria-label="Rating 4,4 dari 5">★★★★★</span><b>4,4</b><i>·</i><small>917 ulasan di Google</small></div>
+          <a className="location-rating" href={SITE.mapsUrl} target="_blank" rel="noreferrer" aria-label={`Rating ${SITE.rating} dari 5, ${SITE.reviews} ulasan di Google`}>
+            <b>{SITE.rating}</b><span><i aria-hidden="true">★★★★★</i><small>{SITE.reviews} ulasan di Google</small></span>
+          </a>
           <div className="location-details">
             <article className="location-detail">
               <span className="location-detail-label"><i>01</i> ALAMAT KAMI</span>
-              <p>Coffee LOCA Cafe Pokemon Boardgame<br />Jl. T. Amir Hamzah No. 11, Sei Agul, Medan Barat, Kota Medan, Sumatera Utara 20114</p>
-              <a href="https://www.google.com/maps/search/?api=1&query=Coffee+LOCA+Cafe+Pokemon+Boardgame%2C+Jl.+T.+Amir+Hamzah+No.11%2C+Sei+Agul%2C+Medan" target="_blank" rel="noreferrer">LIHAT RUTE <span className="arrow-icon" aria-hidden="true" /></a>
+              <p><strong>{SITE.placeName}</strong><br />{SITE.addressLine}, {SITE.addressCity}</p>
+              <a href={SITE.mapsUrl} target="_blank" rel="noreferrer">LIHAT RUTE <span className="arrow-icon" aria-hidden="true" /></a>
             </article>
             <article className="location-detail">
               <span className="location-detail-label"><i>02</i> JAM OPERASIONAL</span>
-              <p>Cek jam buka terbaru langsung di Google Maps.</p>
-              <a href="https://www.google.com/maps/search/?api=1&query=Coffee+LOCA+Cafe+Pokemon+Boardgame%2C+Jl.+T.+Amir+Hamzah+No.11%2C+Sei+Agul%2C+Medan" target="_blank" rel="noreferrer">CEK JAM BUKA <span className="arrow-icon" aria-hidden="true" /></a>
+              <p>Cek jam buka terbaru langsung di Google Maps sebelum berangkat.</p>
+              <a href={SITE.mapsUrl} target="_blank" rel="noreferrer">CEK JAM BUKA <span className="arrow-icon" aria-hidden="true" /></a>
             </article>
           </div>
+          <a className="location-cta" href={SITE.mapsUrl} target="_blank" rel="noreferrer"><span>PETUNJUK ARAH</span><i className="arrow-icon" aria-hidden="true" /></a>
         </div>
         <figure className="location-map">
-          <div className="location-map-top"><span>COFFEE LOCA / MEDAN</span><a href="https://www.google.com/maps/search/?api=1&query=Coffee+LOCA+Cafe+Pokemon+Boardgame%2C+Jl.+T.+Amir+Hamzah+No.11%2C+Sei+Agul%2C+Medan" target="_blank" rel="noreferrer">BUKA DI GOOGLE MAPS <i className="arrow-icon" aria-hidden="true" /></a></div>
-          <div className="location-map-orbit" aria-hidden="true"><span /><span /><span /></div>
-          <iframe
-            className="location-map-frame"
-            src="https://maps.google.com/maps?q=Coffee%20LOCA%20Cafe%20Pokemon%20Boardgame%2C%20Jl.%20T.%20Amir%20Hamzah%20No.11%2C%20Sei%20Agul%2C%20Medan&amp;z=16&amp;output=embed"
-            title="Peta Google Maps Coffee LOCA Cafe Pokemon Boardgame, Medan"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            allowFullScreen
-          />
-          <div className="location-map-bottom"><span>BUKA PETA DAN MULAI JALAN</span><span>GOOD COFFEE, GOOD COMPANY</span></div>
+          <div className="location-map-top"><span>COFFEE LOCA / MEDAN</span><a href={SITE.mapsUrl} target="_blank" rel="noreferrer">BUKA DI GOOGLE MAPS <i className="arrow-icon" aria-hidden="true" /></a></div>
+          <div className="location-map-body">
+            <iframe
+              className="location-map-frame"
+              src={SITE.mapsEmbedUrl}
+              title={`Peta Google Maps ${SITE.placeName}, Medan`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+            <div className="location-map-orbit" aria-hidden="true"><span /><span /><span /></div>
+          </div>
+          <figcaption className="location-map-bottom"><span>BUKA PETA DAN MULAI JALAN</span><span>GOOD COFFEE, GOOD COMPANY</span></figcaption>
         </figure>
       </div>
-      <div className="location-bottomline"><span>DATANG UNTUK KOPI.</span><em>PULANG MEMBAWA CERITA.</em></div>
+      <div className="location-bottomline"><span>DATANG UNTUK KOPI.</span><em>Pulang membawa cerita.</em></div>
     </section>
   );
 }
 
-function ReservationSection() {
-  const [submitted, setSubmitted] = useState(false);
-
-  function handleReservation(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSubmitted(true);
-  }
-
+function SiteFooter() {
   return (
-    <section className="reservation-section section-pad" id="reservation" data-nav-theme="light" aria-labelledby="reservation-title">
-      <div className="section-kicker reservation-kicker"><span>03 / RESERVATION</span><span>SIAPKAN JEDA TERBAIKMU</span></div>
-      <div className="reservation-layout">
-        <div className="reservation-copy">
-          <span className="eyebrow"><i /> MEJA UNTUK CERITA YANG BAIK</span>
-          <h2 id="reservation-title">Simpan tempat<br /><em>untuk nanti.</em></h2>
-          <p>Datang dengan tenang. Pilih waktu yang kamu suka, biar kami siapkan ruang untuk kopi dan cerita yang ingin kamu bagi.</p>
-          <div className="reservation-stamp reservation-mark" aria-hidden="true"><span className="reservation-mark-ring"><img src="/white-coffee-bean.png" alt="" /></span></div>
-          <div className="reservation-meta"><span><b>01</b> KIRIM PERMINTAAN</span><span><b>02</b> KAMI KONFIRMASI</span></div>
+    <footer className="site-footer">
+      <div className="footer-main">
+        <div className="footer-brand">
+          <Wordmark href="#beranda" />
+          <p>Kopi yang baik, teman yang baik, dan jeda kecil untuk dinikmati pelan-pelan.</p>
         </div>
-        <div className="reservation-card">
-          <div className="reservation-card-top"><span>TABLE REQUEST</span><span>COFFE LOCA / MEDAN</span></div>
-          <div className="reservation-card-heading"><span>PILIH WAKTUMU</span><h3>See you at Loca.</h3></div>
-          <form className="reservation-form" onSubmit={handleReservation}>
-            <div className="reservation-field-grid">
-              <label><span>TANGGAL</span><input type="date" name="date" required /></label>
-              <label><span>JAM</span><select name="time" defaultValue="" required><option value="" disabled>Pilih jam</option><option>10:00</option><option>12:00</option><option>14:00</option><option>16:00</option><option>18:00</option><option>20:00</option></select></label>
-            </div>
-            <div className="reservation-field-grid">
-              <label><span>JUMLAH ORANG</span><select name="guests" defaultValue="2" required><option value="1">1 orang</option><option value="2">2 orang</option><option value="3">3 orang</option><option value="4">4 orang</option><option value="5">5 orang</option><option value="6+">6+ orang</option></select></label>
-              <label><span>NAMA</span><input type="text" name="name" placeholder="Nama kamu" required /></label>
-            </div>
-            <label><span>CATATAN KECIL <em>OPSIONAL</em></span><textarea name="note" rows={2} placeholder="Ada yang perlu kami siapkan?"></textarea></label>
-            <button className="reservation-submit" type="submit"><span>{submitted ? "PERMINTAAN TERKIRIM" : "KIRIM PERMINTAAN"}</span><i className="arrow-icon" aria-hidden="true" /></button>
-            {submitted && <p className="reservation-feedback" role="status">Terima kasih. Kami akan menghubungimu untuk konfirmasi meja.</p>}
-          </form>
-          <p className="reservation-note">Reservasi akan dikonfirmasi oleh tim Loca melalui kontak yang tersedia.</p>
+        <nav className="footer-col" aria-label="Navigasi footer">
+          <span className="footer-label">JELAJAHI</span>
+          {menuItems.map((item) => <a key={item.href} href={item.href}>{item.title}</a>)}
+        </nav>
+        <div className="footer-col">
+          <span className="footer-label">KUNJUNGI</span>
+          <address>{SITE.addressLine}<br />{SITE.addressCity}</address>
+          <a href={SITE.mapsUrl} target="_blank" rel="noreferrer">Google Maps <i className="arrow-icon" aria-hidden="true" /></a>
+        </div>
+        <div className="footer-col">
+          <span className="footer-label">SAPA KAMI</span>
+          <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          <a href={SITE.instagram} target="_blank" rel="noreferrer">Instagram <i className="arrow-icon" aria-hidden="true" /></a>
+          <a href={SITE.tiktok} target="_blank" rel="noreferrer">TikTok <i className="arrow-icon" aria-hidden="true" /></a>
+          <a href="/store">Loca Store <i className="arrow-icon" aria-hidden="true" /></a>
         </div>
       </div>
-    </section>
+      <div className="footer-word" aria-hidden="true">Take it easy.</div>
+      <div className="footer-bottom"><span>© COFFE LOCA 2026 — GOOD COFFEE, GOOD COMPANY.</span><span>MADE WITH CARE <i>✳</i> MEDAN</span><a href="#beranda" className="back-top">BACK TO TOP <i className="arrow-icon arrow-up" aria-hidden="true" /></a></div>
+    </footer>
   );
 }
 
@@ -502,7 +544,7 @@ export default function Home() {
         .from(".about-section > .section-kicker span", { autoAlpha: 0, y: 12, duration: 0.45, stagger: 0.1, ease: "power2.out" })
         .from(".about-heading > *", { autoAlpha: 0, y: 24, duration: 0.65, stagger: 0.12, ease: "power3.out" }, "-=0.12")
         .from(".about-text > .underlined-link", { autoAlpha: 0, y: 12, duration: 0.45, ease: "power2.out" }, "-=0.28");
-      gsap.from(".about-rituals > div", {
+      gsap.from(".about-rituals > li", {
         autoAlpha: 0,
         y: 16,
         duration: 0.5,
@@ -528,21 +570,20 @@ export default function Home() {
       <main>
         <SequenceScroll />
         <div className="story-world relative z-10 -mt-[100vh]">
-          <section ref={aboutRef} className="about-section section-pad" id="cerita" data-nav-theme="light">
+          <section ref={aboutRef} className="about-section section-pad" id="cerita" data-nav-theme="light" aria-labelledby="about-title">
             <div className="section-kicker"><span>01 / AWAL CERITA</span><span>DIBUAT UNTUK DINIKMATI PELAN-PELAN</span></div>
             <div className="about-layout">
-              <div className="about-heading"><span className="eyebrow"><i /> HALO, KAMU.</span><h2>Kopi enak.<br /><em>Hari yang baik.</em></h2></div>
+              <div className="about-heading"><span className="eyebrow"><i /> HALO, KAMU.</span><h2 id="about-title">Kopi enak.<br /><em>Hari yang baik.</em></h2><div className="about-scribble-wrap"><div className="about-scribble" aria-hidden="true"><svg viewBox="0 0 180 90"><path d="M4 71C42 7 112 3 176 38M35 86C74 41 124 34 170 52" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><path d="m149 27 28 11-23 17" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg><span>take it easy</span></div></div></div>
               <div className="about-text">
                 <TextReveal>Kami percaya hal sederhana bisa membuat hari terasa lebih baik. Secangkir kopi yang diracik dengan teliti. Sudut nyaman untuk menarik napas. Dan waktu yang tidak perlu diburu-buru.</TextReveal>
                 <a className="underlined-link" href="#menu">LIHAT YANG KAMI SAJIKAN <span className="arrow-icon" aria-hidden="true" /></a>
               </div>
             </div>
-            <div className="about-rituals" aria-label="Hal sederhana di Coffe Loca">
-              <div><span>01</span><strong>Kopi yang diracik dengan teliti</strong><i className="ritual-dot" /></div>
-              <div><span>02</span><strong>Waktu untuk menarik napas</strong><i className="ritual-dot" /></div>
-              <div><span>03</span><strong>Ruang untuk berbagi cerita</strong><i className="ritual-dot" /></div>
-            </div>
-            <div className="about-scribble" aria-hidden="true"><svg viewBox="0 0 180 90"><path d="M4 71C42 7 112 3 176 38M35 86C74 41 124 34 170 52" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><path d="m149 27 28 11-23 17" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg><span>take it easy</span></div>
+            <ol className="about-rituals" aria-label="Hal sederhana di Coffe Loca">
+              <li><span>01</span><strong>Kopi yang diracik dengan teliti</strong><small>Biji pilihan, takaran yang pas, disajikan hangat.</small><i className="ritual-dot" /></li>
+              <li><span>02</span><strong>Waktu untuk menarik napas</strong><small>Sudut tenang untuk kerja, baca, atau sekadar diam.</small><i className="ritual-dot" /></li>
+              <li><span>03</span><strong>Ruang untuk berbagi cerita</strong><small>Boardgame, obrolan panjang, dan teman yang baik.</small><i className="ritual-dot" /></li>
+            </ol>
           </section>
 
           <MenuSection />
@@ -551,10 +592,7 @@ export default function Home() {
 
           <LocationSection />
 
-          <footer className="site-footer">
-            <div className="footer-top"><Wordmark /><span className="footer-thanks">THANK YOU FOR TAKING A MOMENT.</span><a href="#beranda" className="back-top">BACK TO TOP <i className="arrow-icon arrow-up" aria-hidden="true" /></a></div>
-            <div className="footer-bottom"><span>© COFFE LOCA 2026 — GOOD COFFEE, GOOD COMPANY.</span><span>MADE WITH CARE <i>✳</i></span><a href="#beranda">TO THE TOP <i className="arrow-icon arrow-up" aria-hidden="true" /></a></div>
-          </footer>
+          <SiteFooter />
         </div>
       </main>
     </>

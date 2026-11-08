@@ -1,0 +1,31 @@
+/* Loca Store — coming soon */
+.store-content { display:flex; width:min(1180px,86vw); flex:1; flex-direction:column; justify-content:center; margin:0 auto; padding:40px 0 64px; }
+.store-content .page-heading>p { max-width:440px; }
+.store-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:56px 0 0; padding:0; list-style:none; }
+.store-item { display:flex; flex-direction:column; padding:22px 22px 24px; border:1px solid var(--line); border-radius:var(--radius-lg); background:rgba(250,246,235,.66); transition:transform .4s var(--ease-out),border-color .4s,box-shadow .4s; }
+.store-item:hover { transform:translateY(-6px); border-color:rgba(164,78,55,.35); box-shadow:var(--shadow-card); }
+.store-item-top { display:flex; align-items:center; justify-content:space-between; }
+.store-item-top b { color:var(--terracotta); font-family:"Instrument Serif",serif; font-size:22px; font-weight:400; }
+.store-item-top small { padding:4px 10px; border:1px solid rgba(164,78,55,.3); border-radius:99px; color:var(--terracotta); font-size:10px; font-weight:700; letter-spacing:.12em; }
+.store-item-art { display:grid; height:150px; margin:18px 0; place-items:center; border-radius:var(--radius); background:radial-gradient(circle at 50% 60%,rgba(232,189,119,.35),transparent 60%),var(--olive); }
+.store-item-art img { width:58px; height:58px; object-fit:contain; opacity:.9; transition:transform .6s var(--ease-out); }
+.store-item:hover .store-item-art img { transform:rotate(-12deg) scale(1.08); }
+.store-item strong { color:var(--olive); font-family:"Instrument Serif",serif; font-size:30px; font-weight:400; line-height:1; }
+.store-item p { margin:10px 0 0; color:var(--muted-2); font-size:14px; line-height:1.6; }
+.store-actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:36px; }
+.store-cta { width:auto; min-width:300px; }
+
+@media (max-width:860px) {
+  .store-grid { grid-template-columns:1fr; gap:12px; margin-top:40px; }
+  .store-item { display:grid; grid-template-columns:96px 1fr; grid-template-rows:auto auto 1fr; column-gap:16px; padding:16px; }
+  .store-item-top { grid-column:2; }
+  .store-item-art { grid-column:1; grid-row:1 / span 3; height:auto; min-height:96px; margin:0; }
+  .store-item-art img { width:40px; height:40px; }
+  .store-item strong { grid-column:2; margin-top:10px; font-size:26px; }
+  .store-item p { grid-column:2; margin-top:6px; font-size:13px; }
+}
+@media (max-width:760px) {
+  .store-content { width:88vw; padding:24px 0 48px; }
+  .store-actions { flex-direction:column; align-items:stretch; }
+  .store-cta { min-width:0; width:100%; }
+}
