@@ -16,7 +16,9 @@ export default function ProfilePage() {
   const [loadError, setLoadError] = useState("");
   const [qrOpen, setQrOpen] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const cardRef = useRef<HTMLElement>(null);
+  const [flipped, setFlipped] = useState(false);
+  const [hasFlipped, setHasFlipped] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const qrTriggerRef = useRef<HTMLButtonElement>(null);
 
@@ -59,13 +61,21 @@ export default function ProfilePage() {
   const memberCode = user?.id ?? "";
   const stamps = Math.min(profile.stamps, STAMP_GOAL);
   const remaining = STAMP_GOAL - stamps;
+  const isStaff = ["admin", "owner"].includes(profile.role);
+  const memberNumber = memberCode ? `LOCA · ${memberCode.replace(/-/g, "").slice(0, 8).toUpperCase().replace(/(.{4})/, "$1 ")}` : "";
   const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString("id-ID", { month: "long", year: "numeric" }) : "";
+
+  function flip() {
+    setHasFlipped(true);
+    setFlipped((value) => !value);
+    navigator.vibrate?.(10);
+  }
 
   function handlePointerMove(event: React.PointerEvent<HTMLElement>) {
     const card = cardRef.current;
     if (!card || event.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const bounds = card.getBoundingClientRect();
-    setTilt({ x: ((event.clientY - bounds.top) / bounds.height - .5) * -4, y: ((event.clientX - bounds.left) / bounds.width - .5) * 4 });
+    setTilt({ x: ((event.clientY - bounds.top) / bounds.height - .5) * -6, y: ((event.clientX - bounds.left) / bounds.width - .5) * 6 });
   }
   async function signOut() {
     if (!window.confirm("Keluar dari profile Coffe Loca?")) return;
@@ -86,61 +96,89 @@ export default function ProfilePage() {
           <ol className="profile-howto">
             <li><b>01</b>Pesan kopi favoritmu</li>
             <li><b>02</b>Tunjukkan QR member ke kasir</li>
-            <li><b>03</b>Stamp ke-{STAMP_GOAL}: kopi gratis</li>
+            <li><b>03</b>Tekan &ldquo;Lihat stamp&rdquo; — stamp ke-{STAMP_GOAL} kopi gratis</li>
           </ol>
         </div>
 
-        <article ref={cardRef} className={`profile-card card${loading ? " is-loading" : ""}`} style={{ transform: `perspective(1100px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }} onPointerMove={handlePointerMove} onPointerLeave={() => setTilt({ x: 0, y: 0 })}>
-          <div className="profile-card-shimmer" aria-hidden="true" />
-          <div className="card-topline"><span>YOUR LOCA PROFILE</span><span>{memberSince ? `SEJAK ${memberSince.toUpperCase()}` : "MEDAN / 2026"}</span></div>
+        <div className="profile-wallet">
           {loading ? (
-            <div className="profile-skeleton" aria-label="Memuat profile"><i /><i /><i /><i /></div>
+            <div className="card profile-state"><div className="profile-skeleton" aria-label="Memuat profile"><i /><i /><i /><i /></div></div>
           ) : !user ? (
-            <div className="profile-empty">
+            <div className="card profile-state profile-empty">
               <h2>Profile belum bisa dibuka.</h2>
               <p>{loadError || "Kamu perlu login dulu untuk melihat kartu member."}</p>
               <a className="btn-primary" href="/login"><span>LOGIN / REGISTER</span><span className="arrow-icon" aria-hidden="true" /></a>
             </div>
           ) : (
-            <div className="profile-card-content">
-              <div className="profile-identity profile-stagger">
-                <div className="profile-avatar">{user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : initials}</div>
-                <div><span className="profile-kicker">{["admin", "owner"].includes(profile.role) ? `${profile.role.toUpperCase()} COFFE LOCA` : "MEMBER COFFE LOCA"}</span><h2>{displayName}</h2>{email && <p>{email}</p>}</div>
-              </div>
+            <>
+              <div ref={cardRef} className="member-card-scene" style={{ transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }} onPointerMove={handlePointerMove} onPointerLeave={() => setTilt({ x: 0, y: 0 })}>
+                <div className={`member-card${flipped ? " is-flipped" : ""}${hasFlipped ? " has-flipped" : ""}`} onClick={() => flip()}>
+                  <section className="member-card-face member-card-front" aria-hidden={flipped} aria-label="Kartu member Coffe Loca">
+                    <span className="mc-shine" aria-hidden="true" />
+                    <span className="mc-bean" aria-hidden="true"><img src="/white-coffee-bean.png" alt="" /></span>
+                    <header className="mc-top">
+                      <span className="mc-brand"><img src="/white-coffee-bean.png" alt="" /><span>COFFE <b>LOCA</b></span></span>
+                      <span className="mc-tier">{isStaff ? profile.role.toUpperCase() : "MEMBER"}</span>
+                    </header>
+                    <div className="mc-body">
+                      <div className="mc-identity">
+                        <small>NAMA MEMBER</small>
+                        <strong>{displayName}</strong>
+                        <span className="mc-number">{memberNumber}</span>
+                      </div>
+                      <button ref={qrTriggerRef} className="mc-qr" type="button" tabIndex={flipped ? -1 : 0} onClick={(event) => { event.stopPropagation(); setQrOpen(true); }} aria-label="Perbesar QR member">
+                        <QRCodeSVG value={memberCode} size={112} bgColor="#f8f4eb" fgColor="#26372d" level="M" />
+                        <i className="profile-scan-line" />
+                      </button>
+                    </div>
+                    <footer className="mc-bottom"><span>{memberSince ? `SEJAK ${memberSince.toUpperCase()}` : "MEDAN"}</span><span>SCAN DI KASIR</span></footer>
+                  </section>
 
-              <div className="profile-stamps profile-stagger">
-                <div className="profile-section-label"><span>COFFEE STAMP CARD</span><strong>{stamps} / {STAMP_GOAL}</strong></div>
-                <div className="profile-progress" role="progressbar" aria-label="Progress stamp" aria-valuemin={0} aria-valuemax={STAMP_GOAL} aria-valuenow={stamps}><i style={{ width: `${(stamps / STAMP_GOAL) * 100}%` }} /></div>
-                <div className="stamp-row">
-                  {Array.from({ length: STAMP_GOAL }, (_, index) => {
-                    const filled = index < stamps;
-                    const free = index === STAMP_GOAL - 1;
-                    return (
-                      <span className={`${filled ? "is-filled" : ""}${free ? " is-free-coffee" : ""}`} key={index} style={{ animationDelay: `${0.5 + index * 0.05}s` }}>
-                        <img src="/white-coffee-bean.png" alt="" />
-                        {free && <b>FREE</b>}
-                      </span>
-                    );
-                  })}
+                  <section className="member-card-face member-card-back" aria-hidden={!flipped} aria-label={`Kartu stamp: ${stamps} dari ${STAMP_GOAL}`}>
+                    <header className="mc-top">
+                      <span className="mc-back-title"><small>COFFE LOCA</small>Coffee stamp card</span>
+                      <span className="mc-count"><b>{stamps}</b>/{STAMP_GOAL}</span>
+                    </header>
+                    <div className="mc-stamps" key={flipped ? "shown" : "hidden"}>
+                      {Array.from({ length: STAMP_GOAL }, (_, index) => {
+                        const filled = index < stamps;
+                        const free = index === STAMP_GOAL - 1;
+                        return (
+                          <span key={index} className={`mc-stamp${filled ? " is-filled" : ""}${free ? " is-free" : ""}`} style={{ animationDelay: `${0.55 + index * 0.07}s`, ["--tilt" as string]: `${((index * 37) % 21) - 10}deg` }}>
+                            {free ? <b>FREE<br />COFFEE</b> : <img src="/white-coffee-bean.png" alt="" />}
+                          </span>
+                        );
+                      })}
+                    </div>
+                    <footer className="mc-bottom"><span>{remaining === 0 ? "KARTU PENUH — TUKAR KOPI GRATIS!" : `${remaining} STAMP LAGI UNTUK KOPI GRATIS`}</span><span>1 KOPI = 1 STAMP</span></footer>
+                  </section>
                 </div>
-                <small>{remaining === 0 ? "Selamat! Tukarkan kartu ini untuk 1 kopi gratis." : `${remaining} stamp lagi untuk gratis 1 kopi.`}</small>
               </div>
 
-              <div className="profile-member-code profile-stagger">
-                <div><span>MEMBER CODE</span><strong>Scan untuk stamp</strong><small>Tunjukkan ke kasir Coffe Loca. Ketuk QR untuk memperbesar.</small></div>
-                {memberCode && <button ref={qrTriggerRef} className="profile-qr" type="button" onClick={() => setQrOpen(true)} aria-label="Perbesar QR member"><QRCodeSVG value={memberCode} size={96} bgColor="#f8f4eb" fgColor="#354537" level="M" /><i className="profile-scan-line" /></button>}
+              <div className="member-card-controls">
+                <button className="btn-primary mc-flip" type="button" onClick={() => flip()} aria-pressed={flipped}>
+                  <span>{flipped ? "LIHAT KARTU" : "LIHAT STAMP"}</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 9M20 4v5h-5M20 12a8 8 0 0 1-13.7 5.6L4 15M4 20v-5h5" /></svg>
+                </button>
+                <p>{flipped ? "Ketuk kartu untuk kembali ke QR member." : `${stamps}/${STAMP_GOAL} stamp terkumpul. Ketuk kartu untuk membalik.`}</p>
               </div>
 
-              <div className="profile-actions profile-stagger">
-                <a className="btn-primary" href="/#reservation"><span>BUAT RESERVASI</span><span className="arrow-icon" aria-hidden="true" /></a>
-                <div className="profile-actions-row">
-                  {["admin", "owner"].includes(profile.role) && <a className="btn-ghost" href="/admin">ADMIN PANEL <span className="arrow-icon" aria-hidden="true" /></a>}
-                  <button className="btn-ghost profile-logout" type="button" onClick={signOut}>LOGOUT <span className="arrow-icon arrow-up" aria-hidden="true" /></button>
+              <div className="card profile-account">
+                <div className="profile-identity">
+                  <div className="profile-avatar">{user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : initials}</div>
+                  <div><span className="profile-kicker">{isStaff ? `${profile.role.toUpperCase()} COFFE LOCA` : "MEMBER COFFE LOCA"}</span><h2>{displayName}</h2>{email && <p>{email}</p>}</div>
+                </div>
+                <div className="profile-actions">
+                  <a className="btn-primary" href="/#reservation"><span>BUAT RESERVASI</span><span className="arrow-icon" aria-hidden="true" /></a>
+                  <div className="profile-actions-row">
+                    {isStaff && <a className="btn-ghost" href="/admin">ADMIN PANEL <span className="arrow-icon" aria-hidden="true" /></a>}
+                    <button className="btn-ghost profile-logout" type="button" onClick={signOut}>LOGOUT <span className="arrow-icon arrow-up" aria-hidden="true" /></button>
+                  </div>
                 </div>
               </div>
-            </div>
+            </>
           )}
-        </article>
+        </div>
       </section>
       <PageFooter items={["COFFE LOCA · MEDAN", "TAKE IT EASY", "© 2026"]} />
 
