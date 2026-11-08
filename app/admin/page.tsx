@@ -1,14 +1,16 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { getSupabaseClient } from "@/lib/supabase";
 import { PageHeader } from "@/components/PageShell";
+import QrScanner from "@/components/QrScanner";
 
 type Member = { id: string; full_name: string | null; stamps: number; role: string; created_at: string };
 type Status = { tone: "ok" | "error"; text: string } | null;
 const STAMP_GOAL = 10;
 const MEMBER_FIELDS = "id, full_name, stamps, role, created_at";
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -19,23 +21,20 @@ export default function AdminPage() {
   const [submitting, setSubmitting] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const submitRef = useRef<HTMLButtonElement>(null);
+  const closeScanner = useCallback(() => setScannerOpen(false), []);
 
-  useEffect(() => {
-    if (!scannerOpen) return;
-    let scanner: { clear: () => Promise<void> | void } | null = null;
-    import("html5-qrcode").then(({ Html5QrcodeScanner }) => {
-      const instance = new Html5QrcodeScanner("member-qr-reader", { fps: 10, qrbox: { width: 220, height: 220 } }, false);
-      scanner = instance;
-      instance.render((decodedText: string) => {
-        setMemberId(decodedText);
-        setStatus({ tone: "ok", text: "QR member terbaca. Tekan tombol untuk memberikan 1 stamp." });
-        setScannerOpen(false);
-      }, () => undefined);
-    });
-    return () => {
-      Promise.resolve(scanner?.clear()).catch(() => undefined);
-    };
-  }, [scannerOpen]);
+  function handleScan(text: string) {
+    setScannerOpen(false);
+    if (!UUID_PATTERN.test(text)) {
+      setStatus({ tone: "error", text: "QR ini bukan QR member Coffe Loca. Minta member membuka kartu di halaman Profile." });
+      return;
+    }
+    setMemberId(text);
+    const member = members.find((item) => item.id === text);
+    setStatus({ tone: "ok", text: member ? `QR terbaca: ${member.full_name || "member"} (${Math.min(member.stamps, STAMP_GOAL)}/${STAMP_GOAL} stamp). Tekan TAMBAH 1 STAMP.` : "QR member terbaca. Tekan TAMBAH 1 STAMP." });
+    window.setTimeout(() => submitRef.current?.focus(), 50);
+  }
 
   useEffect(() => {
     let active = true;
@@ -142,11 +141,15 @@ export default function AdminPage() {
           <div className="admin-award-card card">
             <div className="card-topline"><span>STAMP DESK</span><span>SCAN / ADD 1</span></div>
             <h2>Tambahkan stamp.</h2>
-            <button className="btn-ghost admin-scan-toggle" type="button" onClick={() => setScannerOpen((value) => !value)} aria-expanded={scannerOpen}>{scannerOpen ? "TUTUP SCANNER" : "SCAN QR MEMBER"}</button>
-            {scannerOpen && <div id="member-qr-reader" className="admin-qr-reader" />}
+            <button className="admin-scan-button" type="button" onClick={() => setScannerOpen(true)}>
+              <span className="admin-scan-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5M7 12h10" /></svg></span>
+              <span><strong>Scan QR member</strong><small>Buka kamera untuk membaca kartu member</small></span>
+              <i className="arrow-icon" aria-hidden="true" />
+            </button>
+            <div className="admin-or"><span>ATAU MASUKKAN MANUAL</span></div>
             <form onSubmit={awardStamp}>
               <label className="field"><span>MEMBER ID / QR VALUE</span><input value={memberId} onChange={(event) => setMemberId(event.target.value)} placeholder="Scan atau tempel ID member" spellCheck={false} /></label>
-              <button className="btn-primary" type="submit" disabled={submitting}><span>{submitting ? "MENAMBAHKAN..." : "TAMBAH 1 STAMP"}</span><i className="arrow-icon" aria-hidden="true" /></button>
+              <button ref={submitRef} className="btn-primary" type="submit" disabled={submitting}><span>{submitting ? "MENAMBAHKAN..." : "TAMBAH 1 STAMP"}</span><i className="arrow-icon" aria-hidden="true" /></button>
             </form>
             {status && <p className={`notice${status.tone === "error" ? " notice-error" : ""}`} role={status.tone === "error" ? "alert" : "status"}>{status.text}</p>}
           </div>
@@ -177,6 +180,7 @@ export default function AdminPage() {
           </div>
         </div>
       </section>
+      {scannerOpen && <QrScanner onResult={handleScan} onClose={closeScanner} />}
     </main>
   );
 }

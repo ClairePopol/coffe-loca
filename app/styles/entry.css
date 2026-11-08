@@ -5,8 +5,9 @@
 .entry-choice-orbit { position:fixed; z-index:-1; right:-16vw; bottom:-28vw; width:70vw; height:70vw; border:1px solid rgba(217,183,122,.25); border-radius:50%; box-shadow:0 0 0 35px rgba(217,183,122,.04),0 0 0 70px rgba(217,183,122,.025); animation:locationOrbit 24s linear infinite; pointer-events:none; }
 .entry-choice-top,.entry-choice-bottom { display:flex; justify-content:space-between; gap:16px; padding:28px 7vw; color:rgba(247,242,231,.66); font-size:var(--fs-label); font-weight:700; letter-spacing:var(--track-label); }
 .entry-choice-content { width:min(760px,86vw); margin:auto; padding:24px 0; text-align:center; }
-.entry-choice-mark { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:34px; color:var(--gold); font-family:"Instrument Serif",serif; font-size:30px; letter-spacing:-.03em; }
-.entry-choice-mark img { width:36px; height:36px; object-fit:contain; filter:sepia(1) saturate(.6) brightness(1.5); }
+.entry-choice-mark { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:34px; color:#f7f2e7; font-family:Manrope,sans-serif; font-size:24px; font-weight:800; letter-spacing:.12em; }
+.entry-choice-mark b { color:#ef4741; font-weight:800; }
+.entry-choice-mark img { width:40px; height:40px; object-fit:contain; }
 .entry-choice .eyebrow { color:#e2bd93; font-size:var(--fs-label); letter-spacing:var(--track-label); }
 .entry-choice h1 { margin:26px 0 16px; color:#f7f2e7; font-family:Manrope,sans-serif; font-size:clamp(56px,8vw,104px); font-weight:400; letter-spacing:-.085em; line-height:.84; }
 .entry-choice h1 em { color:var(--gold); font-family:"Instrument Serif",serif; font-weight:400; }
@@ -26,7 +27,7 @@
   .entry-choice-top,.entry-choice-bottom { padding:20px 6vw; font-size:10px; }
   .entry-choice-bottom>span:last-child { display:none; }
   .entry-choice-content { width:88vw; }
-  .entry-choice-mark { margin-bottom:26px; font-size:26px; }
+  .entry-choice-mark { margin-bottom:26px; font-size:19px; }
   .entry-choice-mark img { width:30px; height:30px; }
   .entry-choice h1 { margin-top:20px; font-size:clamp(50px,13.5vw,80px); }
   .entry-choice-content>p { font-size:14px; }
