@@ -9,6 +9,8 @@ import type { User } from "@supabase/supabase-js";
 import { getSupabaseClient } from "@/lib/supabase";
 import { coffeeAndDrinks, comfortFood, snacks, type Dish } from "@/lib/menu";
 import { SITE } from "@/lib/site";
+import { lenisRef } from "@/lib/lenis";
+import { useScrollLock } from "@/lib/useScrollLock";
 import SequenceScroll from "@/components/SequenceScroll";
 import Wordmark from "@/components/Wordmark";
 
@@ -45,6 +47,29 @@ function Navigation() {
   const [lightSurface, setLightSurface] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const close = () => setOpen(false);
+  useScrollLock(open);
+
+  function goTo(event: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    event.preventDefault();
+    setOpen(false);
+    // Wait until the menu has released the scroll lock (Lenis running again), then glide to the section.
+    const startedAt = performance.now();
+    const tryScroll = () => {
+      const lenis = lenisRef.current;
+      const unlocked = !lenis || !lenis.isStopped;
+      if (!unlocked && performance.now() - startedAt < 1500) {
+        requestAnimationFrame(tryScroll);
+        return;
+      }
+      const target = document.querySelector<HTMLElement>(href);
+      if (!target) return;
+      window.history.replaceState(null, "", href);
+      if (lenis) lenis.scrollTo(target);
+      else target.scrollIntoView({ behavior: "smooth" });
+    };
+    requestAnimationFrame(tryScroll);
+  }
+
   useEffect(() => {
     let active = true;
     try {
@@ -110,12 +135,12 @@ function Navigation() {
       </header>
       <AnimatePresence>
         {open && (
-          <motion.div id="site-menu" data-lenis-prevent className="menu-overlay" initial={{ clipPath: "inset(0 0 100% 0)" }} animate={{ clipPath: "inset(0 0 0% 0)" }} exit={{ clipPath: "inset(0 0 100% 0)" }} transition={{ duration: 0.72, ease: [0.76, 0, 0.24, 1] }}>
+          <motion.div id="site-menu" data-lenis-prevent data-scroll-lock-allow className="menu-overlay" initial={{ clipPath: "inset(0 0 100% 0)" }} animate={{ clipPath: "inset(0 0 0% 0)" }} exit={{ clipPath: "inset(0 0 100% 0)" }} transition={{ duration: 0.72, ease: [0.76, 0, 0.24, 1] }}>
             <div className="menu-inner">
               <div className="menu-top"><span><i /> NAVIGASI / COFFE LOCA</span><span>{pad(menuItems.length)} HALAMAN</span></div>
               <nav className="menu-links" aria-label="Navigasi utama">
                 {menuItems.map((item, index) => (
-                  <motion.a key={item.number} href={item.href} onClick={close} initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 + index * 0.1, duration: 0.62, ease: [0.22, 1, 0.36, 1] }}>
+                  <motion.a key={item.number} href={item.href} onClick={(event) => goTo(event, item.href)} initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 + index * 0.1, duration: 0.62, ease: [0.22, 1, 0.36, 1] }}>
                     <span className="menu-number">{item.number}</span><span className="menu-title-wrap"><span className="menu-title">{item.title}</span><small>{item.note}</small></span><span className="menu-arrow"><i className="arrow-icon" aria-hidden="true" /></span>
                   </motion.a>
                 ))}
@@ -137,6 +162,7 @@ function Navigation() {
 function EntryChoice() {
   const [visible, setVisible] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
+  useScrollLock(visible);
 
   useEffect(() => {
     setVisible(true);
@@ -156,7 +182,7 @@ function EntryChoice() {
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div ref={dialogRef} tabIndex={-1} data-lenis-prevent className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
+        <motion.div ref={dialogRef} tabIndex={-1} data-lenis-prevent data-scroll-lock-allow className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
           <div className="entry-choice-orbit" aria-hidden="true" />
           <div className="entry-choice-top"><span>LOCA / EST. WITH CARE</span><span>MEDAN · 2026</span></div>
           <div className="entry-choice-content">
@@ -179,6 +205,7 @@ function EntryChoice() {
 function SmoothScroll() {
   useEffect(() => {
     const lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.88, anchors: true });
+    lenisRef.current = lenis;
     gsap.registerPlugin(ScrollTrigger);
     const updateScrollTrigger = () => ScrollTrigger.update();
     const raf = (time: number) => lenis.raf(time * 1000);
@@ -196,6 +223,7 @@ function SmoothScroll() {
     observer.observe(document.body, { attributes: true, attributeFilter: ["class"] });
     return () => {
       observer.disconnect();
+      lenisRef.current = null;
       lenis.off("scroll", updateScrollTrigger);
       gsap.ticker.remove(raf);
       lenis.destroy();
