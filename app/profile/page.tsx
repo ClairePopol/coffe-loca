@@ -16,8 +16,9 @@ export default function ProfilePage() {
   const [loadError, setLoadError] = useState("");
   const [qrOpen, setQrOpen] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [flipped, setFlipped] = useState(false);
-  const [hasFlipped, setHasFlipped] = useState(false);
+  const [side, setSide] = useState<"front" | "back">("front");
+  const [phase, setPhase] = useState<"idle" | "out" | "in">("idle");
+  const flipped = side === "back";
   const cardRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const qrTriggerRef = useRef<HTMLButtonElement>(null);
@@ -65,10 +66,26 @@ export default function ProfilePage() {
   const memberNumber = memberCode ? `LOCA · ${memberCode.replace(/-/g, "").slice(0, 8).toUpperCase().replace(/(.{4})/, "$1 ")}` : "";
   const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString("id-ID", { month: "long", year: "numeric" }) : "";
 
+  // Single-sided flip: turn the card edge-on, swap the face, turn it back.
+  // (Two-sided backface-visibility flips are unreliable in mobile Safari.)
   function flip() {
-    setHasFlipped(true);
-    setFlipped((value) => !value);
+    if (phase !== "idle") return;
     navigator.vibrate?.(10);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setSide((current) => (current === "front" ? "back" : "front"));
+      return;
+    }
+    setPhase("out");
+  }
+
+  function onFlipAnimationEnd(event: React.AnimationEvent<HTMLDivElement>) {
+    if (event.target !== event.currentTarget) return;
+    if (phase === "out") {
+      setSide((current) => (current === "front" ? "back" : "front"));
+      setPhase("in");
+    } else if (phase === "in") {
+      setPhase("idle");
+    }
   }
 
   function handlePointerMove(event: React.PointerEvent<HTMLElement>) {
@@ -110,73 +127,82 @@ export default function ProfilePage() {
               <a className="btn-primary" href="/login"><span>LOGIN / REGISTER</span><span className="arrow-icon" aria-hidden="true" /></a>
             </div>
           ) : (
-            <>
-              <div ref={cardRef} className="member-card-scene" style={{ transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }} onPointerMove={handlePointerMove} onPointerLeave={() => setTilt({ x: 0, y: 0 })}>
-                <div className={`member-card${flipped ? " is-flipped" : ""}${hasFlipped ? " has-flipped" : ""}`} onClick={() => flip()}>
-                  <section className="member-card-face member-card-front" aria-hidden={flipped} aria-label="Kartu member Coffe Loca">
-                    <span className="mc-shine" aria-hidden="true" />
-                    <span className="mc-bean" aria-hidden="true"><img src="/white-coffee-bean.png" alt="" /></span>
-                    <header className="mc-top">
-                      <span className="mc-brand"><img src="/white-coffee-bean.png" alt="" /><span>COFFE <b>LOCA</b></span></span>
-                      <span className="mc-tier">{isStaff ? profile.role.toUpperCase() : "MEMBER"}</span>
-                    </header>
-                    <div className="mc-body">
-                      <div className="mc-identity">
-                        <small>NAMA MEMBER</small>
-                        <strong>{displayName}</strong>
-                        <span className="mc-number">{memberNumber}</span>
-                      </div>
-                      <button ref={qrTriggerRef} className="mc-qr" type="button" tabIndex={flipped ? -1 : 0} onClick={(event) => { event.stopPropagation(); setQrOpen(true); }} aria-label="Perbesar QR member">
-                        <QRCodeSVG value={memberCode} size={112} bgColor="#f8f4eb" fgColor="#26372d" level="M" />
-                        <i className="profile-scan-line" />
-                      </button>
-                    </div>
-                    <footer className="mc-bottom"><span>{memberSince ? `SEJAK ${memberSince.toUpperCase()}` : "MEDAN"}</span><span>SCAN DI KASIR</span></footer>
-                  </section>
+            <div className="card profile-wallet-panel">
+              <div className="profile-identity">
+                <div className="profile-avatar">{user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : initials}</div>
+                <div><span className="profile-kicker">{isStaff ? `${profile.role.toUpperCase()} COFFE LOCA` : "MEMBER COFFE LOCA"}</span><h2>{displayName}</h2>{email && <p>{email}</p>}</div>
+              </div>
 
-                  <section className="member-card-face member-card-back" aria-hidden={!flipped} aria-label={`Kartu stamp: ${stamps} dari ${STAMP_GOAL}`}>
-                    <header className="mc-top">
-                      <span className="mc-back-title"><small>COFFE LOCA</small>Coffee stamp card</span>
-                      <span className="mc-count"><b>{stamps}</b>/{STAMP_GOAL}</span>
-                    </header>
-                    <div className="mc-stamps" key={flipped ? "shown" : "hidden"}>
-                      {Array.from({ length: STAMP_GOAL }, (_, index) => {
-                        const filled = index < stamps;
-                        const free = index === STAMP_GOAL - 1;
-                        return (
-                          <span key={index} className={`mc-stamp${filled ? " is-filled" : ""}${free ? " is-free" : ""}`} style={{ animationDelay: `${0.55 + index * 0.07}s`, ["--tilt" as string]: `${((index * 37) % 21) - 10}deg` }}>
-                            {free ? <b>FREE<br />COFFEE</b> : <img src="/white-coffee-bean.png" alt="" />}
-                          </span>
-                        );
-                      })}
-                    </div>
-                    <footer className="mc-bottom"><span>{remaining === 0 ? "KARTU PENUH — TUKAR KOPI GRATIS!" : `${remaining} STAMP LAGI UNTUK KOPI GRATIS`}</span><span>1 KOPI = 1 STAMP</span></footer>
-                  </section>
+              <div ref={cardRef} className="member-card-scene" style={{ transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }} onPointerMove={handlePointerMove} onPointerLeave={() => setTilt({ x: 0, y: 0 })}>
+                <div className={`member-card side-${side}${phase !== "idle" ? ` is-${phase}` : ""}`} onClick={flip} onAnimationEnd={onFlipAnimationEnd} aria-live="polite">
+                  {side === "front" ? (
+                    <section className="member-card-face member-card-front" aria-label="Kartu member Coffe Loca">
+                      <span className="mc-shine" aria-hidden="true" />
+                      <span className="mc-bean" aria-hidden="true"><img src="/white-coffee-bean.png" alt="" /></span>
+                      <header className="mc-top">
+                        <span className="mc-brand"><img src="/white-coffee-bean.png" alt="" /><span>COFFE <b>LOCA</b></span></span>
+                        <span className="mc-tier">{isStaff ? profile.role.toUpperCase() : "MEMBER"}</span>
+                      </header>
+                      <div className="mc-body">
+                        <div className="mc-identity">
+                          <small>NAMA MEMBER</small>
+                          <strong>{displayName}</strong>
+                          <span className="mc-number">{memberNumber}</span>
+                        </div>
+                        <button ref={qrTriggerRef} className="mc-qr" type="button" onClick={(event) => { event.stopPropagation(); setQrOpen(true); }} aria-label="Perbesar QR member">
+                          <QRCodeSVG value={memberCode} size={112} bgColor="#f8f4eb" fgColor="#26372d" level="M" />
+                          <i className="profile-scan-line" />
+                        </button>
+                      </div>
+                      <footer className="mc-bottom"><span>{memberSince ? `SEJAK ${memberSince.toUpperCase()}` : "MEDAN"}</span><span>SCAN DI KASIR</span></footer>
+                    </section>
+                  ) : (
+                    <section className="member-card-face member-card-back" aria-label={`Kartu stamp: ${stamps} dari ${STAMP_GOAL}`}>
+                      <header className="mc-back-top">
+                        <span className="mc-back-brand"><img src="/white-coffee-bean.png" alt="" /><span><small>COFFE <b>LOCA</b></small>Stamp card</span></span>
+                        <span className="mc-count"><b>{stamps}</b>/ {STAMP_GOAL}</span>
+                      </header>
+                      <div className="mc-stamps">
+                        {Array.from({ length: STAMP_GOAL }, (_, index) => {
+                          const filled = index < stamps;
+                          const free = index === STAMP_GOAL - 1;
+                          return (
+                            <span key={index} className={`mc-stamp${filled ? " is-filled" : ""}${free ? " is-free" : ""}`} style={{ ["--i" as string]: index, ["--tilt" as string]: `${((index * 37) % 21) - 10}deg` }}>
+                              {free ? (
+                                <><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1 1 1.5 1 2.5M11.5 3.5c0 1 1 1.5 1 2.5" /></svg><b>FREE</b></>
+                              ) : filled ? (
+                                <img src="/white-coffee-bean.png" alt="" />
+                              ) : (
+                                <em>{index + 1}</em>
+                              )}
+                            </span>
+                          );
+                        })}
+                      </div>
+                      <footer className="mc-back-bottom">
+                        <span className="mc-meter" aria-hidden="true"><i style={{ width: `${(stamps / STAMP_GOAL) * 100}%` }} /></span>
+                        <span>{remaining === 0 ? "Kartu penuh — tukar kopi gratismu!" : `${remaining} stamp lagi untuk kopi gratis`}</span>
+                      </footer>
+                    </section>
+                  )}
                 </div>
               </div>
 
               <div className="member-card-controls">
-                <button className="btn-primary mc-flip" type="button" onClick={() => flip()} aria-pressed={flipped}>
-                  <span>{flipped ? "LIHAT KARTU" : "LIHAT STAMP"}</span>
+                <button className="btn-ghost mc-flip" type="button" onClick={flip} aria-pressed={flipped}>
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 9M20 4v5h-5M20 12a8 8 0 0 1-13.7 5.6L4 15M4 20v-5h5" /></svg>
+                  <span>{flipped ? "LIHAT KARTU" : "LIHAT STAMP"}</span>
                 </button>
-                <p>{flipped ? "Ketuk kartu untuk kembali ke QR member." : `${stamps}/${STAMP_GOAL} stamp terkumpul. Ketuk kartu untuk membalik.`}</p>
               </div>
 
-              <div className="card profile-account">
-                <div className="profile-identity">
-                  <div className="profile-avatar">{user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : initials}</div>
-                  <div><span className="profile-kicker">{isStaff ? `${profile.role.toUpperCase()} COFFE LOCA` : "MEMBER COFFE LOCA"}</span><h2>{displayName}</h2>{email && <p>{email}</p>}</div>
-                </div>
-                <div className="profile-actions">
-                  <a className="btn-primary" href="/#reservation"><span>BUAT RESERVASI</span><span className="arrow-icon" aria-hidden="true" /></a>
-                  <div className="profile-actions-row">
-                    {isStaff && <a className="btn-ghost" href="/admin">ADMIN PANEL <span className="arrow-icon" aria-hidden="true" /></a>}
-                    <button className="btn-ghost profile-logout" type="button" onClick={signOut}>LOGOUT <span className="arrow-icon arrow-up" aria-hidden="true" /></button>
-                  </div>
+              <div className="profile-actions">
+                <a className="btn-primary" href="/#reservation"><span>BUAT RESERVASI</span><span className="arrow-icon" aria-hidden="true" /></a>
+                <div className="profile-actions-row">
+                  {isStaff && <a className="btn-ghost" href="/admin">ADMIN PANEL <span className="arrow-icon" aria-hidden="true" /></a>}
+                  <button className="btn-ghost profile-logout" type="button" onClick={signOut}>LOGOUT <span className="arrow-icon arrow-up" aria-hidden="true" /></button>
                 </div>
               </div>
-            </>
+            </div>
           )}
         </div>
       </section>
