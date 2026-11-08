@@ -181,7 +181,7 @@ export default function ProfilePage() {
                       </div>
                       <footer className="mc-back-bottom">
                         <span className="mc-meter" aria-hidden="true"><i style={{ width: `${(stamps / STAMP_GOAL) * 100}%` }} /></span>
-                        <span>{remaining === 0 ? "Kartu penuh — tukar kopi gratismu!" : `${remaining} stamp lagi untuk kopi gratis`}</span>
+                        <span>{remaining === 0 ? "Penuh! Tunjukkan QR ke kasir untuk kopi gratis" : `${remaining} stamp lagi untuk kopi gratis`}</span>
                       </footer>
                     </section>
                   )}

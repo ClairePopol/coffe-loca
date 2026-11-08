@@ -95,5 +95,97 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
+
+-- ---------------------------------------------------------------------------
+-- Stamp history (who gave / redeemed stamps for whom, and when)
+-- Rows are only written by the functions below; admins/owners can read them.
+-- ---------------------------------------------------------------------------
+create table if not exists public.stamp_logs (
+  id bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),
+  action text not null check (action in ('add', 'redeem')),
+  amount integer not null,
+  stamps_before integer not null,
+  stamps_after integer not null,
+  member_id uuid not null references public.profiles(id) on delete cascade,
+  member_name text,
+  admin_id uuid references public.profiles(id) on delete set null,
+  admin_name text
+);
+
+create index if not exists stamp_logs_created_at_idx on public.stamp_logs (created_at desc);
+create index if not exists stamp_logs_member_idx on public.stamp_logs (member_id, created_at desc);
+
+alter table public.stamp_logs enable row level security;
+revoke insert, update, delete on public.stamp_logs from anon, authenticated;
+
+drop policy if exists "Admins can read stamp logs" on public.stamp_logs;
+create policy "Admins can read stamp logs"
+  on public.stamp_logs for select
+  using (public.is_admin_or_owner());
+
+-- Add 1-10 stamps. The card holds at most 10; extra stamps are not added.
+create or replace function public.award_stamps(target_user_id uuid, amount integer)
+returns public.stamp_logs
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  target_member public.profiles;
+  staff public.profiles;
+  added integer;
+  log_row public.stamp_logs;
+begin
+  select * into staff from public.profiles where id = auth.uid() and role in ('admin', 'owner');
+  if staff.id is null then raise exception 'Hanya admin atau owner yang bisa menambah stamp'; end if;
+  if amount is null or amount < 1 or amount > 10 then raise exception 'Jumlah stamp harus 1 sampai 10'; end if;
+
+  select * into target_member from public.profiles where id = target_user_id for update;
+  if target_member.id is null then raise exception 'Member tidak ditemukan'; end if;
+  if target_member.stamps >= 10 then raise exception 'Kartu member sudah penuh (10/10). Tukarkan kopi gratis dulu.'; end if;
+
+  added := least(amount, 10 - target_member.stamps);
+  update public.profiles set stamps = stamps + added, updated_at = now() where id = target_member.id;
+
+  insert into public.stamp_logs (action, amount, stamps_before, stamps_after, member_id, member_name, admin_id, admin_name)
+  values ('add', added, target_member.stamps, target_member.stamps + added, target_member.id, target_member.full_name, staff.id, staff.full_name)
+  returning * into log_row;
+  return log_row;
+end;
+$$;
+
+revoke all on function public.award_stamps(uuid, integer) from public;
+grant execute on function public.award_stamps(uuid, integer) to authenticated;
+
+-- Redeem a full card (10 stamps) for one free coffee and reset it to 0.
+create or replace function public.redeem_free_coffee(target_user_id uuid)
+returns public.stamp_logs
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  target_member public.profiles;
+  staff public.profiles;
+  log_row public.stamp_logs;
+begin
+  select * into staff from public.profiles where id = auth.uid() and role in ('admin', 'owner');
+  if staff.id is null then raise exception 'Hanya admin atau owner yang bisa menukar kopi gratis'; end if;
+
+  select * into target_member from public.profiles where id = target_user_id for update;
+  if target_member.id is null then raise exception 'Member tidak ditemukan'; end if;
+  if target_member.stamps < 10 then raise exception 'Stamp belum 10 (baru %/10)', target_member.stamps; end if;
+
+  update public.profiles set stamps = 0, updated_at = now() where id = target_member.id;
+
+  insert into public.stamp_logs (action, amount, stamps_before, stamps_after, member_id, member_name, admin_id, admin_name)
+  values ('redeem', 10, target_member.stamps, 0, target_member.id, target_member.full_name, staff.id, staff.full_name)
+  returning * into log_row;
+  return log_row;
+end;
+$$;
+
+revoke all on function public.redeem_free_coffee(uuid) from public;
+grant execute on function public.redeem_free_coffee(uuid) to authenticated;
+
 -- Refresh the API schema cache so new columns (e.g. stamps) are visible immediately.
 notify pgrst, 'reload schema';
