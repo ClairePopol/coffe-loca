@@ -1,5 +1,5 @@
 /* Shared shell for Login, Profile, Admin, Store */
-.page-shell { position:relative; isolation:isolate; display:flex; min-height:100svh; flex-direction:column; overflow:hidden; color:var(--olive); background:linear-gradient(125deg,#f9f4ea 0%,#ece2d0 100%); }
+.page-shell { position:relative; isolation:isolate; display:flex; min-height:100svh; flex-direction:column; overflow:hidden; overflow:clip; color:var(--olive); background:linear-gradient(125deg,#f9f4ea 0%,#ece2d0 100%); }
 .page-shell::before { position:absolute; z-index:-1; top:-10%; right:-8%; width:min(60vw,760px); aspect-ratio:1; content:""; border-radius:50%; background:radial-gradient(circle,rgba(232,189,119,.24),transparent 64%); pointer-events:none; }
 .page-header { position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:20px; padding:28px 7vw; }
 .page-back { display:inline-flex; min-height:44px; align-items:center; gap:8px; color:var(--muted-2); font-size:var(--fs-label); font-weight:700; letter-spacing:var(--track-label); transition:color .25s; }

@@ -6,6 +6,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { PageFooter, PageHeader } from "@/components/PageShell";
 import { useConfirm } from "@/components/ConfirmDialog";
+import { isStaff as isStaffRole, roleLabel } from "@/lib/roles";
 
 type Profile = { stamps: number; role: string };
 const STAMP_GOAL = 10;
@@ -65,7 +66,7 @@ export default function ProfilePage() {
   const memberCode = user?.id ?? "";
   const stamps = Math.min(profile.stamps, STAMP_GOAL);
   const remaining = STAMP_GOAL - stamps;
-  const isStaff = ["admin", "owner"].includes(profile.role);
+  const isStaff = isStaffRole(profile.role);
   const memberNumber = memberCode ? `LOCA · ${memberCode.replace(/-/g, "").slice(0, 8).toUpperCase().replace(/(.{4})/, "$1 ")}` : "";
   const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString("id-ID", { month: "long", year: "numeric" }) : "";
 
@@ -144,7 +145,7 @@ export default function ProfilePage() {
             <div className="card profile-wallet-panel">
               <div className="profile-identity">
                 <div className="profile-avatar">{user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : initials}</div>
-                <div><span className="profile-kicker">{isStaff ? `${profile.role.toUpperCase()} COFFE LOCA` : "MEMBER COFFE LOCA"}</span><h2>{displayName}</h2>{email && <p>{email}</p>}</div>
+                <div><span className="profile-kicker">{`${roleLabel(profile.role).toUpperCase()} COFFE LOCA`}</span><h2>{displayName}</h2>{email && <p>{email}</p>}</div>
               </div>
 
               <div ref={cardRef} className="member-card-scene" style={{ transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }} onPointerMove={handlePointerMove} onPointerLeave={() => setTilt({ x: 0, y: 0 })}>
@@ -155,7 +156,7 @@ export default function ProfilePage() {
                       <span className="mc-bean" aria-hidden="true"><img src="/white-coffee-bean.png" alt="" /></span>
                       <header className="mc-top">
                         <span className="mc-brand"><img src="/white-coffee-bean.png" alt="" /><span>COFFE <b>LOCA</b></span></span>
-                        <span className="mc-tier">{isStaff ? profile.role.toUpperCase() : "MEMBER"}</span>
+                        <span className="mc-tier">{roleLabel(profile.role).toUpperCase()}</span>
                       </header>
                       <div className="mc-body">
                         <div className="mc-identity">
