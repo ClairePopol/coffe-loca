@@ -211,7 +211,9 @@
   .about-layout { gap:6vw; }
   .menu-list { column-gap:40px; }
   .menu-category-tabs button { grid-template-columns:30px minmax(0,1fr) auto; gap:10px; padding:14px 16px; }
-  .menu-tab-copy strong { font-size:24px; }
+  .menu-tab-copy strong { font-size:24px; white-space:nowrap; }
+  .menu-tab-number,.menu-tab-copy small { display:none; }
+  .menu-category-tabs button { grid-template-columns:minmax(0,1fr) auto; min-height:64px; }
   .reservation-layout,.location-layout { grid-template-columns:1fr; gap:48px; }
   .reservation-card { justify-self:stretch; width:100%; }
   .reservation-mark { display:none; }
@@ -219,13 +221,16 @@
   .footer-main { grid-template-columns:1fr 1fr; }
 }
 @media (max-width:860px) {
+  .about-rituals { grid-template-columns:1fr; gap:10px; }
+  .about-rituals>li { min-height:0; }
+  .about-rituals strong { margin-top:14px; }
   .menu-list { columns:1; }
   .menu-item-copy>small { padding-right:0; }
 }
 @media (max-width:760px) {
   .section-pad { padding-right:6vw; padding-left:6vw; }
   .section-kicker { padding-bottom:12px; font-size:10px; letter-spacing:.1em; }
-  .section-kicker>span:last-child { text-align:right; }
+  .section-kicker>span:last-child { display:none; }
   .story-world .eyebrow { font-size:10px; }
   .about-section { min-height:auto; padding-top:92px; padding-bottom:72px; }
   .about-section::before { top:11%; right:-17%; width:min(70vw,340px); opacity:.075; }
