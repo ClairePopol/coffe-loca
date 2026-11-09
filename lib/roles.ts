@@ -15,18 +15,14 @@ export const roleLabel = (role: string | null | undefined) => ROLE_LABEL[asRole(
 export const isStaff = (role: string | null | undefined) => asRole(role) !== "member";
 export const canManageCoffee = (role: string | null | undefined) => ["admin_coffee", "admin", "owner"].includes(asRole(role));
 export const canManageStore = (role: string | null | undefined) => ["admin_store", "admin", "owner"].includes(asRole(role));
-export const canManageRoles = (role: string | null | undefined) => ["admin", "owner"].includes(asRole(role));
+export const canManageRoles = (role: string | null | undefined) => asRole(role) === "owner";
 
-/** Roles the current staff member may hand out (owner: all, Admin Umum: no admin/owner). */
+/** Roles the current user may hand out — only the Owner manages roles. */
 export function assignableRoles(actor: string | null | undefined): Role[] {
-  if (asRole(actor) === "owner") return ["member", "admin_coffee", "admin_store", "admin", "owner"];
-  if (asRole(actor) === "admin") return ["member", "admin_coffee", "admin_store"];
-  return [];
+  return canManageRoles(actor) ? ["member", "admin_coffee", "admin_store", "admin", "owner"] : [];
 }
 
 /** Whether the actor may change this target's role at all. */
-export function canEditRoleOf(actor: string | null | undefined, target: string | null | undefined, isSelf: boolean) {
-  if (isSelf || !canManageRoles(actor)) return false;
-  if (asRole(actor) === "admin") return !["admin", "owner"].includes(asRole(target));
-  return true;
+export function canEditRoleOf(actor: string | null | undefined, _target: string | null | undefined, isSelf: boolean) {
+  return !isSelf && canManageRoles(actor);
 }

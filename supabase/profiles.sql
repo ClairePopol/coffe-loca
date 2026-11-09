@@ -221,8 +221,7 @@ grant execute on function public.redeem_free_coffee(uuid) to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- Change a member's role (from the admin panel)
---   Owner      : can set any role, except changing their own role
---   Admin Umum : can set member / admin_coffee / admin_store; cannot touch admin or owner accounts
+--   Only the Owner can change roles (any role), but not their own.
 -- ---------------------------------------------------------------------------
 create or replace function public.set_member_role(target_user_id uuid, new_role text)
 returns public.profiles
@@ -234,17 +233,13 @@ declare
   target_profile public.profiles;
   updated_profile public.profiles;
 begin
-  select * into staff from public.profiles where id = auth.uid() and role in ('admin', 'owner');
-  if staff.id is null then raise exception 'Hanya Owner atau Admin Umum yang bisa mengubah role'; end if;
+  select * into staff from public.profiles where id = auth.uid() and role = 'owner';
+  if staff.id is null then raise exception 'Hanya Owner yang bisa mengubah role'; end if;
   if new_role not in ('member', 'admin_coffee', 'admin_store', 'admin', 'owner') then raise exception 'Role tidak dikenal: %', new_role; end if;
   if target_user_id = staff.id then raise exception 'Kamu tidak bisa mengubah role akunmu sendiri'; end if;
 
   select * into target_profile from public.profiles where id = target_user_id for update;
   if target_profile.id is null then raise exception 'Member tidak ditemukan'; end if;
-
-  if staff.role = 'admin' and (new_role in ('admin', 'owner') or target_profile.role in ('admin', 'owner')) then
-    raise exception 'Admin Umum tidak bisa mengatur akun Admin Umum atau Owner';
-  end if;
 
   update public.profiles set role = new_role, updated_at = now() where id = target_profile.id
   returning * into updated_profile;
