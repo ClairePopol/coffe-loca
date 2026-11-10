@@ -28,6 +28,9 @@
 .auth-password input { padding-right:112px; }
 .auth-password button { position:absolute; top:5px; right:5px; height:40px; padding:0 12px; border:0; border-radius:8px; color:var(--terracotta); background:transparent; font-size:11px; font-weight:700; letter-spacing:.1em; cursor:pointer; transition:background .25s; }
 .auth-password button:hover { background:rgba(164,78,55,.08); }
+.field-hint { display:block; margin-top:7px; color:var(--muted-2); font-size:12.5px; line-height:1.45; }
+.auth-forgot { color:var(--muted-2); font-size:13.5px; }
+.auth-forgot b { color:var(--terracotta); font-weight:600; }
 .auth-form-meta { display:flex; align-items:center; justify-content:space-between; gap:12px; }
 .auth-check { display:flex; min-height:32px; align-items:center; gap:8px; cursor:pointer; }
 .auth-check input { width:16px; height:16px; margin:0; accent-color:var(--terracotta); }

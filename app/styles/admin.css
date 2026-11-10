@@ -67,6 +67,7 @@
 .admin-member-info { display:flex; min-width:0; flex-direction:column; gap:4px; }
 .admin-member-info strong { display:flex; align-items:center; gap:8px; color:var(--olive); font-size:15px; font-weight:600; }
 .admin-member-info em { padding:2px 8px; border-radius:99px; color:var(--terracotta); background:rgba(164,78,55,.1); font-size:10px; font-style:normal; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.admin-member-phone { color:var(--olive); font-size:13px; font-weight:600; letter-spacing:.02em; }
 .admin-member-info small { overflow:hidden; color:#8f8878; font-family:ui-monospace,monospace; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
 .admin-member-stamps { display:flex; flex-direction:column; gap:6px; }
 .admin-member-stamps span { color:var(--terracotta); font-size:13px; font-weight:700; }

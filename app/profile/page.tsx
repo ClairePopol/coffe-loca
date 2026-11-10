@@ -7,6 +7,7 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { PageFooter, PageHeader } from "@/components/PageShell";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { isStaff as isStaffRole, roleLabel } from "@/lib/roles";
+import { formatPhone, isPhoneAuthEmail, userPhone } from "@/lib/phone";
 
 type Profile = { stamps: number; role: string };
 const STAMP_GOAL = 10;
@@ -60,8 +61,10 @@ export default function ProfilePage() {
     };
   }, [qrOpen]);
 
-  const displayName: string = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Loca member";
-  const email = user?.email ?? "";
+  const phone = userPhone(user);
+  const displayName: string = user?.user_metadata?.full_name || (phone ? formatPhone(phone) : user?.email?.split("@")[0]) || "Loca member";
+  // Show the phone number for phone accounts; old accounts still show their email.
+  const contact = phone ? formatPhone(phone) : isPhoneAuthEmail(user?.email) ? "" : user?.email ?? "";
   const initials = useMemo(() => displayName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "L", [displayName]);
   const memberCode = user?.id ?? "";
   const stamps = Math.min(profile.stamps, STAMP_GOAL);
@@ -145,7 +148,7 @@ export default function ProfilePage() {
             <div className="card profile-wallet-panel">
               <div className="profile-identity">
                 <div className="profile-avatar">{user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : initials}</div>
-                <div><span className="profile-kicker">{`${roleLabel(profile.role).toUpperCase()} COFFE LOCA`}</span><h2>{displayName}</h2>{email && <p>{email}</p>}</div>
+                <div><span className="profile-kicker">{`${roleLabel(profile.role).toUpperCase()} COFFE LOCA`}</span><h2>{displayName}</h2>{contact && <p>{contact}</p>}</div>
               </div>
 
               <div ref={cardRef} className="member-card-scene" style={{ transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }} onPointerMove={handlePointerMove} onPointerLeave={() => setTilt({ x: 0, y: 0 })}>

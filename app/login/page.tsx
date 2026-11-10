@@ -3,15 +3,25 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase";
-import { SITE } from "@/lib/site";
+import { normalizePhone, phoneToAuthEmail } from "@/lib/phone";
 import { PageFooter, PageHeader } from "@/components/PageShell";
 
 type AuthMode = "login" | "register";
 
+function friendlyAuthError(error: unknown, isRegister: boolean) {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  if (/invalid login credentials/i.test(message)) return "Nomor HP atau password salah.";
+  if (/already registered|already exists/i.test(message)) return "Nomor HP ini sudah terdaftar. Silakan login.";
+  if (/email not confirmed/i.test(message)) return "Akun belum aktif. Admin perlu mematikan 'Confirm email' di Supabase.";
+  if (/password should be at least|weak password/i.test(message)) return "Password minimal 6 karakter.";
+  if (/rate limit|too many/i.test(message)) return "Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.";
+  if (/fetch|network/i.test(message)) return "Koneksi bermasalah. Periksa internet lalu coba lagi.";
+  return message || (isRegister ? "Akun gagal dibuat. Coba lagi." : "Gagal masuk. Coba lagi.");
+}
+
 export default function LoginPage() {
   const [mode, setMode] = useState<AuthMode>("login");
   const [showPassword, setShowPassword] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
@@ -19,27 +29,31 @@ export default function LoginPage() {
 
   function switchMode(nextMode: AuthMode) {
     setMode(nextMode);
-    setSubmitted(false);
     setErrorMessage("");
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(false);
     setErrorMessage("");
     const formData = new FormData(event.currentTarget);
-    const email = String(formData.get("email") ?? "").trim();
+    const identifier = String(formData.get("phone") ?? "").trim();
     const password = String(formData.get("password") ?? "");
+    const name = String(formData.get("name") ?? "").trim();
 
+    // Old accounts registered with email can still log in with their email address.
+    const usesEmail = !isRegister && identifier.includes("@");
+    const phone = usesEmail ? null : normalizePhone(identifier);
+    if (!usesEmail && !phone) {
+      setErrorMessage("Nomor HP belum benar. Contoh: 0812 3456 7890.");
+      return;
+    }
     if (isRegister) {
-      const name = String(formData.get("name") ?? "").trim();
-      const confirmation = String(formData.get("password-confirmation") ?? "");
-      if (password !== confirmation) {
-        setErrorMessage("Konfirmasi password belum sama.");
-        return;
-      }
       if (!name) {
         setErrorMessage("Nama lengkap wajib diisi.");
+        return;
+      }
+      if (password !== String(formData.get("password-confirmation") ?? "")) {
+        setErrorMessage("Konfirmasi password belum sama.");
         return;
       }
     }
@@ -47,19 +61,24 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const supabase = getSupabaseClient();
-      const result = isRegister
-        ? await supabase.auth.signUp({ email, password, options: { data: { full_name: String(formData.get("name") ?? "").trim() } } })
-        : await supabase.auth.signInWithPassword({ email, password });
-
-      if (result.error) throw result.error;
-      if (!isRegister) {
-        router.push("/");
-        router.refresh();
+      const email = usesEmail ? identifier : phoneToAuthEmail(phone!);
+      if (isRegister) {
+        const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name, phone } } });
+        if (error) throw error;
+        // Supabase returns a user without identities when the address is already registered.
+        if (data.user && data.user.identities?.length === 0) throw new Error("User already registered");
+        if (!data.session) {
+          setErrorMessage("Akun dibuat, tapi belum bisa langsung masuk. Admin perlu mematikan 'Confirm email' di Supabase.");
+          return;
+        }
       } else {
-        setSubmitted(true);
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
       }
+      router.push(isRegister ? "/profile" : "/");
+      router.refresh();
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Terjadi kesalahan. Coba lagi.");
+      setErrorMessage(friendlyAuthError(error, isRegister));
     } finally {
       setLoading(false);
     }
@@ -96,13 +115,16 @@ export default function LoginPage() {
 
             <form className="auth-form" onSubmit={handleSubmit}>
               {isRegister && <label className="field"><span>NAMA LENGKAP</span><input name="name" type="text" placeholder="Nama kamu" autoComplete="name" required /></label>}
-              <label className="field"><span>EMAIL</span><input name="email" type="email" placeholder="kamu@email.com" autoComplete="email" required /></label>
+              <label className="field">
+                <span>NOMOR HP</span>
+                <input name="phone" type={isRegister ? "tel" : "text"} inputMode={isRegister ? "tel" : "text"} placeholder="0812 3456 7890" autoComplete={isRegister ? "tel" : "username"} required />
+                <small className="field-hint">{isRegister ? "Pakai nomor WhatsApp aktif. Nomor ini jadi ID login kamu." : "Akun lama dengan email? Ketik email di sini."}</small>
+              </label>
               <label className="field"><span>PASSWORD</span><div className="auth-password"><input name="password" type={showPassword ? "text" : "password"} placeholder="Minimal 6 karakter" autoComplete={isRegister ? "new-password" : "current-password"} minLength={6} required /><button type="button" onClick={() => setShowPassword((value) => !value)} aria-pressed={showPassword}>{showPassword ? "SEMBUNYIKAN" : "LIHAT"}</button></div></label>
               {isRegister && <label className="field"><span>KONFIRMASI PASSWORD</span><input name="password-confirmation" type={showPassword ? "text" : "password"} placeholder="Ulangi password" autoComplete="new-password" minLength={6} required /></label>}
-              {!isRegister && <div className="auth-form-meta"><label className="auth-check"><input type="checkbox" name="remember" /><span>Ingat aku</span></label><a href={`mailto:${SITE.email}?subject=Lupa%20password`}>Lupa password?</a></div>}
+              {!isRegister && <div className="auth-form-meta"><span className="auth-forgot">Lupa password? <b>Minta bantuan kasir Coffe Loca.</b></span></div>}
               <button className="btn-primary" type="submit" disabled={loading}><span>{loading ? "MENGHUBUNGKAN..." : isRegister ? "BUAT AKUN" : "MASUK KE LOCA"}</span><span className="arrow-icon" aria-hidden="true" /></button>
               {errorMessage && <p className="notice notice-error" role="alert">{errorMessage}</p>}
-              {submitted && <p className="notice" role="status">Akun dibuat. Cek email untuk konfirmasi sebelum login.</p>}
             </form>
           </div>
           <p className="auth-switch">{isRegister ? "Sudah punya akun?" : "Belum punya akun?"} <button type="button" onClick={() => switchMode(isRegister ? "login" : "register")}>{isRegister ? "Login" : "Daftar sekarang"} <span className="arrow-icon" aria-hidden="true" /></button></p>
