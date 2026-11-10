@@ -533,6 +533,31 @@ function ReservationSection() {
   );
 }
 
+/** Live "open now / closed" badge based on Medan time (WIB, UTC+7). */
+function OpenStatus() {
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    const tick = () => {
+      const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jakarta", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(new Date());
+      const get = (type: string) => Number(parts.find((part) => part.type === type)?.value ?? 0);
+      setNow(get("hour") * 60 + get("minute"));
+    };
+    tick();
+    const timer = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  if (now === null) return <span className="location-status" aria-hidden="true">&nbsp;</span>;
+  const { openMinutes, closeMinutes, open, close } = SITE.hours;
+  const isOpen = now >= openMinutes && now < closeMinutes;
+  const closingSoon = isOpen && closeMinutes - now <= 60;
+  return (
+    <span className={`location-status${isOpen ? " is-open" : " is-closed"}`} role="status">
+      <i aria-hidden="true" />
+      {isOpen ? (closingSoon ? `Sedang buka · tutup pukul ${close}` : "Sedang buka sekarang") : `Sudah tutup · buka lagi pukul ${open}`}
+    </span>
+  );
+}
+
 function LocationSection() {
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -573,8 +598,8 @@ function LocationSection() {
             </article>
             <article className="location-detail">
               <span className="location-detail-label"><i>02</i> JAM OPERASIONAL</span>
-              <p>Cek jam buka terbaru langsung di Google Maps sebelum berangkat.</p>
-              <a href={SITE.mapsUrl} target="_blank" rel="noreferrer">CEK JAM BUKA <span className="arrow-icon" aria-hidden="true" /></a>
+              <p className="location-hours"><strong>{SITE.hours.open} – {SITE.hours.close}</strong><span>WIB</span></p>
+              <OpenStatus />
             </article>
           </div>
           <a className="location-cta" href={SITE.mapsUrl} target="_blank" rel="noreferrer"><span>PETUNJUK ARAH</span><i className="arrow-icon" aria-hidden="true" /></a>
@@ -615,6 +640,7 @@ function SiteFooter() {
         <div className="footer-col">
           <span className="footer-label">KUNJUNGI</span>
           <address>{SITE.addressLine}<br />{SITE.addressCity}</address>
+          <span className="footer-hours">Buka {SITE.hours.open} – {SITE.hours.close} WIB</span>
           <a href={SITE.mapsUrl} target="_blank" rel="noreferrer">Google Maps <i className="arrow-icon" aria-hidden="true" /></a>
         </div>
         <div className="footer-col">

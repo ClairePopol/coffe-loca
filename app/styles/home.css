@@ -154,6 +154,16 @@
 .location-detail>a { display:inline-flex; align-items:center; gap:8px; color:var(--olive); font-size:var(--fs-label); font-weight:700; letter-spacing:.12em; transition:color .2s ease; }
 .location-detail>a:hover { color:var(--terracotta); }
 .location-detail>a .arrow-icon { width:12px; height:12px; color:var(--terracotta); }
+.location-hours { display:flex; align-items:baseline; gap:8px; }
+.location-detail .location-hours strong { color:var(--olive); font-family:"Instrument Serif",serif; font-size:clamp(26px,2.6vw,32px); font-weight:400; line-height:1; letter-spacing:-.01em; }
+.location-detail .location-hours span { color:var(--muted-2); font-size:12px; font-weight:700; letter-spacing:.12em; }
+.location-status { display:inline-flex; align-items:center; gap:8px; width:fit-content; padding:6px 12px 6px 10px; border-radius:99px; color:var(--muted-2); background:rgba(53,69,55,.07); font-size:12px; font-weight:700; }
+.location-status i { width:8px; height:8px; flex:none; border-radius:50%; background:#a29a8a; }
+.location-status.is-open { color:#3f6b48; background:rgba(92,150,104,.14); }
+.location-status.is-open i { background:#4f9a5f; box-shadow:0 0 0 0 rgba(79,154,95,.5); animation:openPulse 2s ease-out infinite; }
+.location-status.is-closed { color:#9a4138; background:rgba(183,67,52,.1); }
+.location-status.is-closed i { background:#b74334; }
+@keyframes openPulse { 70% { box-shadow:0 0 0 7px rgba(79,154,95,0); } 100% { box-shadow:0 0 0 0 rgba(79,154,95,0); } }
 .location-cta { display:inline-flex; min-height:54px; align-items:center; gap:26px; margin-top:22px; padding:0 22px; border-radius:99px; color:var(--paper); background:var(--olive); box-shadow:0 12px 26px rgba(53,69,55,.18); font-size:12px; font-weight:700; letter-spacing:.14em; transition:background .3s,transform .3s var(--ease-out); }
 .location-cta:hover { transform:translateY(-2px); background:var(--terracotta); }
 .location-cta .arrow-icon { color:var(--gold); }
@@ -187,6 +197,7 @@
 .footer-label { margin-bottom:4px; color:var(--gold); font-size:var(--fs-label); font-weight:700; letter-spacing:var(--track-label); }
 .footer-col a,.footer-col address { display:inline-flex; align-items:center; gap:8px; color:#d7d2c4; font-size:15px; font-style:normal; line-height:1.55; transition:color .25s; }
 .footer-col address { display:block; color:#b0ae9f; }
+.footer-hours { color:var(--gold); font-size:14px; font-weight:600; }
 .footer-col a:hover { color:var(--gold); }
 .footer-col .arrow-icon { width:11px; height:11px; opacity:.7; }
 .footer-word { margin:0 -.04em; padding-bottom:.12em; overflow:hidden; color:rgba(238,230,215,.06); font-family:"Instrument Serif",serif; font-size:clamp(70px,15vw,240px); line-height:.9; letter-spacing:-.04em; white-space:nowrap; pointer-events:none; user-select:none; }
