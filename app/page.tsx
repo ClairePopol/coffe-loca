@@ -233,11 +233,12 @@ function SmoothScroll() {
 }
 
 /**
- * Slowly plays the hero scroll animation on its own once the intro screens are gone.
+ * Slowly plays the hero scroll animation on its own once the intro screens are gone,
+ * ending with the "Kopi enak. Hari yang baik." section fully in view.
  * Any user input (swipe/touch, wheel, click, key) stops it immediately and hands
  * control back. Only drives the page scroll — the hero itself is untouched.
  */
-const AUTO_SCROLL_SECONDS = 18;
+const AUTO_SCROLL_SECONDS = 11;
 const AUTO_SCROLL_START_DELAY = 1200;
 
 function HeroAutoScroll() {
@@ -266,10 +267,11 @@ function HeroAutoScroll() {
 
     const begin = () => {
       const lenis = lenisRef.current;
-      const stage = document.getElementById("beranda");
-      if (cancelled || !lenis || !stage || lenis.isStopped) return;
+      const story = document.getElementById("cerita"); // "Kopi enak. Hari yang baik."
+      if (cancelled || !lenis || !story || lenis.isStopped) return;
       if (window.scrollY > 40) { stop(); return; } // visitor already scrolled — don't take over
-      const end = stage.getBoundingClientRect().top + window.scrollY + stage.offsetHeight - window.innerHeight;
+      // End with the Cerita section filling the screen (its top at the top of the viewport).
+      const end = Math.round(story.getBoundingClientRect().top + window.scrollY);
       if (end <= window.scrollY) { stop(); return; }
       running = true;
       lenis.scrollTo(end, {
