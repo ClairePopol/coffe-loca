@@ -232,6 +232,68 @@ function SmoothScroll() {
   return null;
 }
 
+/**
+ * Slowly plays the hero scroll animation on its own once the intro screens are gone.
+ * Any user input (swipe/touch, wheel, click, key) stops it immediately and hands
+ * control back. Only drives the page scroll — the hero itself is untouched.
+ */
+const AUTO_SCROLL_SECONDS = 18;
+const AUTO_SCROLL_START_DELAY = 1200;
+
+function HeroAutoScroll() {
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let cancelled = false;
+    let running = false;
+    let startTimer = 0;
+    let pollTimer = 0;
+
+    const stop = () => {
+      if (cancelled) return;
+      cancelled = true;
+      window.clearTimeout(startTimer);
+      window.clearInterval(pollTimer);
+      removeListeners();
+      const lenis = lenisRef.current;
+      // stop() + start() cancels Lenis' running scrollTo and keeps the current position.
+      if (running && lenis && !lenis.isStopped) { lenis.stop(); lenis.start(); }
+      running = false;
+    };
+    const onKey = (event: KeyboardEvent) => { if (!event.metaKey && !event.ctrlKey && !event.altKey) stop(); };
+    const events: [string, EventListener][] = [["wheel", stop], ["touchstart", stop], ["pointerdown", stop], ["keydown", onKey as EventListener]];
+    const addListeners = () => events.forEach(([type, fn]) => window.addEventListener(type, fn, { passive: true, capture: true }));
+    const removeListeners = () => events.forEach(([type, fn]) => window.removeEventListener(type, fn, { capture: true }));
+
+    const begin = () => {
+      const lenis = lenisRef.current;
+      const stage = document.getElementById("beranda");
+      if (cancelled || !lenis || !stage || lenis.isStopped) return;
+      if (window.scrollY > 40) { stop(); return; } // visitor already scrolled — don't take over
+      const end = stage.getBoundingClientRect().top + window.scrollY + stage.offsetHeight - window.innerHeight;
+      if (end <= window.scrollY) { stop(); return; }
+      running = true;
+      lenis.scrollTo(end, {
+        duration: AUTO_SCROLL_SECONDS,
+        easing: (t) => -(Math.cos(Math.PI * t) - 1) / 2, // gentle ease-in-out
+        onComplete: () => { running = false; stop(); },
+      });
+    };
+
+    // Wait until the entry choice is closed and the preloader is gone, then start after a short pause.
+    const ready = () => !document.body.classList.contains("entry-is-open") && !document.querySelector(".preloader") && lenisRef.current;
+    // Listen for user input only from here on, so the tap that closes the entry choice doesn't count.
+    pollTimer = window.setInterval(() => {
+      if (cancelled || !ready()) return;
+      window.clearInterval(pollTimer);
+      addListeners();
+      startTimer = window.setTimeout(begin, AUTO_SCROLL_START_DELAY);
+    }, 200);
+
+    return stop;
+  }, []);
+  return null;
+}
+
 function TextReveal({ children }: { children: string }) {
   const textRef = useRef<HTMLParagraphElement>(null);
   const { scrollYProgress } = useScroll({ target: textRef, offset: ["start 0.88", "end 0.52"] });
@@ -603,6 +665,7 @@ export default function Home() {
   return (
     <>
       <SmoothScroll />
+      <HeroAutoScroll />
       <EntryChoice />
       <Navigation />
       <main>
