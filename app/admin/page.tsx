@@ -7,15 +7,16 @@ import { PageHeader } from "@/components/PageShell";
 import QrScanner from "@/components/QrScanner";
 import { useConfirm } from "@/components/ConfirmDialog";
 import MultiDatePicker, { dayKey } from "@/components/MultiDatePicker";
+import { formatPhone } from "@/lib/phone";
 import { assignableRoles, canEditRoleOf, canManageCoffee, canManageStore, isStaff, roleLabel, type Role } from "@/lib/roles";
 
-type Member = { id: string; full_name: string | null; stamps: number; role: string; created_at: string };
+type Member = { id: string; full_name: string | null; phone: string | null; stamps: number; role: string; created_at: string };
 type StampLog = { id: number; created_at: string; action: "add" | "redeem"; amount: number; stamps_before: number; stamps_after: number; member_id: string; member_name: string | null; admin_id: string | null; admin_name: string | null };
 type Status = { tone: "ok" | "error"; text: string } | null;
 type LogFilter = "all" | "add" | "redeem";
 
 const STAMP_GOAL = 10;
-const MEMBER_FIELDS = "id, full_name, stamps, role, created_at";
+const MEMBER_FIELDS = "id, full_name, phone, stamps, role, created_at";
 const LOG_FIELDS = "id, created_at, action, amount, stamps_before, stamps_after, member_id, member_name, admin_id, admin_name";
 const MEMBER_PAGE = 10;
 const LOG_PAGE = 15;
@@ -23,7 +24,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 
 const errorText = (error: unknown, fallback: string) => {
   const message = error instanceof Error ? error.message : typeof error === "object" && error && "message" in error ? String((error as { message: unknown }).message) : "";
-  if (/stamp_logs|award_stamps|redeem_free_coffee|set_member_role|can_manage/.test(message) && /does not exist|not find|schema cache/i.test(message)) {
+  if (/stamp_logs|award_stamps|redeem_free_coffee|set_member_role|can_manage|profiles\.phone|column .*phone/.test(message) && /does not exist|not find|schema cache/i.test(message)) {
     return "Fitur ini butuh update database. Jalankan supabase/profiles.sql di Supabase SQL Editor, lalu refresh.";
   }
   return message || fallback;
@@ -250,7 +251,10 @@ export default function AdminPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const list = q ? members.filter((member) => (member.full_name ?? "").toLowerCase().includes(q) || member.id.toLowerCase().includes(q)) : members;
+    const qDigits = q.replace(/\D/g, "");
+    // Phone search accepts 0812…, 812… or 62812…
+    const qPhone = qDigits.startsWith("0") ? `62${qDigits.slice(1)}` : qDigits;
+    const list = q ? members.filter((member) => (member.full_name ?? "").toLowerCase().includes(q) || member.id.toLowerCase().includes(q) || (qDigits.length >= 4 && (member.phone ?? "").includes(qPhone))) : members;
     return [...list].sort((a, b) => Number(b.stamps >= STAMP_GOAL) - Number(a.stamps >= STAMP_GOAL));
   }, [members, query]);
   const logDaySet = useMemo(() => new Set(logDays), [logDays]);
@@ -363,7 +367,7 @@ export default function AdminPage() {
             </div>
             <div className="admin-tabpanel" id="admin-panel-members" role="tabpanel" aria-labelledby="admin-tab-members" hidden={tab !== "members"}>
             {listStatus && <p className={`notice admin-list-status${listStatus.tone === "error" ? " notice-error" : ""}`} role={listStatus.tone === "error" ? "alert" : "status"}>{listStatus.text}</p>}
-            <label className="field admin-search"><span className="sr-only">Cari member</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari nama atau ID member" /></label>
+            <label className="field admin-search"><span className="sr-only">Cari member</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari nama, nomor HP, atau ID" /></label>
             {loading ? <p className="admin-empty">Memuat member…</p> : filtered.length === 0 ? <p className="admin-empty">{members.length === 0 ? "Belum ada data profile." : "Tidak ada member yang cocok."}</p> : (
               <ul className="admin-member-list">
                 {filtered.slice(0, memberLimit).map((member) => {
@@ -373,6 +377,7 @@ export default function AdminPage() {
                     <li key={member.id} className={full ? "is-full" : ""}>
                       <div className="admin-member-info">
                         <strong>{member.full_name || "Unnamed member"}{member.role !== "member" && <em>{roleLabel(member.role)}</em>}{member.id === user?.id && <em className="is-you">Kamu</em>}</strong>
+                        {member.phone ? <span className="admin-member-phone">{formatPhone(member.phone)}</span> : null}
                         <small>{member.id}</small>
                         {canEditRoleOf(role, member.role, member.id === user?.id) && (
                           <label className="admin-role-select">

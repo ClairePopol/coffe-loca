@@ -12,6 +12,7 @@ alter table public.profiles add column if not exists role text not null default 
 alter table public.profiles add column if not exists points integer not null default 0;
 alter table public.profiles add column if not exists stamps integer not null default 0;
 alter table public.profiles add column if not exists full_name text;
+alter table public.profiles add column if not exists phone text;
 alter table public.profiles add column if not exists created_at timestamptz not null default now();
 alter table public.profiles add column if not exists updated_at timestamptz not null default now();
 
@@ -115,8 +116,8 @@ language plpgsql
 security definer set search_path = public
 as $$
 begin
-  insert into public.profiles (id, full_name)
-  values (new.id, new.raw_user_meta_data ->> 'full_name')
+  insert into public.profiles (id, full_name, phone)
+  values (new.id, new.raw_user_meta_data ->> 'full_name', nullif(new.raw_user_meta_data ->> 'phone', ''))
   on conflict (id) do nothing;
   return new;
 end;
@@ -249,6 +250,17 @@ $$;
 
 revoke all on function public.set_member_role(uuid, text) from public;
 grant execute on function public.set_member_role(uuid, text) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Phone-number login (members log in with phone + password; see lib/phone.ts)
+-- One account per phone number. Backfill phone for accounts created before this column.
+-- ---------------------------------------------------------------------------
+create unique index if not exists profiles_phone_key on public.profiles (phone) where phone is not null;
+
+update public.profiles p
+set phone = nullif(u.raw_user_meta_data ->> 'phone', '')
+from auth.users u
+where u.id = p.id and p.phone is null and nullif(u.raw_user_meta_data ->> 'phone', '') is not null;
 
 -- Refresh the API schema cache so new columns (e.g. stamps) are visible immediately.
 notify pgrst, 'reload schema';
