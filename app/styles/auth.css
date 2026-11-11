@@ -56,3 +56,10 @@
   .auth-layout { width:88vw; }
   .auth-card { padding:24px 18px 22px; }
 }
+
+/* SMS OTP step (Twilio) */
+.auth-code input { height:60px; font-family:ui-monospace,"SFMono-Regular",monospace; font-size:26px; letter-spacing:.5em; text-align:center; text-indent:.5em; }
+.auth-otp-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 16px; }
+.auth-link { padding:6px 0; border:0; color:var(--terracotta); background:none; font-size:12px; font-weight:700; letter-spacing:.08em; cursor:pointer; }
+.auth-link:hover:not(:disabled) { text-decoration:underline; text-underline-offset:3px; }
+.auth-link:disabled { color:var(--muted-2); cursor:default; opacity:.7; }

@@ -36,3 +36,6 @@ export function userPhone(user: { email?: string | null; user_metadata?: Record<
   if (fromMeta) return fromMeta;
   return isPhoneAuthEmail(user?.email) ? (user?.email ?? "").split("@")[0] : "";
 }
+
+/** 6281234567890 → "+6281234567890" (E.164, the format Supabase phone auth / Twilio expect). */
+export const phoneToE164 = (phone: string) => `+${phone}`;
