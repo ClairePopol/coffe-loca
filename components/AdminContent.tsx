@@ -9,7 +9,8 @@ import { errorMessage, formatDateId, type CafeEvent, type Promo, type Voucher, t
 type MemberLite = { id: string; full_name: string | null; phone: string | null; role: string };
 type Tab = "voucher" | "promo" | "event";
 type Status = { tone: "ok" | "error"; text: string } | null;
-type GiveMode = "pick" | "random";
+// How a voucher is handed out: to exactly one member, to several chosen members, or to N random members.
+type GiveMode = "one" | "multi" | "random";
 
 const memberName = (member: MemberLite) => member.full_name || (member.phone ? formatPhone(member.phone) : member.id.slice(0, 8));
 
@@ -30,7 +31,7 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
 
   // voucher giving UI
   const [giveFor, setGiveFor] = useState<number | null>(null);
-  const [giveMode, setGiveMode] = useState<GiveMode>("pick");
+  const [giveMode, setGiveMode] = useState<GiveMode>("one");
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [pickQuery, setPickQuery] = useState("");
   const [randomCount, setRandomCount] = useState(1);
@@ -135,7 +136,7 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
 
   function openGive(voucherId: number) {
     setGiveFor((current) => (current === voucherId ? null : voucherId));
-    setGiveMode("pick");
+    setGiveMode("one");
     setPicked(new Set());
     setPickQuery("");
     setRandomCount(1);
@@ -191,10 +192,16 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
   const markUsed = (grantId: number) => run(() => getSupabaseClient().rpc("use_member_voucher", { p_member_voucher_id: grantId }), "Voucher ditandai terpakai.", "Gagal menandai voucher.");
 
   const togglePick = (id: string) => setPicked((current) => {
+    if (giveMode === "one") return new Set([id]);
     const next = new Set(current);
     if (next.has(id)) next.delete(id); else next.add(id);
     return next;
   });
+
+  const changeGiveMode = (mode: GiveMode) => {
+    setGiveMode(mode);
+    setPicked(new Set());
+  };
 
   const tabs: [Tab, string, number][] = [["voucher", "Voucher", vouchers.length], ["promo", "Promo", promos.length], ["event", "Acara", events.length]];
 
@@ -210,7 +217,7 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
 
       {tab === "voucher" && (
         <div className="admin-tabpanel">
-          <p className="admin-content-hint"><b>Rewards &amp; Voucher</b> — buat voucher, lalu beri ke member yang dipilih atau ke beberapa member secara acak.</p>
+          <p className="admin-content-hint"><b>Rewards &amp; Voucher</b> — buat voucher, lalu kirim ke <b>1 member</b>, <b>beberapa member</b> pilihanmu, atau <b>member acak</b>.</p>
           <form className="admin-content-form" onSubmit={addVoucher}>
             <label className="field"><span>NAMA VOUCHER / REWARD</span><input name="title" required maxLength={80} placeholder="Contoh: Gratis 1 Es Kopi Susu" /></label>
             <label className="field"><span>KETERANGAN (OPSIONAL)</span><textarea name="detail" maxLength={300} rows={2} placeholder="Syarat & ketentuan singkat" /></label>
@@ -247,10 +254,11 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
                     {giveFor === voucher.id && (
                       <div className="admin-give">
                         <div className="admin-chips" role="group" aria-label="Cara memberi">
-                          <button type="button" className={giveMode === "pick" ? "is-active" : ""} aria-pressed={giveMode === "pick"} onClick={() => setGiveMode("pick")}>Pilih member</button>
-                          <button type="button" className={giveMode === "random" ? "is-active" : ""} aria-pressed={giveMode === "random"} onClick={() => setGiveMode("random")}>Acak</button>
+                          <button type="button" className={giveMode === "one" ? "is-active" : ""} aria-pressed={giveMode === "one"} onClick={() => changeGiveMode("one")}>1 member</button>
+                          <button type="button" className={giveMode === "multi" ? "is-active" : ""} aria-pressed={giveMode === "multi"} onClick={() => changeGiveMode("multi")}>Beberapa member</button>
+                          <button type="button" className={giveMode === "random" ? "is-active" : ""} aria-pressed={giveMode === "random"} onClick={() => changeGiveMode("random")}>Acak</button>
                         </div>
-                        {giveMode === "pick" ? (
+                        {giveMode !== "random" ? (
                           <>
                             <label className="field admin-search"><span className="sr-only">Cari member</span><input type="search" value={pickQuery} onChange={(event) => setPickQuery(event.target.value)} placeholder="Cari nama atau nomor HP" /></label>
                             <ul className="admin-pick-list">
@@ -260,7 +268,7 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
                                 return (
                                   <li key={member.id}>
                                     <label className={has ? "is-has" : ""}>
-                                      <input type="checkbox" checked={picked.has(member.id)} disabled={has} onChange={() => togglePick(member.id)} />
+                                      <input type={giveMode === "one" ? "radio" : "checkbox"} name={`give-${voucher.id}`} checked={picked.has(member.id)} disabled={has} onChange={() => togglePick(member.id)} />
                                       <span><b>{memberName(member)}</b>{member.phone && member.full_name ? <small>{formatPhone(member.phone)}</small> : null}</span>
                                       {has && <em>SUDAH PUNYA</em>}
                                     </label>
@@ -268,7 +276,7 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
                                 );
                               })}
                             </ul>
-                            <button type="button" className="btn-primary" disabled={busy || picked.size === 0} onClick={() => giveToPicked(voucher.id)}><span>{picked.size === 0 ? "PILIH MEMBER DULU" : `BERI KE ${picked.size} MEMBER`}</span><i className="arrow-icon" aria-hidden="true" /></button>
+                            <button type="button" className="btn-primary" disabled={busy || picked.size === 0} onClick={() => giveToPicked(voucher.id)}><span>{picked.size === 0 ? (giveMode === "one" ? "PILIH 1 MEMBER DULU" : "PILIH MEMBER DULU") : giveMode === "one" ? `BERI KE ${memberName(memberById.get([...picked][0]) ?? { id: [...picked][0], full_name: null, phone: null, role: "member" }).toUpperCase()}` : `BERI KE ${picked.size} MEMBER`}</span><i className="arrow-icon" aria-hidden="true" /></button>
                           </>
                         ) : (
                           <>
