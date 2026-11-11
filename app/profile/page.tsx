@@ -239,10 +239,6 @@ export default function ProfilePage() {
           <aside className="profile-aside" aria-label="Rewards, promo, dan acara bulan ini">
             <section className="card aside-card" aria-labelledby="aside-rewards">
               <header className="aside-head"><h2 id="aside-rewards">Rewards &amp; Voucher</h2><span>{stamps} / {STAMP_GOAL} STAMP</span></header>
-              <div className="aside-reward">
-                <span className="mc-meter" aria-hidden="true"><i style={{ width: `${(stamps / STAMP_GOAL) * 100}%` }} /></span>
-                <p>{remaining === 0 ? "Stamp penuh! Tunjukkan QR ke kasir untuk kopi gratis." : `${remaining} stamp lagi untuk kopi gratis.`}</p>
-              </div>
               {vouchers.length === 0 ? (
                 <p className="aside-empty">Belum ada voucher aktif. Voucher barumu akan muncul di sini.</p>
               ) : (
