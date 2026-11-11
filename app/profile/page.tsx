@@ -8,7 +8,7 @@ import { PageFooter, PageHeader } from "@/components/PageShell";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { isStaff as isStaffRole, roleLabel } from "@/lib/roles";
 import { formatPhone, isPhoneAuthEmail, userPhone } from "@/lib/phone";
-import { monthlyEvents, monthlyPromos, vouchers } from "@/lib/profile-content";
+import { formatDateId, monthBounds, todayWib, type CafeEvent, type Promo, type Voucher } from "@/lib/content";
 
 type Profile = { stamps: number; role: string };
 const STAMP_GOAL = 10;
@@ -18,6 +18,10 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile>({ stamps: 0, role: "member" });
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+  // Managed by staff in the admin panel (supabase/content.sql). Empty until loaded / when nothing is published.
+  const [promos, setPromos] = useState<Pick<Promo, "id" | "title" | "detail" | "badge" | "valid_until">[]>([]);
+  const [events, setEvents] = useState<Pick<CafeEvent, "id" | "title" | "detail" | "event_date" | "time_text">[]>([]);
+  const [vouchers, setVouchers] = useState<{ id: number; voucher: Pick<Voucher, "id" | "title" | "detail" | "expires_at"> }[]>([]);
   const [qrOpen, setQrOpen] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [side, setSide] = useState<"front" | "back">("front");
@@ -40,6 +44,21 @@ export default function ProfilePage() {
         setUser(authData.user);
         const { data } = await supabase.from("profiles").select("stamps, role").eq("id", authData.user.id).maybeSingle();
         if (active && data) setProfile({ stamps: data.stamps ?? 0, role: data.role ?? "member" });
+
+        // Side panels: a failure here must never break the member card, so errors are ignored (panels stay empty).
+        const today = todayWib();
+        const [promoRes, eventRes, voucherRes] = await Promise.all([
+          supabase.from("promos").select("id, title, detail, badge, valid_until").eq("is_active", true).or(`valid_until.is.null,valid_until.gte.${today}`).order("created_at", { ascending: false }),
+          supabase.from("events").select("id, title, detail, event_date, time_text").eq("is_active", true).gte("event_date", today).lte("event_date", monthBounds(today).end).order("event_date", { ascending: true }),
+          supabase.from("member_vouchers").select("id, vouchers(id, title, detail, expires_at, is_active)").eq("member_id", authData.user.id).eq("status", "active").order("granted_at", { ascending: false }),
+        ]);
+        if (!active) return;
+        if (!promoRes.error) setPromos(promoRes.data ?? []);
+        if (!eventRes.error) setEvents(eventRes.data ?? []);
+        if (!voucherRes.error) {
+          const rows = (voucherRes.data ?? []) as unknown as { id: number; vouchers: (Voucher & { is_active: boolean }) | null }[];
+          setVouchers(rows.flatMap((row) => (row.vouchers && row.vouchers.is_active && (!row.vouchers.expires_at || row.vouchers.expires_at >= today) ? [{ id: row.id, voucher: row.vouchers }] : [])));
+        }
       } catch (error) {
         if (active) setLoadError(error instanceof Error ? error.message : "Profile gagal dimuat.");
       } finally {
@@ -228,8 +247,11 @@ export default function ProfilePage() {
                 <p className="aside-empty">Belum ada voucher aktif. Voucher barumu akan muncul di sini.</p>
               ) : (
                 <ul className="aside-list">
-                  {vouchers.map((voucher) => (
-                    <li key={voucher.code} className="aside-voucher"><div><strong>{voucher.title}</strong><small>{voucher.detail}</small></div><span>{voucher.expires}</span></li>
+                  {vouchers.map(({ id, voucher }) => (
+                    <li key={id} className="aside-voucher">
+                      <div><strong>{voucher.title}</strong>{voucher.detail && <small>{voucher.detail}</small>}</div>
+                      <span>{voucher.expires_at ? `s/d ${formatDateId(voucher.expires_at)}` : "Tanpa batas"}</span>
+                    </li>
                   ))}
                 </ul>
               )}
@@ -237,14 +259,14 @@ export default function ProfilePage() {
 
             <section className="card aside-card" aria-labelledby="aside-promo">
               <header className="aside-head"><h2 id="aside-promo">This Month&rsquo;s Promo</h2><span>{monthLabel}</span></header>
-              {monthlyPromos.length === 0 ? (
+              {promos.length === 0 ? (
                 <p className="aside-empty">Promo bulan ini segera hadir.</p>
               ) : (
                 <ul className="aside-list">
-                  {monthlyPromos.map((promo) => (
-                    <li key={promo.title} className="aside-promo">
-                      <div><strong>{promo.title}</strong>{promo.badge && <b className="aside-badge">{promo.badge}</b>}<small>{promo.detail}</small></div>
-                      <em>{promo.validUntil}</em>
+                  {promos.map((promo) => (
+                    <li key={promo.id} className="aside-promo">
+                      <div><strong>{promo.title}</strong>{promo.badge && <b className="aside-badge">{promo.badge}</b>}{promo.detail && <small>{promo.detail}</small>}</div>
+                      {promo.valid_until && <em>s/d {formatDateId(promo.valid_until)}</em>}
                     </li>
                   ))}
                 </ul>
@@ -253,16 +275,19 @@ export default function ProfilePage() {
 
             <section className="card aside-card" aria-labelledby="aside-events">
               <header className="aside-head"><h2 id="aside-events">What&rsquo;s Happening This Month</h2><span>{monthLabel}</span></header>
-              {monthlyEvents.length === 0 ? (
+              {events.length === 0 ? (
                 <p className="aside-empty">Belum ada acara bulan ini.</p>
               ) : (
                 <ul className="aside-list">
-                  {monthlyEvents.map((event) => (
-                    <li key={`${event.day}-${event.title}`} className="aside-event">
-                      <time className="aside-date"><b>{event.day}</b>{event.month}</time>
-                      <div><strong>{event.title}</strong><small>{event.detail}</small><em>{event.time}</em></div>
-                    </li>
-                  ))}
+                  {events.map((event) => {
+                    const date = new Date(`${event.event_date}T00:00:00`);
+                    return (
+                      <li key={event.id} className="aside-event">
+                        <time className="aside-date" dateTime={event.event_date}><b>{date.getDate()}</b>{date.toLocaleDateString("id-ID", { month: "short" }).toUpperCase()}</time>
+                        <div><strong>{event.title}</strong>{event.detail && <small>{event.detail}</small>}{event.time_text && <em>{event.time_text}</em>}</div>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </section>
