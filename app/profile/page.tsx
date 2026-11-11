@@ -238,7 +238,7 @@ export default function ProfilePage() {
         {showAside && (
           <aside className="profile-aside" aria-label="Rewards, promo, dan acara bulan ini">
             <section className="card aside-card" aria-labelledby="aside-rewards">
-              <header className="aside-head"><h2 id="aside-rewards">Rewards &amp; Voucher</h2><span>{stamps} / {STAMP_GOAL} STAMP</span></header>
+              <header className="aside-head"><h2 id="aside-rewards">Rewards &amp; Voucher</h2></header>
               {vouchers.length === 0 ? (
                 <p className="aside-empty">Belum ada voucher aktif. Voucher barumu akan muncul di sini.</p>
               ) : (

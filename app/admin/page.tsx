@@ -52,7 +52,7 @@ export default function AdminPage() {
   const [logsLoading, setLogsLoading] = useState(false);
   const [todayLogs, setTodayLogs] = useState<StampLog[]>([]);
   const [role, setRole] = useState<Role>("member");
-  const [section, setSection] = useState<"coffee" | "content" | "store">("coffee");
+  const [section, setSection] = useState<"coffee" | "store">("coffee");
   const [listStatus, setListStatus] = useState<Status>(null);
   const [tab, setTab] = useState<"members" | "logs">("members");
   const [memberLimit, setMemberLimit] = useState(MEMBER_PAGE);
@@ -271,8 +271,8 @@ export default function AdminPage() {
       <section className="admin-layout">
         <div className="admin-heading page-heading">
           <span className="eyebrow"><i /> PRIVATE / ADMIN ACCESS</span>
-          <h1>{section === "store" ? <>Store<br /><em>control.</em></> : section === "content" ? <>Content<br /><em>control.</em></> : <>Member<br /><em>control.</em></>}</h1>
-          <p>{section === "store" ? "Kelola produk dan pesanan Loca Store." : section === "content" ? "Atur voucher, promo, dan acara yang tampil di profil member." : "Kelola stamp member Coffe Loca dari satu ruang."}</p>
+          <h1>{section === "store" ? <>Store<br /><em>control.</em></> : <>Member<br /><em>control.</em></>}</h1>
+          <p>{section === "store" ? "Kelola produk dan pesanan Loca Store." : "Kelola stamp, voucher, promo, dan acara Coffe Loca dari satu ruang."}</p>
           <span className="admin-role">{user ? <>MASUK SEBAGAI {(user.user_metadata?.full_name || user.email || "STAFF").toUpperCase()} <b>{roleLabel(role).toUpperCase()}</b></> : "AUTHORIZED STAFF ONLY"}</span>
           {section === "coffee" && <dl className="admin-stats">
             <div><dt>MEMBER</dt><dd>{loading ? "—" : members.length}</dd></div>
@@ -285,8 +285,7 @@ export default function AdminPage() {
         <div className="admin-content">
           {user && (
             <div className="admin-sections" role="tablist" aria-label="Area admin">
-              {canManageCoffee(role) && <button type="button" role="tab" aria-selected={section === "coffee"} className={section === "coffee" ? "is-active" : ""} onClick={() => setSection("coffee")}><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1 1 1.5 1 2.5M11.5 3.5c0 1 1 1.5 1 2.5" /></svg></span><span><strong>Coffee</strong><small>Stamp, member &amp; riwayat</small></span></button>}
-              {canManageCoffee(role) && <button type="button" role="tab" aria-selected={section === "content"} className={section === "content" ? "is-active" : ""} onClick={() => setSection("content")}><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3h8l10 10-8 8L3 11zM7.5 7.5h.01" /></svg></span><span><strong>Konten</strong><small>Voucher, promo &amp; acara</small></span></button>}
+              {canManageCoffee(role) && <button type="button" role="tab" aria-selected={section === "coffee"} className={section === "coffee" ? "is-active" : ""} onClick={() => setSection("coffee")}><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1 1 1.5 1 2.5M11.5 3.5c0 1 1 1.5 1 2.5" /></svg></span><span><strong>Coffee</strong><small>Stamp, voucher &amp; member</small></span></button>}
               {canManageStore(role) && <button type="button" role="tab" aria-selected={section === "store"} className={section === "store" ? "is-active" : ""} onClick={() => setSection("store")}><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2" /></svg></span><span><strong>Store</strong><small>Produk &amp; pesanan</small></span></button>}
             </div>
           )}
@@ -303,8 +302,6 @@ export default function AdminPage() {
               </ul>
             </div>
           )}
-
-          {section === "content" && user && canManageCoffee(role) && <AdminContent members={members} userId={user.id} />}
 
           {section === "coffee" && canManageCoffee(role) && (<>
           <div className="admin-award-card card" id="stamp-desk">
@@ -438,6 +435,7 @@ export default function AdminPage() {
             {visibleLogs.length > logLimit && <button type="button" className="admin-more" onClick={() => setLogLimit((value) => value + LOG_PAGE)}>TAMPILKAN LEBIH BANYAK <span>{logLimit} / {visibleLogs.length}</span></button>}
             </div>
           </div>
+          {user && <AdminContent members={members} userId={user.id} />}
           </>)}
         </div>
       </section>
