@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { getSupabaseClient } from "@/lib/supabase";
 import { PageHeader } from "@/components/PageShell";
@@ -19,7 +19,6 @@ type LogFilter = "all" | "add" | "redeem";
 const STAMP_GOAL = 10;
 const MEMBER_FIELDS = "id, full_name, phone, stamps, role, created_at";
 const LOG_FIELDS = "id, created_at, action, amount, stamps_before, stamps_after, member_id, member_name, admin_id, admin_name";
-const MEMBER_PAGE = 10;
 const LOG_PAGE = 15;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -55,7 +54,7 @@ export default function AdminPage() {
   const [section, setSection] = useState<"coffee" | "store">("coffee");
   const [listStatus, setListStatus] = useState<Status>(null);
   const [tab, setTab] = useState<"members" | "logs">("members");
-  const [memberLimit, setMemberLimit] = useState(MEMBER_PAGE);
+  const memberListRef = useRef<HTMLUListElement>(null);
   const [logLimit, setLogLimit] = useState(LOG_PAGE);
   const closeScanner = useCallback(() => setScannerOpen(false), []);
   const [confirm, confirmDialog] = useConfirm();
@@ -155,7 +154,6 @@ export default function AdminPage() {
     return () => { active = false; };
   }, [refresh]);
 
-  useEffect(() => { setMemberLimit(MEMBER_PAGE); }, [query]);
   useEffect(() => { setLogLimit(LOG_PAGE); }, [logFilter, logDays]);
 
   // Keep the chosen amount within what still fits on the selected card.
@@ -258,6 +256,19 @@ export default function AdminPage() {
     const list = q ? members.filter((member) => (member.full_name ?? "").toLowerCase().includes(q) || member.id.toLowerCase().includes(q) || (qDigits.length >= 4 && (member.phone ?? "").includes(qPhone))) : members;
     return [...list].sort((a, b) => Number(b.stamps >= STAMP_GOAL) - Number(a.stamps >= STAMP_GOAL));
   }, [members, query]);
+  // Show exactly 5 member rows and scroll the rest. Rows differ in height (the Owner sees a role select), so measure them.
+  useLayoutEffect(() => {
+    const list = memberListRef.current;
+    if (!list) return;
+    const fit = () => {
+      if (list.offsetParent === null) return; // tab hidden → nothing to measure
+      const rows = Array.from(list.children).slice(0, 5) as HTMLElement[];
+      list.style.maxHeight = rows.length >= 5 ? `${rows.reduce((sum, row) => sum + row.offsetHeight, 0)}px` : "";
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [filtered, role, tab, loading]);
   const logDaySet = useMemo(() => new Set(logDays), [logDays]);
   const visibleLogs = useMemo(() => logs.filter((log) => (logFilter === "all" || log.action === logFilter) && (!logDaySet.size || logDaySet.has(localDay(log.created_at)))), [logs, logFilter, logDaySet]);
   const activeDays = useMemo(() => new Set([...logs, ...todayLogs].map((log) => localDay(log.created_at))), [logs, todayLogs]);
@@ -370,8 +381,8 @@ export default function AdminPage() {
             {listStatus && <p className={`notice admin-list-status${listStatus.tone === "error" ? " notice-error" : ""}`} role={listStatus.tone === "error" ? "alert" : "status"}>{listStatus.text}</p>}
             <label className="field admin-search"><span className="sr-only">Cari member</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari nama, nomor HP, atau ID" /></label>
             {loading ? <p className="admin-empty">Memuat member…</p> : filtered.length === 0 ? <p className="admin-empty">{members.length === 0 ? "Belum ada data profile." : "Tidak ada member yang cocok."}</p> : (
-              <ul className="admin-member-list">
-                {filtered.slice(0, memberLimit).map((member) => {
+              <ul className="admin-member-list" ref={memberListRef}>
+                {filtered.map((member) => {
                   const stamps = Math.min(member.stamps, STAMP_GOAL);
                   const full = stamps >= STAMP_GOAL;
                   return (
@@ -402,7 +413,6 @@ export default function AdminPage() {
                 })}
               </ul>
             )}
-            {filtered.length > memberLimit && <button type="button" className="admin-more" onClick={() => setMemberLimit((value) => value + MEMBER_PAGE)}>TAMPILKAN LEBIH BANYAK <span>{memberLimit} / {filtered.length}</span></button>}
             </div>
 
             <div className="admin-tabpanel" id="admin-panel-logs" role="tabpanel" aria-labelledby="admin-tab-logs" hidden={tab !== "logs"}>
