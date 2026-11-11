@@ -1,13 +1,33 @@
 /* Member profile — flippable member card (front: QR, back: stamps) */
 .profile-page::after { position:absolute; z-index:-1; right:-6vw; bottom:-10vw; content:"LOCA"; color:rgba(53,69,55,.04); font-family:"Instrument Serif",serif; font-size:clamp(220px,32vw,520px); line-height:.7; pointer-events:none; }
-.profile-layout { display:grid; width:min(1120px,86vw); flex:1; grid-template-columns:1fr 1fr; align-items:center; gap:clamp(40px,6vw,96px); margin:0 auto; padding:40px 0 64px; }
-.profile-heading { animation:fadeUp .8s .1s both var(--ease-out); }
-.profile-heading h1 { font-size:clamp(52px,5.8vw,88px); }
-.profile-howto { display:flex; max-width:380px; flex-direction:column; margin:34px 0 0; padding:0; list-style:none; border-top:1px solid var(--line-strong); }
-.profile-howto li { display:grid; grid-template-columns:40px 1fr; align-items:baseline; padding:13px 0; border-bottom:1px solid var(--line); color:var(--muted-2); font-size:14px; }
-.profile-howto b { color:var(--terracotta); font-family:"Instrument Serif",serif; font-size:19px; font-weight:400; }
+.profile-layout { display:grid; width:min(1120px,86vw); flex:1; grid-template-columns:minmax(0,1fr); align-items:center; gap:32px; margin:0 auto; padding:40px 0 64px; }
+.profile-wallet { width:min(100%,500px); justify-self:center; }
 
-.profile-wallet { width:min(100%,500px); justify-self:end; }
+/* Signed-in layout: member card on the left, rewards / promo / events stacked on the right */
+.profile-layout.has-aside { width:min(1120px,88vw); grid-template-columns:minmax(0,500px) minmax(0,1fr); align-items:start; gap:clamp(32px,4.5vw,64px); }
+.has-aside .profile-wallet { justify-self:start; }
+.profile-aside { display:flex; min-width:0; flex-direction:column; gap:16px; animation:cardIn .8s .3s backwards var(--ease-out); }
+.aside-card { padding:20px clamp(18px,2.4vw,26px) 22px; }
+.aside-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--line); }
+.aside-head h2 { margin:0; color:var(--olive); font-family:"Instrument Serif",serif; font-size:clamp(22px,2.2vw,27px); font-weight:400; line-height:1.1; }
+.aside-head>span { flex:none; color:var(--terracotta); font-size:var(--fs-label); font-weight:700; letter-spacing:var(--track-label); }
+.aside-reward { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+.aside-reward .mc-meter { flex:0 0 38%; }
+.aside-reward p,.aside-empty { margin:0; color:var(--muted-2); font-size:14px; line-height:1.55; }
+.aside-reward p { color:var(--terracotta); font-size:13px; font-weight:600; }
+.aside-list { display:flex; flex-direction:column; margin:0; padding:0; list-style:none; }
+.aside-list li { padding:12px 0; border-top:1px solid var(--line); }
+.aside-list li:first-child { padding-top:0; border-top:0; }
+.aside-list li:last-child { padding-bottom:0; }
+.aside-list strong { color:var(--olive); font-size:15px; font-weight:700; line-height:1.35; }
+.aside-list small { display:block; margin-top:3px; color:var(--muted-2); font-size:13px; line-height:1.5; }
+.aside-list em { display:block; margin-top:5px; color:var(--terracotta); font-size:12px; font-style:normal; font-weight:600; letter-spacing:.04em; }
+.aside-voucher,.aside-promo { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.aside-voucher>span { flex:none; color:var(--terracotta); font-size:12px; font-weight:600; }
+.aside-badge { display:inline-block; margin-left:8px; padding:2px 8px; border-radius:99px; color:var(--terracotta); background:rgba(164,78,55,.1); font-size:10px; font-weight:800; letter-spacing:.12em; vertical-align:middle; }
+.aside-event { display:grid; grid-template-columns:54px minmax(0,1fr); align-items:start; gap:14px; }
+.aside-date { display:flex; width:54px; flex-direction:column; align-items:center; justify-content:center; padding:7px 0 6px; border:1px solid rgba(232,189,119,.7); border-radius:12px; color:var(--terracotta); background:rgba(232,189,119,.16); font-size:10px; font-weight:800; letter-spacing:.12em; line-height:1; }
+.aside-date b { margin-bottom:3px; color:var(--olive); font-family:"Instrument Serif",serif; font-size:24px; font-weight:400; letter-spacing:0; }
 .profile-state { padding:28px clamp(22px,3.4vw,40px) 30px; }
 .profile-wallet-panel { display:flex; flex-direction:column; gap:20px; padding:22px clamp(18px,3vw,30px) 24px; animation:cardIn .8s .15s backwards var(--ease-out); }
 
@@ -121,9 +141,9 @@
 @keyframes skeletonShimmer { to { background-position:-200% 0; } }
 
 @media (max-width:960px) {
-  .profile-layout { grid-template-columns:1fr; gap:32px; padding:24px 0 48px; }
-  .profile-wallet { justify-self:center; }
-  .profile-howto { display:none; }
+  .profile-layout,.profile-layout.has-aside { grid-template-columns:minmax(0,1fr); gap:32px; padding:24px 0 48px; }
+  .profile-wallet,.has-aside .profile-wallet { justify-self:center; }
+  .profile-aside { width:min(100%,500px); justify-self:center; }
 }
 @media (max-width:760px) {
   .profile-layout { width:88vw; }

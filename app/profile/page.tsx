@@ -8,6 +8,7 @@ import { PageFooter, PageHeader } from "@/components/PageShell";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { isStaff as isStaffRole, roleLabel } from "@/lib/roles";
 import { formatPhone, isPhoneAuthEmail, userPhone } from "@/lib/phone";
+import { monthlyEvents, monthlyPromos, vouchers } from "@/lib/profile-content";
 
 type Profile = { stamps: number; role: string };
 const STAMP_GOAL = 10;
@@ -72,6 +73,8 @@ export default function ProfilePage() {
   const isStaff = isStaffRole(profile.role);
   const memberNumber = memberCode ? `LOCA · ${memberCode.replace(/-/g, "").slice(0, 8).toUpperCase().replace(/(.{4})/, "$1 ")}` : "";
   const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString("id-ID", { month: "long", year: "numeric" }) : "";
+  const monthLabel = new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" }).toUpperCase();
+  const showAside = !loading && Boolean(user);
 
   // Single-sided flip: turn the card edge-on, swap the face, turn it back.
   // (Two-sided backface-visibility flips are unreliable in mobile Safari.)
@@ -123,18 +126,7 @@ export default function ProfilePage() {
       <div className="profile-bean profile-bean-one" aria-hidden="true"><img src="/white-coffee-bean.png" alt="" /></div>
       <div className="profile-bean profile-bean-two" aria-hidden="true"><img src="/white-coffee-bean.png" alt="" /></div>
       <PageHeader />
-      <section className="profile-layout" aria-labelledby="profile-title">
-        <div className="profile-heading page-heading">
-          <span className="eyebrow"><i /> MEMBER CARD / MEDAN</span>
-          <h1 id="profile-title">A little space<br /><em>for your moments.</em></h1>
-          <p>Semua momen Loca-mu, tersimpan dalam satu kartu. Tunjukkan QR ke kasir setiap kali beli kopi.</p>
-          <ol className="profile-howto">
-            <li><b>01</b>Pesan kopi favoritmu</li>
-            <li><b>02</b>Tunjukkan QR member ke kasir</li>
-            <li><b>03</b>Tekan &ldquo;Lihat stamp&rdquo; — stamp ke-{STAMP_GOAL} kopi gratis</li>
-          </ol>
-        </div>
-
+      <section className={`profile-layout${showAside ? " has-aside" : ""}`} aria-label="Profil member">
         <div className="profile-wallet">
           {loading ? (
             <div className="card profile-state"><div className="profile-skeleton" aria-label="Memuat profile"><i /><i /><i /><i /></div></div>
@@ -223,6 +215,59 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
+
+        {showAside && (
+          <aside className="profile-aside" aria-label="Rewards, promo, dan acara bulan ini">
+            <section className="card aside-card" aria-labelledby="aside-rewards">
+              <header className="aside-head"><h2 id="aside-rewards">Rewards &amp; Voucher</h2><span>{stamps} / {STAMP_GOAL} STAMP</span></header>
+              <div className="aside-reward">
+                <span className="mc-meter" aria-hidden="true"><i style={{ width: `${(stamps / STAMP_GOAL) * 100}%` }} /></span>
+                <p>{remaining === 0 ? "Stamp penuh! Tunjukkan QR ke kasir untuk kopi gratis." : `${remaining} stamp lagi untuk kopi gratis.`}</p>
+              </div>
+              {vouchers.length === 0 ? (
+                <p className="aside-empty">Belum ada voucher aktif. Voucher barumu akan muncul di sini.</p>
+              ) : (
+                <ul className="aside-list">
+                  {vouchers.map((voucher) => (
+                    <li key={voucher.code} className="aside-voucher"><div><strong>{voucher.title}</strong><small>{voucher.detail}</small></div><span>{voucher.expires}</span></li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            <section className="card aside-card" aria-labelledby="aside-promo">
+              <header className="aside-head"><h2 id="aside-promo">This Month&rsquo;s Promo</h2><span>{monthLabel}</span></header>
+              {monthlyPromos.length === 0 ? (
+                <p className="aside-empty">Promo bulan ini segera hadir.</p>
+              ) : (
+                <ul className="aside-list">
+                  {monthlyPromos.map((promo) => (
+                    <li key={promo.title} className="aside-promo">
+                      <div><strong>{promo.title}</strong>{promo.badge && <b className="aside-badge">{promo.badge}</b>}<small>{promo.detail}</small></div>
+                      <em>{promo.validUntil}</em>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            <section className="card aside-card" aria-labelledby="aside-events">
+              <header className="aside-head"><h2 id="aside-events">What&rsquo;s Happening This Month</h2><span>{monthLabel}</span></header>
+              {monthlyEvents.length === 0 ? (
+                <p className="aside-empty">Belum ada acara bulan ini.</p>
+              ) : (
+                <ul className="aside-list">
+                  {monthlyEvents.map((event) => (
+                    <li key={`${event.day}-${event.title}`} className="aside-event">
+                      <time className="aside-date"><b>{event.day}</b>{event.month}</time>
+                      <div><strong>{event.title}</strong><small>{event.detail}</small><em>{event.time}</em></div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </aside>
+        )}
       </section>
       <PageFooter items={["COFFE LOCA · MEDAN", "TAKE IT EASY", "© 2026"]} />
       {confirmDialog}
