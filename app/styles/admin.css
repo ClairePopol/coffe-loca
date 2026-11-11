@@ -271,3 +271,8 @@
   .admin-content-actions { max-width:none; justify-content:flex-start; }
   .admin-content-two { grid-template-columns:1fr; }
 }
+.admin-pick-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.admin-pick-bar>span { color:var(--muted-2); font-size:12px; font-weight:600; }
+.admin-pick-all { min-height:36px; padding:0 14px; border:1px solid var(--line-strong); border-radius:99px; color:var(--olive); background:transparent; font-size:11px; font-weight:700; letter-spacing:.1em; cursor:pointer; transition:background .2s,color .2s; }
+.admin-pick-all:hover:not(:disabled) { color:var(--paper); background:var(--olive); }
+.admin-pick-all:disabled { cursor:not-allowed; opacity:.4; }
