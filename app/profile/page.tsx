@@ -8,11 +8,10 @@ import { PageFooter, PageHeader } from "@/components/PageShell";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { isStaff as isStaffRole, roleLabel } from "@/lib/roles";
 import { formatPhone, isPhoneAuthEmail, userPhone } from "@/lib/phone";
+import { OWNER_WHATSAPP_URL } from "@/lib/owner";
 import { VOUCHER_QR_PREFIX, errorMessage, formatDateId, monthBounds, todayWib, type CafeEvent, type Promo, type Voucher } from "@/lib/content";
 
 type Profile = { stamps: number; role: string; approved: boolean };
-// Owner's WhatsApp chat link (wa.link). New accounts open it to ask for verification. Override with NEXT_PUBLIC_OWNER_WHATSAPP_URL.
-const OWNER_WHATSAPP_URL = process.env.NEXT_PUBLIC_OWNER_WHATSAPP_URL || "https://wa.link/d57y1v";
 const STAMP_GOAL = 10;
 
 export default function ProfilePage() {
