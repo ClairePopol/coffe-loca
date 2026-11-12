@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { QRCodeSVG } from "qrcode.react";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -8,7 +8,7 @@ import { PageFooter, PageHeader } from "@/components/PageShell";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { isStaff as isStaffRole, roleLabel } from "@/lib/roles";
 import { formatPhone, isPhoneAuthEmail, userPhone } from "@/lib/phone";
-import { formatDateId, monthBounds, todayWib, type CafeEvent, type Promo, type Voucher } from "@/lib/content";
+import { errorMessage, formatDateId, monthBounds, todayWib, type CafeEvent, type Promo, type Voucher } from "@/lib/content";
 
 type Profile = { stamps: number; role: string };
 const STAMP_GOAL = 10;
@@ -19,9 +19,12 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   // Managed by staff in the admin panel (supabase/content.sql). Empty until loaded / when nothing is published.
-  const [promos, setPromos] = useState<Pick<Promo, "id" | "title" | "detail" | "badge" | "valid_until">[]>([]);
+  const [promos, setPromos] = useState<Pick<Promo, "id" | "title" | "detail" | "badge" | "valid_until" | "claim_uses">[]>([]);
   const [events, setEvents] = useState<Pick<CafeEvent, "id" | "title" | "detail" | "event_date" | "time_text">[]>([]);
-  const [vouchers, setVouchers] = useState<{ id: number; voucher: Pick<Voucher, "id" | "title" | "detail" | "expires_at"> }[]>([]);
+  const [vouchers, setVouchers] = useState<{ id: number; usesLeft: number; usesTotal: number; expires: string | null; voucher: Pick<Voucher, "id" | "title" | "detail" | "expires_at"> }[]>([]);
+  const [claimedPromoIds, setClaimedPromoIds] = useState<Set<number>>(new Set());
+  const [claimingId, setClaimingId] = useState<number | null>(null);
+  const [claimNote, setClaimNote] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
   const [qrOpen, setQrOpen] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [side, setSide] = useState<"front" | "back">("front");
@@ -32,6 +35,47 @@ export default function ProfilePage() {
   const [confirm, confirmDialog] = useConfirm();
   const [signingOut, setSigningOut] = useState(false);
   const qrTriggerRef = useRef<HTMLButtonElement>(null);
+
+  // Promos, this month's events and the member's vouchers (incl. claimed promos). Errors leave the panels as they were.
+  const loadPanels = useCallback(async (userId: string) => {
+    const supabase = getSupabaseClient();
+    const today = todayWib();
+    const [promoRes, eventRes, voucherRes] = await Promise.all([
+      supabase.from("promos").select("id, title, detail, badge, valid_until, claim_uses").eq("is_active", true).or(`valid_until.is.null,valid_until.gte.${today}`).order("created_at", { ascending: false }),
+      supabase.from("events").select("id, title, detail, event_date, time_text").eq("is_active", true).gte("event_date", today).lte("event_date", monthBounds(today).end).order("event_date", { ascending: true }),
+      supabase.from("member_vouchers").select("id, status, uses_left, uses_total, expires_at, vouchers(id, title, detail, expires_at, is_active, promo_id)").eq("member_id", userId).order("granted_at", { ascending: false }),
+    ]);
+    if (!promoRes.error) setPromos(promoRes.data ?? []);
+    if (!eventRes.error) setEvents(eventRes.data ?? []);
+    if (!voucherRes.error) {
+      type Row = { id: number; status: string; uses_left: number; uses_total: number; expires_at: string | null; vouchers: (Voucher & { is_active: boolean }) | null };
+      const rows = (voucherRes.data ?? []) as unknown as Row[];
+      // a promo stays "claimed" even after its voucher is used up or expired
+      setClaimedPromoIds(new Set(rows.flatMap((row) => (row.vouchers?.promo_id ? [row.vouchers.promo_id] : []))));
+      setVouchers(rows.flatMap((row) => {
+        const voucher = row.vouchers;
+        const expires = row.expires_at ?? voucher?.expires_at ?? null;
+        if (!voucher || !voucher.is_active || row.status !== "active" || row.uses_left < 1 || (expires && expires < today)) return [];
+        return [{ id: row.id, usesLeft: row.uses_left, usesTotal: row.uses_total, expires, voucher }];
+      }));
+    }
+  }, []);
+
+  async function claimPromo(promo: { id: number; title: string; claim_uses: number }) {
+    if (!user || claimingId) return;
+    setClaimingId(promo.id);
+    setClaimNote(null);
+    try {
+      const { error } = await getSupabaseClient().rpc("claim_promo", { p_promo_id: promo.id });
+      if (error) throw error;
+      setClaimNote({ tone: "ok", text: `“${promo.title}” masuk ke Rewards & Voucher — bisa dipakai ${promo.claim_uses}x sampai akhir bulan.` });
+      await loadPanels(user.id);
+    } catch (error) {
+      setClaimNote({ tone: "error", text: errorMessage(error, "Promo gagal diklaim. Coba lagi.") });
+    } finally {
+      setClaimingId(null);
+    }
+  }
 
   useEffect(() => {
     let active = true;
@@ -45,20 +89,8 @@ export default function ProfilePage() {
         const { data } = await supabase.from("profiles").select("stamps, role").eq("id", authData.user.id).maybeSingle();
         if (active && data) setProfile({ stamps: data.stamps ?? 0, role: data.role ?? "member" });
 
-        // Side panels: a failure here must never break the member card, so errors are ignored (panels stay empty).
-        const today = todayWib();
-        const [promoRes, eventRes, voucherRes] = await Promise.all([
-          supabase.from("promos").select("id, title, detail, badge, valid_until").eq("is_active", true).or(`valid_until.is.null,valid_until.gte.${today}`).order("created_at", { ascending: false }),
-          supabase.from("events").select("id, title, detail, event_date, time_text").eq("is_active", true).gte("event_date", today).lte("event_date", monthBounds(today).end).order("event_date", { ascending: true }),
-          supabase.from("member_vouchers").select("id, vouchers(id, title, detail, expires_at, is_active)").eq("member_id", authData.user.id).eq("status", "active").order("granted_at", { ascending: false }),
-        ]);
-        if (!active) return;
-        if (!promoRes.error) setPromos(promoRes.data ?? []);
-        if (!eventRes.error) setEvents(eventRes.data ?? []);
-        if (!voucherRes.error) {
-          const rows = (voucherRes.data ?? []) as unknown as { id: number; vouchers: (Voucher & { is_active: boolean }) | null }[];
-          setVouchers(rows.flatMap((row) => (row.vouchers && row.vouchers.is_active && (!row.vouchers.expires_at || row.vouchers.expires_at >= today) ? [{ id: row.id, voucher: row.vouchers }] : [])));
-        }
+        // Side panels: a failure here must never break the member card, so errors are ignored inside loadPanels.
+        await loadPanels(authData.user.id);
       } catch (error) {
         if (active) setLoadError(error instanceof Error ? error.message : "Profile gagal dimuat.");
       } finally {
@@ -67,7 +99,7 @@ export default function ProfilePage() {
     }
     loadProfile();
     return () => { active = false; };
-  }, []);
+  }, [loadPanels]);
 
   useEffect(() => {
     if (!qrOpen) return;
@@ -243,10 +275,10 @@ export default function ProfilePage() {
                 <p className="aside-empty">Belum ada voucher aktif. Voucher barumu akan muncul di sini.</p>
               ) : (
                 <ul className="aside-list">
-                  {vouchers.map(({ id, voucher }) => (
+                  {vouchers.map(({ id, voucher, usesLeft, usesTotal, expires }) => (
                     <li key={id} className="aside-voucher">
                       <div><strong>{voucher.title}</strong>{voucher.detail && <small>{voucher.detail}</small>}</div>
-                      <span>{voucher.expires_at ? `s/d ${formatDateId(voucher.expires_at)}` : "Tanpa batas"}</span>
+                      <span>{usesTotal > 1 && <b>Sisa {usesLeft}/{usesTotal}x</b>}{expires ? `s/d ${formatDateId(expires)}` : "Tanpa batas"}</span>
                     </li>
                   ))}
                 </ul>
@@ -255,14 +287,17 @@ export default function ProfilePage() {
 
             <section className="card aside-card" aria-labelledby="aside-promo">
               <header className="aside-head"><h2 id="aside-promo">This Month&rsquo;s Promo</h2><span>{monthLabel}</span></header>
+              {claimNote && <p className={`notice aside-note${claimNote.tone === "error" ? " notice-error" : ""}`} role={claimNote.tone === "error" ? "alert" : "status"}>{claimNote.text}</p>}
               {promos.length === 0 ? (
                 <p className="aside-empty">Promo bulan ini segera hadir.</p>
               ) : (
                 <ul className="aside-list">
                   {promos.map((promo) => (
                     <li key={promo.id} className="aside-promo">
-                      <div><strong>{promo.title}</strong>{promo.badge && <b className="aside-badge">{promo.badge}</b>}{promo.detail && <small>{promo.detail}</small>}</div>
-                      {promo.valid_until && <em>s/d {formatDateId(promo.valid_until)}</em>}
+                      <div><strong>{promo.title}</strong>{promo.badge && <b className="aside-badge">{promo.badge}</b>}{promo.detail && <small>{promo.detail}</small>}{promo.valid_until && <em>s/d {formatDateId(promo.valid_until)}</em>}</div>
+                      {claimedPromoIds.has(promo.id)
+                        ? <span className="aside-claimed">SUDAH DIKLAIM</span>
+                        : <button type="button" className="aside-claim" disabled={claimingId !== null} onClick={() => claimPromo(promo)}>{claimingId === promo.id ? "MEMPROSES…" : `KLAIM · ${promo.claim_uses}x`}</button>}
                     </li>
                   ))}
                 </ul>

@@ -165,3 +165,11 @@
   .profile-bean-one { top:30%; left:-4%; width:54px; }
   .profile-bean-two { right:-2%; bottom:22%; width:39px; }
 }
+.aside-note { margin-bottom:12px; font-size:13px; }
+.aside-promo { align-items:center; }
+.aside-claim { flex:none; min-height:36px; padding:0 14px; border:0; border-radius:99px; color:var(--paper); background:var(--olive); font-size:11px; font-weight:700; letter-spacing:.1em; white-space:nowrap; cursor:pointer; transition:background .2s,transform .2s; }
+.aside-claim:hover:not(:disabled) { transform:translateY(-1px); background:var(--terracotta); }
+.aside-claim:disabled { cursor:wait; opacity:.55; }
+.aside-claimed { flex:none; color:var(--muted-2); font-size:10px; font-weight:700; letter-spacing:.12em; white-space:nowrap; }
+.aside-voucher>span { text-align:right; }
+.aside-voucher>span b { display:block; margin-bottom:2px; color:var(--olive); font-size:12px; }

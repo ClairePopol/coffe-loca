@@ -4,7 +4,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { formatPhone } from "@/lib/phone";
-import { errorMessage, formatDateId, type CafeEvent, type Promo, type Voucher, type VoucherGrant } from "@/lib/content";
+import { errorMessage, formatDateId, todayWib, type CafeEvent, type Promo, type Voucher, type VoucherGrant } from "@/lib/content";
 
 type MemberLite = { id: string; full_name: string | null; phone: string | null; role: string };
 type Tab = "voucher" | "promo" | "event";
@@ -46,7 +46,7 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
         supabase.from("promos").select("*").order("created_at", { ascending: false }),
         supabase.from("events").select("*").order("event_date", { ascending: true }),
         supabase.from("vouchers").select("*").order("created_at", { ascending: false }),
-        supabase.from("member_vouchers").select("id, voucher_id, member_id, status, granted_at, used_at").order("granted_at", { ascending: false }),
+        supabase.from("member_vouchers").select("id, voucher_id, member_id, status, uses_total, uses_left, expires_at, granted_at, used_at").order("granted_at", { ascending: false }),
       ]);
       const failed = p.error || e.error || v.error || g.error;
       if (failed) throw failed;
@@ -101,7 +101,7 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
     const form = event.currentTarget;
     const data = new FormData(form);
     const ok = await run(
-      () => getSupabaseClient().from("promos").insert({ title: text(data, "title"), detail: optional(text(data, "detail")), badge: optional(text(data, "badge").toUpperCase()), valid_until: optional(text(data, "date")), created_by: userId }),
+      () => getSupabaseClient().from("promos").insert({ title: text(data, "title"), detail: optional(text(data, "detail")), badge: optional(text(data, "badge").toUpperCase()), valid_until: optional(text(data, "date")), claim_uses: Math.min(Math.max(Math.floor(Number(text(data, "uses"))) || 4, 1), 50), created_by: userId }),
       "Promo ditambahkan dan langsung tampil di profil member.",
       "Promo gagal ditambahkan.",
     );
@@ -189,7 +189,7 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
     }
   }
 
-  const markUsed = (grantId: number) => run(() => getSupabaseClient().rpc("use_member_voucher", { p_member_voucher_id: grantId }), "Voucher ditandai terpakai.", "Gagal menandai voucher.");
+  const markUsed = (grantId: number) => run(() => getSupabaseClient().rpc("use_member_voucher", { p_member_voucher_id: grantId }), "Pemakaian dicatat.", "Gagal menandai voucher.");
 
   const togglePick = (id: string) => setPicked((current) => {
     const next = new Set(current);
@@ -242,12 +242,12 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
                   <li key={voucher.id} className={voucher.is_active ? "" : "is-off"}>
                     <div className="admin-content-row">
                       <div className="admin-content-info">
-                        <strong>{voucher.title}{!voucher.is_active && <em>NONAKTIF</em>}</strong>
+                        <strong>{voucher.title}{voucher.promo_id !== null && <em>DARI PROMO</em>}{!voucher.is_active && <em>NONAKTIF</em>}</strong>
                         {voucher.detail && <small>{voucher.detail}</small>}
                         <span>{voucher.expires_at ? `Berlaku sampai ${formatDateId(voucher.expires_at)}` : "Tanpa batas waktu"} · {mine.length} penerima · {used} terpakai</span>
                       </div>
                       <div className="admin-content-actions">
-                        <button type="button" className="admin-use-id" disabled={busy || !voucher.is_active} onClick={() => openGive(voucher.id)} aria-expanded={giveFor === voucher.id}>BERI</button>
+                        <button type="button" className="admin-use-id" disabled={busy || !voucher.is_active || voucher.promo_id !== null} title={voucher.promo_id !== null ? "Voucher ini dibuat otomatis saat member mengklaim promo" : undefined} onClick={() => openGive(voucher.id)} aria-expanded={giveFor === voucher.id}>BERI</button>
                         <button type="button" className="admin-use-id" disabled={busy} onClick={() => toggleActive("vouchers", voucher.id, !voucher.is_active)}>{voucher.is_active ? "NONAKTIFKAN" : "AKTIFKAN"}</button>
                         <button type="button" className="admin-use-id admin-use-danger" disabled={busy} onClick={() => remove("vouchers", voucher.id, voucher.title)}>HAPUS</button>
                       </div>
@@ -309,10 +309,15 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
                           <ul className="admin-holders">
                             {mine.map((grant) => {
                               const member = memberById.get(grant.member_id);
+                              const expiry = grant.expires_at ?? voucher.expires_at;
+                              const expired = Boolean(expiry && expiry < todayWib());
                               return (
                                 <li key={grant.id}>
-                                  <span>{member ? memberName(member) : grant.member_id.slice(0, 8)}</span>
-                                  {grant.status === "used" ? <em className="is-used">TERPAKAI</em> : <button type="button" className="admin-use-id" disabled={busy} onClick={() => markUsed(grant.id)}>TANDAI TERPAKAI</button>}
+                                  <span className="admin-holder-info">
+                                    <b>{member ? memberName(member) : grant.member_id.slice(0, 8)}</b>
+                                    <small>{grant.uses_total > 1 ? `Sisa ${grant.uses_left}/${grant.uses_total}x` : "1x pakai"}{expiry ? ` · s/d ${formatDateId(expiry)}` : ""}</small>
+                                  </span>
+                                  {grant.status === "used" ? <em className="is-used">TERPAKAI</em> : expired ? <em className="is-used">KEDALUWARSA</em> : <button type="button" className="admin-use-id" disabled={busy} onClick={() => markUsed(grant.id)}>{grant.uses_total > 1 ? "PAKAI 1x" : "TANDAI TERPAKAI"}</button>}
                                 </li>
                               );
                             })}
@@ -330,7 +335,7 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
 
       {tab === "promo" && (
         <div className="admin-tabpanel">
-          <p className="admin-content-hint"><b>This Month&rsquo;s Promo</b> — tampil untuk semua member yang login. Promo yang lewat tanggal berlaku otomatis disembunyikan.</p>
+          <p className="admin-content-hint"><b>This Month&rsquo;s Promo</b> — tampil untuk semua member yang login. Member bisa menekan <b>KLAIM</b>: promo masuk ke Rewards &amp; Voucher mereka dan berlaku sampai akhir bulan. Promo yang lewat tanggal berlaku otomatis disembunyikan.</p>
           <form className="admin-content-form" onSubmit={addPromo}>
             <label className="field"><span>JUDUL PROMO</span><input name="title" required maxLength={80} placeholder="Contoh: Beli 2 Gratis 1" /></label>
             <label className="field"><span>KETERANGAN</span><textarea name="detail" maxLength={300} rows={2} placeholder="Detail promo" /></label>
@@ -338,17 +343,21 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
               <label className="field"><span>LABEL (OPSIONAL)</span><input name="badge" maxLength={16} placeholder="NEW / HOT" /></label>
               <label className="field"><span>BERLAKU SAMPAI</span><input name="date" type="date" /></label>
             </div>
+            <label className="field"><span>JUMLAH PAKAI PER KLAIM</span><input name="uses" type="number" min={1} max={50} defaultValue={4} required /><small className="field-hint">Setelah diklaim, voucher bisa dipakai sebanyak ini dan hangus di akhir bulan.</small></label>
             <button className="btn-primary" type="submit" disabled={busy}><span>{busy ? "MENYIMPAN..." : "TAMBAH PROMO"}</span><i className="arrow-icon" aria-hidden="true" /></button>
           </form>
           {loading ? <p className="admin-empty">Memuat…</p> : promos.length === 0 ? <p className="admin-empty">Belum ada promo.</p> : (
             <ul className="admin-content-list">
-              {promos.map((promo) => (
+              {promos.map((promo) => {
+                const promoVoucher = vouchers.find((voucher) => voucher.promo_id === promo.id);
+                const claims = promoVoucher ? grants.filter((grant) => grant.voucher_id === promoVoucher.id).length : 0;
+                return (
                 <li key={promo.id} className={promo.is_active ? "" : "is-off"}>
                   <div className="admin-content-row">
                     <div className="admin-content-info">
                       <strong>{promo.title}{promo.badge && <em>{promo.badge}</em>}{!promo.is_active && <em>NONAKTIF</em>}</strong>
                       {promo.detail && <small>{promo.detail}</small>}
-                      <span>{promo.valid_until ? `Berlaku sampai ${formatDateId(promo.valid_until)}` : "Tanpa batas waktu"}</span>
+                      <span>{promo.valid_until ? `Berlaku sampai ${formatDateId(promo.valid_until)}` : "Tanpa batas waktu"} · {promo.claim_uses}x pakai · {claims} diklaim</span>
                     </div>
                     <div className="admin-content-actions">
                       <button type="button" className="admin-use-id" disabled={busy} onClick={() => toggleActive("promos", promo.id, !promo.is_active)}>{promo.is_active ? "NONAKTIFKAN" : "AKTIFKAN"}</button>
@@ -356,7 +365,8 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
                     </div>
                   </div>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           )}
         </div>
