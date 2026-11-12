@@ -1,5 +1,6 @@
 "use client";
 
+import { OWNER_WHATSAPP_URL } from "@/lib/owner";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -35,6 +36,8 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [otp, setOtp] = useState<OtpState | null>(null);
   const [cooldown, setCooldown] = useState(0);
+  // Registered (or logged in) but not yet approved by the owner: no session is kept, only this notice is shown.
+  const [waiting, setWaiting] = useState(false);
   const router = useRouter();
   const isRegister = mode === "register";
 
@@ -44,9 +47,16 @@ export default function LoginPage() {
     return () => window.clearTimeout(timer);
   }, [cooldown]);
 
+  // The account only becomes usable once the owner approves it, so drop the session and show the WhatsApp step.
+  async function holdForApproval() {
+    await getSupabaseClient().auth.signOut();
+    setOtp(null);
+    setErrorMessage("");
+    setWaiting(true);
+  }
+
   function finish() {
-    router.push("/profile");
-    router.refresh();
+    holdForApproval();
   }
 
   // Step 2 of registration: confirm the phone number with the 6-digit code sent by Twilio.
@@ -147,14 +157,11 @@ export default function LoginPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
-      // Accounts still waiting for owner verification land on /profile, which shows the WhatsApp step.
-      let destination = isRegister ? "/profile" : "/";
-      if (!isRegister) {
-        const { data: me } = await supabase.auth.getUser();
-        const { data: row } = me.user ? await supabase.from("profiles").select("role, approved").eq("id", me.user.id).maybeSingle() : { data: null };
-        if (row && row.role === "member" && row.approved === false) destination = "/profile";
-      }
-      router.push(destination);
+      if (isRegister) { await holdForApproval(); return; }
+      const { data: me } = await supabase.auth.getUser();
+      const { data: row } = me.user ? await supabase.from("profiles").select("role, approved").eq("id", me.user.id).maybeSingle() : { data: null };
+      if (row && row.role === "member" && row.approved === false) { await holdForApproval(); return; }
+      router.push("/");
       router.refresh();
     } catch (error) {
       setErrorMessage(friendlyAuthError(error, isRegister));
@@ -181,7 +188,17 @@ export default function LoginPage() {
 
         <div className="auth-card card">
           <div className="card-topline"><span>MEMBER ACCESS</span><span>MEDAN / 2026</span></div>
-          {otp ? (
+          {waiting ? (
+            <div id="auth-panel">
+              <div className="auth-card-heading">
+                <span className="auth-kicker">MENUNGGU PERSETUJUAN</span>
+                <h2>Akunmu belum aktif.</h2>
+                <p>Akun baru harus disetujui Owner Coffe Loca dulu sebelum bisa dipakai. Chat Owner lewat WhatsApp, sebutkan nama dan nomor HP yang kamu daftarkan. Setelah disetujui, kamu bisa login.</p>
+              </div>
+              <a className="btn-primary" href={OWNER_WHATSAPP_URL} target="_blank" rel="noopener noreferrer"><span>CHAT OWNER DI WHATSAPP</span><span className="arrow-icon" aria-hidden="true" /></a>
+              <button type="button" className="auth-link" onClick={() => { setWaiting(false); setMode("login"); }}>KEMBALI KE LOGIN</button>
+            </div>
+          ) : otp ? (
             <div id="auth-panel">
               <div className="auth-card-heading">
                 <span className="auth-kicker">VERIFIKASI NOMOR</span>
