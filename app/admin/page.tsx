@@ -8,6 +8,7 @@ import QrScanner from "@/components/QrScanner";
 import { useConfirm } from "@/components/ConfirmDialog";
 import MultiDatePicker, { dayKey } from "@/components/MultiDatePicker";
 import AdminContent from "@/components/AdminContent";
+import { VOUCHER_QR_PREFIX } from "@/lib/content";
 import { formatPhone } from "@/lib/phone";
 import { assignableRoles, canEditRoleOf, canManageCoffee, canManageStore, isStaff, roleLabel, type Role } from "@/lib/roles";
 
@@ -44,6 +45,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [voucherScan, setVoucherScan] = useState<{ id: number; nonce: number } | null>(null);
   const [query, setQuery] = useState("");
   const [logFilter, setLogFilter] = useState<LogFilter>("all");
   const [logDays, setLogDays] = useState<string[]>([]);
@@ -170,6 +172,10 @@ export default function AdminPage() {
 
   function handleScan(text: string) {
     setScannerOpen(false);
+    if (text.startsWith(VOUCHER_QR_PREFIX)) {
+      const id = Number(text.slice(VOUCHER_QR_PREFIX.length));
+      if (Number.isInteger(id) && id > 0) { setVoucherScan({ id, nonce: Date.now() }); return; }
+    }
     if (!UUID_PATTERN.test(text)) {
       setStatus({ tone: "error", text: "QR ini bukan QR member Coffe Loca. Minta member membuka kartu di halaman Profile." });
       return;
@@ -320,7 +326,7 @@ export default function AdminPage() {
             <h2>Tambahkan stamp.</h2>
             <button className="admin-scan-button" type="button" onClick={() => setScannerOpen(true)}>
               <span className="admin-scan-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5M7 12h10" /></svg></span>
-              <span><strong>Scan QR member</strong><small>Buka kamera untuk membaca kartu member</small></span>
+              <span><strong>Scan QR member / voucher</strong><small>Baca kartu member (stamp) atau voucher yang mau di-redeem</small></span>
               <i className="arrow-icon" aria-hidden="true" />
             </button>
             <div className="admin-or"><span>ATAU MASUKKAN MANUAL</span></div>
@@ -445,7 +451,7 @@ export default function AdminPage() {
             {visibleLogs.length > logLimit && <button type="button" className="admin-more" onClick={() => setLogLimit((value) => value + LOG_PAGE)}>TAMPILKAN LEBIH BANYAK <span>{logLimit} / {visibleLogs.length}</span></button>}
             </div>
           </div>
-          {user && <AdminContent members={members} userId={user.id} />}
+          {user && <AdminContent members={members} userId={user.id} scan={voucherScan} />}
           </>)}
         </div>
       </section>

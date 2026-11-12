@@ -8,7 +8,7 @@ import { PageFooter, PageHeader } from "@/components/PageShell";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { isStaff as isStaffRole, roleLabel } from "@/lib/roles";
 import { formatPhone, isPhoneAuthEmail, userPhone } from "@/lib/phone";
-import { errorMessage, formatDateId, monthBounds, todayWib, type CafeEvent, type Promo, type Voucher } from "@/lib/content";
+import { VOUCHER_QR_PREFIX, errorMessage, formatDateId, monthBounds, todayWib, type CafeEvent, type Promo, type Voucher } from "@/lib/content";
 
 type Profile = { stamps: number; role: string };
 const STAMP_GOAL = 10;
@@ -26,6 +26,9 @@ export default function ProfilePage() {
   const [claimingId, setClaimingId] = useState<number | null>(null);
   const [claimNote, setClaimNote] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
   const [qrOpen, setQrOpen] = useState(false);
+  // voucher shown to the cashier as a QR; `redeemed` flips when staff scans it and the use is recorded
+  const [shownVoucher, setShownVoucher] = useState<{ id: number; title: string; usesLeft: number; usesTotal: number } | null>(null);
+  const [voucherRedeemed, setVoucherRedeemed] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [side, setSide] = useState<"front" | "back">("front");
   const [phase, setPhase] = useState<"idle" | "out" | "in">("idle");
@@ -100,6 +103,22 @@ export default function ProfilePage() {
     loadProfile();
     return () => { active = false; };
   }, [loadPanels]);
+
+  // While a voucher QR is on screen: re-check every 3s so the member sees when the cashier has redeemed it.
+  useEffect(() => {
+    if (!shownVoucher || voucherRedeemed || !user) return;
+    const timer = window.setInterval(() => { loadPanels(user.id); }, 3000);
+    return () => window.clearInterval(timer);
+  }, [shownVoucher, voucherRedeemed, user, loadPanels]);
+
+  useEffect(() => {
+    if (!shownVoucher || voucherRedeemed) return;
+    const current = vouchers.find((item) => item.id === shownVoucher.id);
+    if (!current || current.usesLeft < shownVoucher.usesLeft) {
+      setVoucherRedeemed(true);
+      navigator.vibrate?.(120);
+    }
+  }, [vouchers, shownVoucher, voucherRedeemed]);
 
   useEffect(() => {
     if (!qrOpen) return;
@@ -279,6 +298,7 @@ export default function ProfilePage() {
                     <li key={id} className="aside-voucher">
                       <div><strong>{voucher.title}</strong>{voucher.detail && <small>{voucher.detail}</small>}</div>
                       <span>{usesTotal > 1 && <b>Sisa {usesLeft}/{usesTotal}x</b>}{expires ? `s/d ${formatDateId(expires)}` : "Tanpa batas"}</span>
+                      <button type="button" className="aside-claim aside-show" onClick={() => { setVoucherRedeemed(false); setShownVoucher({ id, title: voucher.title, usesLeft, usesTotal }); }}>TUNJUKKAN KE KASIR</button>
                     </li>
                   ))}
                 </ul>
@@ -327,6 +347,22 @@ export default function ProfilePage() {
       </section>
       <PageFooter items={["COFFE LOCA · MEDAN", "TAKE IT EASY", "© 2026"]} />
       {confirmDialog}
+
+      {shownVoucher && (
+        <div className="profile-qr-modal" role="dialog" aria-modal="true" aria-labelledby="voucher-qr-title" onClick={() => setShownVoucher(null)}>
+          <div className="profile-qr-modal-card" onClick={(event) => event.stopPropagation()}>
+            <button className="profile-modal-close" type="button" onClick={() => setShownVoucher(null)} aria-label="Tutup">×</button>
+            <span id="voucher-qr-title">VOUCHER · TUNJUKKAN KE KASIR</span>
+            {voucherRedeemed ? (
+              <div className="profile-qr-large voucher-redeemed" role="status"><b>✓</b><span>Voucher berhasil dipakai</span></div>
+            ) : (
+              <div className="profile-qr-large"><QRCodeSVG value={`${VOUCHER_QR_PREFIX}${shownVoucher.id}`} size={240} bgColor="#f8f4eb" fgColor="#354537" level="M" /></div>
+            )}
+            <strong>{shownVoucher.title}</strong>
+            <small>{voucherRedeemed ? "Terima kasih! Sisa pemakaian sudah diperbarui." : "Kasir akan scan QR ini, lalu voucher dipotong otomatis."}</small>
+          </div>
+        </div>
+      )}
 
       {qrOpen && memberCode && (
         <div className="profile-qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-title" onClick={() => setQrOpen(false)}>

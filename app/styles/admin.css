@@ -285,3 +285,11 @@
 .admin-holder-info { display:flex; min-width:0; flex-direction:column; gap:2px; }
 .admin-holder-info b { color:var(--olive); font-size:14px; font-weight:600; }
 .admin-holder-info small { color:var(--muted-2); font-size:12px; }
+
+/* cashier redeem card (scanned voucher QR) */
+.admin-redeem { display:grid; gap:10px; margin-bottom:16px; border-color:rgba(217,183,122,.8); }
+.admin-redeem>strong { color:var(--olive); font-family:"Instrument Serif",serif; font-size:28px; font-weight:400; }
+.admin-redeem>p { margin:0; color:var(--muted-2); }
+.admin-redeem.is-problem { border-color:#c4604a; }
+.admin-redeem.is-done { border-color:#6f9a6a; }
+.admin-redeem-close { border:0; background:none; font-size:22px; line-height:1; cursor:pointer; color:inherit; }
