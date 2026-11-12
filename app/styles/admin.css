@@ -293,3 +293,5 @@
 .admin-redeem.is-problem { border-color:#c4604a; }
 .admin-redeem.is-done { border-color:#6f9a6a; }
 .admin-redeem-close { border:0; background:none; font-size:22px; line-height:1; cursor:pointer; color:inherit; }
+
+.admin-member-info strong em.is-pending { color:#9c4a32; background:rgba(196,96,74,.14); }

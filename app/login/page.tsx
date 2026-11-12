@@ -147,7 +147,14 @@ export default function LoginPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
-      router.push(isRegister ? "/profile" : "/");
+      // Accounts still waiting for owner verification land on /profile, which shows the WhatsApp step.
+      let destination = isRegister ? "/profile" : "/";
+      if (!isRegister) {
+        const { data: me } = await supabase.auth.getUser();
+        const { data: row } = me.user ? await supabase.from("profiles").select("role, approved").eq("id", me.user.id).maybeSingle() : { data: null };
+        if (row && row.role === "member" && row.approved === false) destination = "/profile";
+      }
+      router.push(destination);
       router.refresh();
     } catch (error) {
       setErrorMessage(friendlyAuthError(error, isRegister));
