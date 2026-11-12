@@ -12,13 +12,13 @@ import { VOUCHER_QR_PREFIX } from "@/lib/content";
 import { formatPhone } from "@/lib/phone";
 import { assignableRoles, canEditRoleOf, canManageCoffee, canManageStore, isStaff, roleLabel, type Role } from "@/lib/roles";
 
-type Member = { id: string; full_name: string | null; phone: string | null; stamps: number; role: string; created_at: string };
+type Member = { id: string; full_name: string | null; phone: string | null; stamps: number; role: string; approved: boolean; created_at: string };
 type StampLog = { id: number; created_at: string; action: "add" | "redeem"; amount: number; stamps_before: number; stamps_after: number; member_id: string; member_name: string | null; admin_id: string | null; admin_name: string | null };
 type Status = { tone: "ok" | "error"; text: string } | null;
 type LogFilter = "all" | "add" | "redeem";
 
 const STAMP_GOAL = 10;
-const MEMBER_FIELDS = "id, full_name, phone, stamps, role, created_at";
+const MEMBER_FIELDS = "id, full_name, phone, stamps, role, approved, created_at";
 const LOG_FIELDS = "id, created_at, action, amount, stamps_before, stamps_after, member_id, member_name, admin_id, admin_name";
 const LOG_PAGE = 15;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -254,6 +254,25 @@ export default function AdminPage() {
     }
   }
 
+  async function setApproval(member: Member, approve: boolean) {
+    const ok = await confirm({
+      title: approve ? `Verifikasi ${member.full_name || "member"}?` : `Cabut verifikasi ${member.full_name || "member"}?`,
+      message: approve ? "Akun ini akan aktif dan bisa memakai kartu member, voucher, dan promo." : "Akun ini kembali ke status menunggu verifikasi.",
+      confirmLabel: approve ? "YA, VERIFIKASI" : "YA, CABUT",
+      tone: approve ? "default" : "danger",
+    });
+    if (!ok) return;
+    setListStatus(null);
+    try {
+      const { error } = await getSupabaseClient().rpc("set_member_approval", { target_user_id: member.id, is_approved: approve });
+      if (error) throw error;
+      setListStatus({ tone: "ok", text: approve ? `${member.full_name || "Member"} sudah diverifikasi.` : `Verifikasi ${member.full_name || "member"} dicabut.` });
+      await refresh();
+    } catch (error) {
+      setListStatus({ tone: "error", text: errorText(error, "Verifikasi gagal diubah.") });
+    }
+  }
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const qDigits = q.replace(/\D/g, "");
@@ -394,7 +413,7 @@ export default function AdminPage() {
                   return (
                     <li key={member.id} className={full ? "is-full" : ""}>
                       <div className="admin-member-info">
-                        <strong>{member.full_name || "Unnamed member"}{member.role !== "member" && <em>{roleLabel(member.role)}</em>}{member.id === user?.id && <em className="is-you">Kamu</em>}</strong>
+                        <strong>{member.full_name || "Unnamed member"}{member.role !== "member" && <em>{roleLabel(member.role)}</em>}{member.id === user?.id && <em className="is-you">Kamu</em>}{member.role === "member" && !member.approved && <em className="is-pending">BELUM VERIFIKASI</em>}</strong>
                         {member.phone ? <span className="admin-member-phone">{formatPhone(member.phone)}</span> : null}
                         <small>{member.id}</small>
                         {canEditRoleOf(role, member.role, member.id === user?.id) && (
@@ -411,7 +430,9 @@ export default function AdminPage() {
                         <span>{full ? "Siap ditukar ☕" : `${stamps} / ${STAMP_GOAL}`}</span>
                         <i aria-hidden="true"><b style={{ width: `${(stamps / STAMP_GOAL) * 100}%` }} /></i>
                       </div>
-                      {full
+                      {member.role === "member" && !member.approved
+                        ? <button type="button" className="admin-use-id admin-use-redeem" onClick={() => setApproval(member, true)}>VERIFIKASI</button>
+                        : full
                         ? <button type="button" className="admin-use-id admin-use-redeem" disabled={submitting} onClick={() => redeem(member)}>TUKAR</button>
                         : <button type="button" className="admin-use-id" onClick={() => chooseMember(member.id)}>PILIH</button>}
                     </li>

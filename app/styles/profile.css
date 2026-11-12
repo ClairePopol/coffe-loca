@@ -179,3 +179,9 @@
 .voucher-redeemed { display:grid; place-items:center; gap:8px; width:min(240px,64vw); aspect-ratio:1; color:#3f6b3a; }
 .voucher-redeemed b { font-size:72px; line-height:1; }
 .voucher-redeemed span { font-weight:700; }
+
+/* account waiting for owner verification */
+.profile-pending { display:grid; gap:14px; justify-items:start; text-align:left; }
+.profile-pending h2 { margin:0; }
+.profile-pending p { margin:0; color:var(--muted-2); line-height:1.6; }
+.profile-pending-check { border:0; background:none; padding:0; color:var(--terracotta); font-size:13px; font-weight:600; text-decoration:underline; cursor:pointer; }

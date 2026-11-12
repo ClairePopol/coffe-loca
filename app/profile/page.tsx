@@ -10,12 +10,14 @@ import { isStaff as isStaffRole, roleLabel } from "@/lib/roles";
 import { formatPhone, isPhoneAuthEmail, userPhone } from "@/lib/phone";
 import { VOUCHER_QR_PREFIX, errorMessage, formatDateId, monthBounds, todayWib, type CafeEvent, type Promo, type Voucher } from "@/lib/content";
 
-type Profile = { stamps: number; role: string };
+type Profile = { stamps: number; role: string; approved: boolean };
+// Owner's WhatsApp (digits with country code, e.g. 6281234567890). New accounts chat this number to get verified.
+const OWNER_WHATSAPP = (process.env.NEXT_PUBLIC_OWNER_WHATSAPP ?? "").replace(/\D/g, "");
 const STAMP_GOAL = 10;
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile>({ stamps: 0, role: "member" });
+  const [profile, setProfile] = useState<Profile>({ stamps: 0, role: "member", approved: true });
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   // Managed by staff in the admin panel (supabase/content.sql). Empty until loaded / when nothing is published.
@@ -89,8 +91,8 @@ export default function ProfilePage() {
         if (!authData.user) { window.location.href = "/login"; return; }
         if (!active) return;
         setUser(authData.user);
-        const { data } = await supabase.from("profiles").select("stamps, role").eq("id", authData.user.id).maybeSingle();
-        if (active && data) setProfile({ stamps: data.stamps ?? 0, role: data.role ?? "member" });
+        const { data } = await supabase.from("profiles").select("stamps, role, approved").eq("id", authData.user.id).maybeSingle();
+        if (active && data) setProfile({ stamps: data.stamps ?? 0, role: data.role ?? "member", approved: data.approved !== false });
 
         // Side panels: a failure here must never break the member card, so errors are ignored inside loadPanels.
         await loadPanels(authData.user.id);
@@ -144,7 +146,9 @@ export default function ProfilePage() {
   const memberNumber = memberCode ? `LOCA · ${memberCode.replace(/-/g, "").slice(0, 8).toUpperCase().replace(/(.{4})/, "$1 ")}` : "";
   const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString("id-ID", { month: "long", year: "numeric" }) : "";
   const monthLabel = new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" }).toUpperCase();
-  const showAside = !loading && Boolean(user);
+  const pending = profile.role === "member" && !profile.approved;
+  const showAside = !loading && Boolean(user) && !pending;
+  const whatsappLink = `https://wa.me/${OWNER_WHATSAPP}?text=${encodeURIComponent(`Halo Owner Coffe Loca, saya ${displayName}${contact ? ` (${contact})` : ""} baru daftar akun member. Mohon diverifikasi ya, terima kasih.`)}`;
 
   // Single-sided flip: turn the card edge-on, swap the face, turn it back.
   // (Two-sided backface-visibility flips are unreliable in mobile Safari.)
@@ -205,6 +209,16 @@ export default function ProfilePage() {
               <h2>Profile belum bisa dibuka.</h2>
               <p>{loadError || "Kamu perlu login dulu untuk melihat kartu member."}</p>
               <a className="btn-primary" href="/login"><span>LOGIN / REGISTER</span><span className="arrow-icon" aria-hidden="true" /></a>
+            </div>
+          ) : pending ? (
+            <div className="card profile-state profile-pending">
+              <span className="profile-kicker">MENUNGGU VERIFIKASI</span>
+              <h2>Akunmu belum diverifikasi.</h2>
+              <p>Halo {displayName}! Supaya akunmu aktif, chat Owner Coffe Loca lewat WhatsApp dan minta akunmu diverifikasi. Setelah disetujui, kartu member dan voucher akan terbuka.</p>
+              {OWNER_WHATSAPP
+                ? <a className="btn-primary" href={whatsappLink} target="_blank" rel="noopener noreferrer"><span>CHAT OWNER DI WHATSAPP</span><span className="arrow-icon" aria-hidden="true" /></a>
+                : <p className="notice notice-error">Nomor WhatsApp owner belum diatur. Hubungi pihak Coffe Loca langsung.</p>}
+              <button type="button" className="profile-pending-check" onClick={() => window.location.reload()}>Sudah diverifikasi? Cek status</button>
             </div>
           ) : (
             <div className="card profile-wallet-panel">
