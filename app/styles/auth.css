@@ -63,3 +63,11 @@
 .auth-link { padding:6px 0; border:0; color:var(--terracotta); background:none; font-size:12px; font-weight:700; letter-spacing:.08em; cursor:pointer; }
 .auth-link:hover:not(:disabled) { text-decoration:underline; text-underline-offset:3px; }
 .auth-link:disabled { color:var(--muted-2); cursor:default; opacity:.7; }
+
+/* "verify your account" popup (account waits for owner approval) */
+.auth-modal { position:fixed; z-index:300; inset:0; display:grid; place-items:center; padding:24px; background:rgba(28,34,27,.55); backdrop-filter:blur(15px); -webkit-backdrop-filter:blur(15px); }
+.auth-modal-card { position:relative; display:flex; width:min(100%,420px); flex-direction:column; align-items:center; gap:14px; padding:38px 28px 28px; border:1px solid rgba(217,183,122,.72); border-radius:var(--radius-lg); background:#f7f2e7; box-shadow:0 25px 70px rgba(0,0,0,.25); text-align:center; }
+.auth-modal-card h2 { margin:0; color:var(--olive); font-family:"Instrument Serif",serif; font-size:34px; font-weight:400; }
+.auth-modal-card p { margin:0; color:var(--muted-2); line-height:1.6; }
+.auth-modal-note { font-size:13px; }
+.auth-modal-close { position:absolute; top:10px; right:14px; border:0; background:none; font-size:26px; line-height:1; cursor:pointer; color:inherit; }
