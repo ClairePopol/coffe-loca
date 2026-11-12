@@ -282,3 +282,6 @@
 .admin-pick-all { min-height:36px; padding:0 14px; border:1px solid var(--line-strong); border-radius:99px; color:var(--olive); background:transparent; font-size:11px; font-weight:700; letter-spacing:.1em; cursor:pointer; transition:background .2s,color .2s; }
 .admin-pick-all:hover:not(:disabled) { color:var(--paper); background:var(--olive); }
 .admin-pick-all:disabled { cursor:not-allowed; opacity:.4; }
+.admin-holder-info { display:flex; min-width:0; flex-direction:column; gap:2px; }
+.admin-holder-info b { color:var(--olive); font-size:14px; font-weight:600; }
+.admin-holder-info small { color:var(--muted-2); font-size:12px; }
