@@ -11,8 +11,8 @@ import { formatPhone, isPhoneAuthEmail, userPhone } from "@/lib/phone";
 import { VOUCHER_QR_PREFIX, errorMessage, formatDateId, monthBounds, todayWib, type CafeEvent, type Promo, type Voucher } from "@/lib/content";
 
 type Profile = { stamps: number; role: string; approved: boolean };
-// Owner's WhatsApp (digits with country code, e.g. 6281234567890). New accounts chat this number to get verified.
-const OWNER_WHATSAPP = (process.env.NEXT_PUBLIC_OWNER_WHATSAPP ?? "").replace(/\D/g, "");
+// Owner's WhatsApp chat link (wa.link). New accounts open it to ask for verification. Override with NEXT_PUBLIC_OWNER_WHATSAPP_URL.
+const OWNER_WHATSAPP_URL = process.env.NEXT_PUBLIC_OWNER_WHATSAPP_URL || "https://wa.link/d57y1v";
 const STAMP_GOAL = 10;
 
 export default function ProfilePage() {
@@ -148,7 +148,6 @@ export default function ProfilePage() {
   const monthLabel = new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" }).toUpperCase();
   const pending = profile.role === "member" && !profile.approved;
   const showAside = !loading && Boolean(user) && !pending;
-  const whatsappLink = `https://wa.me/${OWNER_WHATSAPP}?text=${encodeURIComponent(`Halo Owner Coffe Loca, saya ${displayName}${contact ? ` (${contact})` : ""} baru daftar akun member. Mohon diverifikasi ya, terima kasih.`)}`;
 
   // Single-sided flip: turn the card edge-on, swap the face, turn it back.
   // (Two-sided backface-visibility flips are unreliable in mobile Safari.)
@@ -215,9 +214,8 @@ export default function ProfilePage() {
               <span className="profile-kicker">MENUNGGU VERIFIKASI</span>
               <h2>Akunmu belum diverifikasi.</h2>
               <p>Halo {displayName}! Supaya akunmu aktif, chat Owner Coffe Loca lewat WhatsApp dan minta akunmu diverifikasi. Setelah disetujui, kartu member dan voucher akan terbuka.</p>
-              {OWNER_WHATSAPP
-                ? <a className="btn-primary" href={whatsappLink} target="_blank" rel="noopener noreferrer"><span>CHAT OWNER DI WHATSAPP</span><span className="arrow-icon" aria-hidden="true" /></a>
-                : <p className="notice notice-error">Nomor WhatsApp owner belum diatur. Hubungi pihak Coffe Loca langsung.</p>}
+              <a className="btn-primary" href={OWNER_WHATSAPP_URL} target="_blank" rel="noopener noreferrer"><span>CHAT OWNER DI WHATSAPP</span><span className="arrow-icon" aria-hidden="true" /></a>
+              <p>Sebutkan nama dan nomor HP yang kamu pakai untuk daftar: <b>{displayName}{contact ? ` · ${contact}` : ""}</b></p>
               <button type="button" className="profile-pending-check" onClick={() => window.location.reload()}>Sudah diverifikasi? Cek status</button>
             </div>
           ) : (
