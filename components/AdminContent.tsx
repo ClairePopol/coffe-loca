@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { formatPhone } from "@/lib/phone";
@@ -18,7 +18,7 @@ const memberName = (member: MemberLite) => member.full_name || (member.phone ? f
  * Admin panel → "Konten": vouchers (given to chosen or random members), monthly promos and monthly events.
  * Everything here is what members see on /profile.
  */
-export default function AdminContent({ members, userId }: { members: MemberLite[]; userId: string }) {
+export default function AdminContent({ members, userId, scan }: { members: MemberLite[]; userId: string; scan?: { id: number; nonce: number } | null }) {
   const [tab, setTab] = useState<Tab>("voucher");
   const [status, setStatus] = useState<Status>(null);
   const [loading, setLoading] = useState(true);
@@ -36,6 +36,11 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
   const [pickQuery, setPickQuery] = useState("");
   const [randomCount, setRandomCount] = useState(1);
   const [holdersFor, setHoldersFor] = useState<number | null>(null);
+
+  // Cashier flow: a scanned voucher QR opens this card; one tap records the use (use_member_voucher).
+  type Redeem = { id: number; title: string; who: string; usesLeft: number; usesTotal: number; expires: string | null; problem: string | null; done: boolean };
+  const [redeem, setRedeem] = useState<Redeem | null>(null);
+  const redeemRef = useRef<HTMLDivElement>(null);
 
   const memberById = useMemo(() => new Map(members.map((member) => [member.id, member])), [members]);
 
@@ -62,6 +67,38 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    if (!scan) return;
+    let active = true;
+    (async () => {
+      const { data, error } = await getSupabaseClient().from("member_vouchers").select("id, member_id, status, uses_left, uses_total, expires_at, vouchers(title, expires_at, is_active)").eq("id", scan.id).maybeSingle();
+      if (!active) return;
+      const row = data as unknown as { id: number; member_id: string; status: string; uses_left: number; uses_total: number; expires_at: string | null; vouchers: { title: string; expires_at: string | null; is_active: boolean } | null } | null;
+      if (error || !row) {
+        setRedeem({ id: scan.id, title: "Voucher tidak ditemukan", who: "", usesLeft: 0, usesTotal: 0, expires: null, problem: error ? errorMessage(error, "Voucher gagal dibaca.") : "QR ini tidak cocok dengan voucher mana pun.", done: false });
+      } else {
+        const member = memberById.get(row.member_id);
+        const expires = row.expires_at ?? row.vouchers?.expires_at ?? null;
+        const problem = row.status !== "active" || row.uses_left < 1 ? "Voucher ini sudah terpakai habis."
+          : expires && expires < todayWib() ? "Voucher ini sudah kedaluwarsa."
+          : row.vouchers && !row.vouchers.is_active ? "Voucher ini sudah dinonaktifkan." : null;
+        setRedeem({ id: row.id, title: row.vouchers?.title ?? "Voucher", who: member ? memberName(member) : "Member", usesLeft: row.uses_left, usesTotal: row.uses_total, expires, problem, done: false });
+      }
+      window.setTimeout(() => redeemRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+    })();
+    return () => { active = false; };
+  }, [scan, memberById]);
+
+  async function redeemNow() {
+    if (!redeem) return;
+    setBusy(true);
+    const { error } = await getSupabaseClient().rpc("use_member_voucher", { p_member_voucher_id: redeem.id });
+    setBusy(false);
+    if (error) { setRedeem({ ...redeem, problem: errorMessage(error, "Gagal me-redeem voucher.") }); return; }
+    setRedeem({ ...redeem, usesLeft: redeem.usesLeft - 1, done: true });
+    await load();
+  }
 
   // Run a write, then reload. Shows the success text (or the error) in the status line.
   async function run(action: () => PromiseLike<{ error: unknown }>, okText: string, fallback: string) {
@@ -205,6 +242,20 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
   const tabs: [Tab, string, number][] = [["voucher", "Voucher", vouchers.length], ["promo", "Promo", promos.length], ["event", "Acara", events.length]];
 
   return (
+    <>
+    {redeem && (
+      <div ref={redeemRef} className={`admin-panel card admin-redeem${redeem.problem ? " is-problem" : redeem.done ? " is-done" : ""}`} role="status">
+        <div className="card-topline"><span>REDEEM VOUCHER</span><button type="button" className="admin-redeem-close" onClick={() => setRedeem(null)} aria-label="Tutup">×</button></div>
+        <strong>{redeem.title}</strong>
+        {redeem.who && <p>{redeem.who}{redeem.expires ? ` · s/d ${formatDateId(redeem.expires)}` : ""}</p>}
+        {redeem.problem ? <p className="notice notice-error" role="alert">{redeem.problem}</p>
+          : redeem.done ? <p className="notice">✓ Berhasil di-redeem.{redeem.usesLeft > 0 ? ` Sisa ${redeem.usesLeft}/${redeem.usesTotal}x.` : " Voucher sudah habis dipakai."}</p>
+          : <>
+              <p>Sisa {redeem.usesLeft}/{redeem.usesTotal}x — redeem 1x sekarang?</p>
+              <button className="btn-primary" type="button" disabled={busy} onClick={redeemNow}><span>{busy ? "MEMPROSES..." : "REDEEM 1x"}</span><i className="arrow-icon" aria-hidden="true" /></button>
+            </>}
+      </div>
+    )}
     <div className="admin-panel card admin-content-card">
       <div className="card-topline"><span>KONTEN PROFIL</span><span>TAMPIL DI HALAMAN MEMBER</span></div>
       <div className="admin-tabs is-three" role="tablist" aria-label="Jenis konten">
@@ -407,5 +458,6 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
       )}
       {confirmDialog}
     </div>
+    </>
   );
 }

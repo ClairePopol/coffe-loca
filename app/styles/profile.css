@@ -19,7 +19,7 @@
 .aside-list strong { color:var(--olive); font-size:15px; font-weight:700; line-height:1.35; }
 .aside-list small { display:block; margin-top:3px; color:var(--muted-2); font-size:13px; line-height:1.5; }
 .aside-list em { display:block; margin-top:5px; color:var(--terracotta); font-size:12px; font-style:normal; font-weight:600; letter-spacing:.04em; }
-.aside-voucher,.aside-promo { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.aside-voucher,.aside-promo { display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:14px; }
 .aside-voucher>span { flex:none; color:var(--terracotta); font-size:12px; font-weight:600; }
 .aside-badge { display:inline-block; margin-left:8px; padding:2px 8px; border-radius:99px; color:var(--terracotta); background:rgba(164,78,55,.1); font-size:10px; font-weight:800; letter-spacing:.12em; vertical-align:middle; }
 .aside-event { display:grid; grid-template-columns:54px minmax(0,1fr); align-items:start; gap:14px; }
@@ -173,3 +173,9 @@
 .aside-claimed { flex:none; color:var(--muted-2); font-size:10px; font-weight:700; letter-spacing:.12em; white-space:nowrap; }
 .aside-voucher>span { text-align:right; }
 .aside-voucher>span b { display:block; margin-bottom:2px; color:var(--olive); font-size:12px; }
+
+/* voucher QR for the cashier */
+.aside-show { flex:1 1 100%; margin-top:4px; }
+.voucher-redeemed { display:grid; place-items:center; gap:8px; width:min(240px,64vw); aspect-ratio:1; color:#3f6b3a; }
+.voucher-redeemed b { font-size:72px; line-height:1; }
+.voucher-redeemed span { font-weight:700; }

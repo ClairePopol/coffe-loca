@@ -5,6 +5,9 @@ export type CafeEvent = { id: number; title: string; detail: string | null; even
 export type Voucher = { id: number; title: string; detail: string | null; expires_at: string | null; promo_id: number | null; is_active: boolean; created_at: string };
 export type VoucherGrant = { id: number; voucher_id: number; member_id: string; status: "active" | "used"; uses_total: number; uses_left: number; expires_at: string | null; granted_at: string; used_at: string | null };
 
+/** What the member's voucher QR encodes ("LOCA-VOUCHER:<member_voucher id>"); the cashier scans it in the admin panel. */
+export const VOUCHER_QR_PREFIX = "LOCA-VOUCHER:";
+
 /** Today as YYYY-MM-DD in Medan time (WIB), so "this month" / "expired" don't depend on the visitor's timezone. */
 export const todayWib = () => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" });
 
