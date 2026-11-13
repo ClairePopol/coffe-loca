@@ -87,3 +87,6 @@
 .redeem-options small { display:block; margin-top:2px; color:var(--muted-2); font-size:12px; line-height:1.4; }
 .redeem-options b { display:flex; align-items:baseline; gap:4px; flex:none; font-family:"Instrument Serif",serif; font-size:28px; font-weight:400; }
 .redeem-options i { color:var(--muted-2); font-family:Manrope,sans-serif; font-size:11px; font-style:normal; }
+.redeem-options button:disabled { opacity:.5; cursor:not-allowed; background:rgba(53,69,55,.06); }
+.redeem-options button:disabled:hover { background:rgba(53,69,55,.06); }
+.redeem-options em { display:block; margin-top:3px; color:var(--terracotta); font-size:11px; font-style:normal; font-weight:700; letter-spacing:.04em; }
