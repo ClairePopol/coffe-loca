@@ -9,7 +9,7 @@ import { useConfirm } from "@/components/ConfirmDialog";
 import { isStaff as isStaffRole, roleLabel } from "@/lib/roles";
 import { formatPhone, isPhoneAuthEmail, userPhone } from "@/lib/phone";
 import { OWNER_WHATSAPP_URL } from "@/lib/owner";
-import { VOUCHER_QR_PREFIX, errorMessage, formatDateId, monthBounds, todayWib, type CafeEvent, type Promo, type Voucher } from "@/lib/content";
+import { VOUCHER_QR_PREFIX, errorMessage, formatDateId, monthBounds, todayWib, type CafeEvent, type Promo, type Reward, type Voucher } from "@/lib/content";
 
 type Profile = { stamps: number; role: string; approved: boolean };
 const STAMP_GOAL = 10;
@@ -23,6 +23,7 @@ export default function ProfilePage() {
   const [promos, setPromos] = useState<Pick<Promo, "id" | "title" | "detail" | "badge" | "valid_until" | "claim_uses">[]>([]);
   const [events, setEvents] = useState<Pick<CafeEvent, "id" | "title" | "detail" | "event_date" | "time_text">[]>([]);
   const [vouchers, setVouchers] = useState<{ id: number; usesLeft: number; usesTotal: number; expires: string | null; voucher: Pick<Voucher, "id" | "title" | "detail" | "expires_at"> }[]>([]);
+  const [rewards, setRewards] = useState<Pick<Reward, "id" | "title" | "detail" | "stamps_cost">[]>([]);
   const [claimedPromoIds, setClaimedPromoIds] = useState<Set<number>>(new Set());
   const [claimingId, setClaimingId] = useState<number | null>(null);
   const [claimNote, setClaimNote] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
@@ -44,11 +45,13 @@ export default function ProfilePage() {
   const loadPanels = useCallback(async (userId: string) => {
     const supabase = getSupabaseClient();
     const today = todayWib();
-    const [promoRes, eventRes, voucherRes] = await Promise.all([
+    const [promoRes, eventRes, voucherRes, rewardRes] = await Promise.all([
       supabase.from("promos").select("id, title, detail, badge, valid_until, claim_uses").eq("is_active", true).or(`valid_until.is.null,valid_until.gte.${today}`).order("created_at", { ascending: false }),
       supabase.from("events").select("id, title, detail, event_date, time_text").eq("is_active", true).gte("event_date", today).lte("event_date", monthBounds(today).end).order("event_date", { ascending: true }),
       supabase.from("member_vouchers").select("id, status, uses_left, uses_total, expires_at, vouchers(id, title, detail, expires_at, is_active, promo_id)").eq("member_id", userId).order("granted_at", { ascending: false }),
+      supabase.from("rewards").select("id, title, detail, stamps_cost").eq("is_active", true).order("stamps_cost", { ascending: true }).order("id", { ascending: true }),
     ]);
+    if (!rewardRes.error) setRewards(rewardRes.data ?? []);
     if (!promoRes.error) setPromos(promoRes.data ?? []);
     if (!eventRes.error) setEvents(eventRes.data ?? []);
     if (!voucherRes.error) {
@@ -355,6 +358,29 @@ export default function ProfilePage() {
                   })}
                 </ul>
               )}
+            </section>
+
+            <section className="card aside-card" aria-labelledby="aside-showcase">
+              <header className="aside-head"><h2 id="aside-showcase">Etalase Hadiah</h2><span>{totalStamps} STAMP</span></header>
+              {rewards.length === 0 ? (
+                <p className="aside-empty">Belum ada hadiah di etalase.</p>
+              ) : (
+                <ul className="showcase-grid">
+                  {rewards.map((reward) => {
+                    const ready = totalStamps >= reward.stamps_cost;
+                    return (
+                      <li key={reward.id} className={ready ? "is-ready" : ""}>
+                        <span className="showcase-cost"><b>{reward.stamps_cost}</b>stamp</span>
+                        <strong>{reward.title}</strong>
+                        {reward.detail && <small>{reward.detail}</small>}
+                        <em>{ready ? "Bisa ditukar di kasir" : `Kurang ${reward.stamps_cost - totalStamps} stamp`}</em>
+                        <i className="showcase-meter" aria-hidden="true"><b style={{ width: `${Math.min(100, (totalStamps / reward.stamps_cost) * 100)}%` }} /></i>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              <p className="showcase-note">Tunjukkan QR member ke kasir untuk menukar. Stamp bisa ditabung, jadi kamu bebas pilih hadiah mana pun.</p>
             </section>
           </aside>
         )}
