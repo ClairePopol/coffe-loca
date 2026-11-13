@@ -70,3 +70,20 @@
   .field input { font-size:16px; }
   .btn-ghost { padding:0 14px; font-size:11px; letter-spacing:.1em; }
 }
+
+/* Redeem Stamps popup (home hero) */
+.redeem-sheet { max-height:calc(100dvh - 40px); overflow-y:auto; }
+.confirm-actions.is-single { grid-template-columns:1fr; }
+.confirm-actions a.confirm-ok { display:grid; place-items:center; min-height:52px; border-radius:var(--radius); font-size:12px; font-weight:700; letter-spacing:.12em; text-decoration:none; }
+.redeem-balance { display:flex; align-items:baseline; justify-content:center; gap:8px; margin-top:14px; padding:14px 22px; border:1px solid var(--line); border-radius:var(--radius); background:rgba(255,255,255,.55); }
+.redeem-balance small { align-self:center; margin-right:4px; color:var(--muted-2); font-size:10px; font-weight:700; letter-spacing:.12em; }
+.redeem-balance strong { color:var(--olive); font-family:"Instrument Serif",serif; font-size:46px; font-weight:400; line-height:1; }
+.redeem-balance span { color:var(--muted-2); font-size:13px; }
+.redeem-options { display:flex; width:100%; flex-direction:column; gap:8px; margin:14px 0 0; padding:0; list-style:none; text-align:left; }
+.redeem-options button { display:flex; width:100%; align-items:center; justify-content:space-between; gap:14px; padding:13px 16px; border:1px solid var(--line-strong); border-radius:var(--radius); color:var(--olive); background:rgba(232,189,119,.18); cursor:pointer; transition:transform .15s, background .2s; }
+.redeem-options button:hover { background:rgba(232,189,119,.34); }
+.redeem-options button:active { transform:scale(.98); }
+.redeem-options strong { display:block; font-size:15px; }
+.redeem-options small { display:block; margin-top:2px; color:var(--muted-2); font-size:12px; line-height:1.4; }
+.redeem-options b { display:flex; align-items:baseline; gap:4px; flex:none; font-family:"Instrument Serif",serif; font-size:28px; font-weight:400; }
+.redeem-options i { color:var(--muted-2); font-family:Manrope,sans-serif; font-size:11px; font-style:normal; }
