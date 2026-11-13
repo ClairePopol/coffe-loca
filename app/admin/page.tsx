@@ -261,14 +261,17 @@ export default function AdminPage() {
     }
   }
 
+  // Members still waiting for verification only appear in the "Verifikasi member" card, not in the lists below.
+  const verifiedMembers = useMemo(() => members.filter((member) => member.role !== "member" || member.approved), [members]);
+  const pendingMembers = useMemo(() => members.filter((member) => member.role === "member" && !member.approved).sort((a, b) => a.created_at.localeCompare(b.created_at)), [members]);
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const qDigits = q.replace(/\D/g, "");
     // Phone search accepts 0812…, 812… or 62812…
     const qPhone = qDigits.startsWith("0") ? `62${qDigits.slice(1)}` : qDigits;
-    const list = q ? members.filter((member) => (member.full_name ?? "").toLowerCase().includes(q) || member.id.toLowerCase().includes(q) || (qDigits.length >= 4 && (member.phone ?? "").includes(qPhone))) : members;
+    const list = q ? verifiedMembers.filter((member) => (member.full_name ?? "").toLowerCase().includes(q) || member.id.toLowerCase().includes(q) || (qDigits.length >= 4 && (member.phone ?? "").includes(qPhone))) : verifiedMembers;
     return [...list].sort((a, b) => Number(b.stamps >= STAMP_GOAL) - Number(a.stamps >= STAMP_GOAL));
-  }, [members, query]);
+  }, [verifiedMembers, query]);
   // Show exactly 5 member rows and scroll the rest. Rows differ in height (the Owner sees a role select), so measure them.
   useLayoutEffect(() => {
     const list = memberListRef.current;
@@ -285,8 +288,7 @@ export default function AdminPage() {
   const logDaySet = useMemo(() => new Set(logDays), [logDays]);
   const visibleLogs = useMemo(() => logs.filter((log) => (logFilter === "all" || log.action === logFilter) && (!logDaySet.size || logDaySet.has(localDay(log.created_at)))), [logs, logFilter, logDaySet]);
   const activeDays = useMemo(() => new Set([...logs, ...todayLogs].map((log) => localDay(log.created_at))), [logs, todayLogs]);
-  const pendingMembers = useMemo(() => members.filter((member) => member.role === "member" && !member.approved).sort((a, b) => a.created_at.localeCompare(b.created_at)), [members]);
-  const readyForReward = members.filter((member) => member.stamps >= STAMP_GOAL).length;
+  const readyForReward = verifiedMembers.filter((member) => member.stamps >= STAMP_GOAL).length;
   const stampsToday = todayLogs.filter((log) => log.action === "add").reduce((sum, log) => sum + log.amount, 0);
   const redeemedToday = todayLogs.filter((log) => log.action === "redeem").length;
 
@@ -300,7 +302,7 @@ export default function AdminPage() {
           <p>{section === "store" ? "Kelola produk dan pesanan Loca Store." : adminUp ? "Kelola stamp, hadiah, voucher, promo, dan acara Coffe Loca dari satu ruang." : "Scan kartu stamp dan voucher member di kasir."}</p>
           <span className="admin-role">{user ? <>MASUK SEBAGAI {(user.user_metadata?.full_name || user.email || "STAFF").toUpperCase()} <b>{roleLabel(role).toUpperCase()}</b></> : "AUTHORIZED STAFF ONLY"}</span>
           {section === "coffee" && adminUp && <dl className="admin-stats">
-            <div><dt>MEMBER</dt><dd>{loading ? "—" : members.length}</dd></div>
+            <div><dt>MEMBER</dt><dd>{loading ? "—" : verifiedMembers.length}</dd></div>
             <div><dt>STAMP HARI INI</dt><dd>{loading ? "—" : stampsToday}</dd></div>
             <div><dt>MIN. 10 STAMP</dt><dd>{loading ? "—" : readyForReward}</dd></div>
           </dl>}
@@ -395,13 +397,13 @@ export default function AdminPage() {
 
           <div className="admin-panel card">
             <div className="admin-tabs" role="tablist" aria-label="Data admin">
-              <button id="admin-tab-members" type="button" role="tab" aria-selected={tab === "members"} aria-controls="admin-panel-members" className={tab === "members" ? "is-active" : ""} onClick={() => setTab("members")}>Member <span>{members.length}</span></button>
+              <button id="admin-tab-members" type="button" role="tab" aria-selected={tab === "members"} aria-controls="admin-panel-members" className={tab === "members" ? "is-active" : ""} onClick={() => setTab("members")}>Member <span>{verifiedMembers.length}</span></button>
               <button id="admin-tab-logs" type="button" role="tab" aria-selected={tab === "logs"} aria-controls="admin-panel-logs" className={tab === "logs" ? "is-active" : ""} onClick={() => setTab("logs")}>Riwayat stamp <span>{logs.length}</span></button>
             </div>
             <div className="admin-tabpanel" id="admin-panel-members" role="tabpanel" aria-labelledby="admin-tab-members" hidden={tab !== "members"}>
             {listStatus && <p className={`notice admin-list-status${listStatus.tone === "error" ? " notice-error" : ""}`} role={listStatus.tone === "error" ? "alert" : "status"}>{listStatus.text}</p>}
             <label className="field admin-search"><span className="sr-only">Cari member</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Cari nama, nomor HP, atau ID" /></label>
-            {loading ? <p className="admin-empty">Memuat member…</p> : filtered.length === 0 ? <p className="admin-empty">{members.length === 0 ? "Belum ada data profile." : "Tidak ada member yang cocok."}</p> : (
+            {loading ? <p className="admin-empty">Memuat member…</p> : filtered.length === 0 ? <p className="admin-empty">{verifiedMembers.length === 0 ? "Belum ada member terverifikasi." : "Tidak ada member yang cocok."}</p> : (
               <ul className="admin-member-list" ref={memberListRef}>
                 {filtered.map((member) => {
                   const stamps = member.stamps;
@@ -410,7 +412,7 @@ export default function AdminPage() {
                   return (
                     <li key={member.id} className={full ? "is-full" : ""}>
                       <div className="admin-member-info">
-                        <strong>{member.full_name || "Unnamed member"}{member.role !== "member" && <em>{roleLabel(member.role)}</em>}{member.id === user?.id && <em className="is-you">Kamu</em>}{member.role === "member" && !member.approved && <em className="is-pending">BELUM VERIFIKASI</em>}</strong>
+                        <strong>{member.full_name || "Unnamed member"}{member.role !== "member" && <em>{roleLabel(member.role)}</em>}{member.id === user?.id && <em className="is-you">Kamu</em>}</strong>
                         {member.phone ? <span className="admin-member-phone">{formatPhone(member.phone)}</span> : null}
                         <small>{member.id}</small>
                         {canEditRoleOf(role, member.role, member.id === user?.id) && (
@@ -427,9 +429,7 @@ export default function AdminPage() {
                         <span>{full ? `${stamps} stamp ☕` : `${stamps} / ${STAMP_GOAL}`}</span>
                         <i aria-hidden="true"><b style={{ width: `${(onCard / STAMP_GOAL) * 100}%` }} /></i>
                       </div>
-                      {member.role === "member" && !member.approved
-                        ? <button type="button" className="admin-use-id admin-use-redeem" onClick={() => setApproval(member, true)}>VERIFIKASI</button>
-                        : <button type="button" className="admin-use-id" onClick={() => chooseMember(member.id)}>PILIH</button>}
+                      <button type="button" className="admin-use-id" onClick={() => chooseMember(member.id)}>PILIH</button>
                     </li>
                   );
                 })}
@@ -467,7 +467,7 @@ export default function AdminPage() {
             {visibleLogs.length > logLimit && <button type="button" className="admin-more" onClick={() => setLogLimit((value) => value + LOG_PAGE)}>TAMPILKAN LEBIH BANYAK <span>{logLimit} / {visibleLogs.length}</span></button>}
             </div>
           </div>
-          <AdminContent members={members} userId={user.id} />
+          <AdminContent members={verifiedMembers} userId={user.id} />
           </>)}
           </>)}
         </div>
