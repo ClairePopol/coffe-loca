@@ -267,7 +267,7 @@ export default function ProfilePage() {
                           return (
                             <span key={index} className={`mc-stamp${filled ? " is-filled" : ""}${free ? " is-free" : ""}`} style={{ ["--i" as string]: index, ["--tilt" as string]: `${((index * 37) % 21) - 10}deg` }}>
                               {free ? (
-                                <><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1 1 1.5 1 2.5M11.5 3.5c0 1 1 1.5 1 2.5" /></svg><b>FREE</b></>
+                                <><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z" /></svg><b>{filled ? "YEY!" : "10"}</b></>
                               ) : filled ? (
                                 <img src="/white-coffee-bean.png" alt="" />
                               ) : (
@@ -279,7 +279,7 @@ export default function ProfilePage() {
                       </div>
                       <footer className="mc-back-bottom">
                         <span className="mc-meter" aria-hidden="true"><i style={{ width: `${(stamps / STAMP_GOAL) * 100}%` }} /></span>
-                        <span>{remaining === 0 ? `Penuh! Tunjukkan QR ke kasir: tukar kopi gratis atau tabung untuk hadiah lain · total ${totalStamps} stamp` : fullCards > 0 ? `${remaining} stamp lagi untuk kartu penuh ke-${fullCards + 1} · total ${totalStamps} stamp` : `${remaining} stamp lagi untuk kopi gratis`}</span>
+                        <span>{remaining === 0 ? `Yey, you made it! 🎉 Kartu penuh — tukar hadiahmu atau lanjut menabung · total ${totalStamps} stamp` : fullCards > 0 ? `${remaining} stamp lagi untuk kartu penuh ke-${fullCards + 1} · total ${totalStamps} stamp` : `${remaining} stamp lagi untuk kopi gratis`}</span>
                       </footer>
                     </section>
                   )}
