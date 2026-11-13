@@ -6,6 +6,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { PageFooter, PageHeader } from "@/components/PageShell";
 import { useConfirm } from "@/components/ConfirmDialog";
+import RedeemStamps from "@/components/RedeemStamps";
 import { isStaff as isStaffRole, roleLabel } from "@/lib/roles";
 import { formatPhone, isPhoneAuthEmail, userPhone } from "@/lib/phone";
 import { OWNER_WHATSAPP_URL } from "@/lib/owner";
@@ -293,7 +294,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="profile-actions">
-                <a className="btn-primary" href="/#reservation"><span>BUAT RESERVASI</span><span className="arrow-icon" aria-hidden="true" /></a>
+                <RedeemStamps variant="profile" onRedeemed={(stamps) => setProfile((current) => ({ ...current, stamps }))} />
                 <div className="profile-actions-row">
                   {isStaff && <a className="btn-ghost" href="/admin">ADMIN PANEL <span className="arrow-icon" aria-hidden="true" /></a>}
                   <button className="btn-ghost profile-logout" type="button" onClick={signOut} disabled={signingOut}>{signingOut ? "KELUAR..." : "LOGOUT"} <span className="arrow-icon arrow-up" aria-hidden="true" /></button>

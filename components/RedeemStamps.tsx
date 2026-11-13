@@ -11,17 +11,18 @@ type Item = Pick<Reward, "id" | "title" | "detail" | "stamps_cost">;
 const bean = <svg viewBox="0 0 24 24"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1 1 1.5 1 2.5M11.5 3.5c0 1 1 1.5 1 2.5" /></svg>;
 
 /** Hero button + popup: shows the stamp balance, lists only the rewards that balance can pay for, then asks "yakin?". */
-export default function RedeemStamps() {
+export default function RedeemStamps({ variant = "hero", onRedeemed }: { variant?: "hero" | "profile"; onRedeemed?: (newBalance: number) => void }) {
   const [open, setOpen] = useState(false);
+  const className = variant === "profile" ? "btn-primary" : "pill-button pill-button-light";
   return (
     <>
-      <button type="button" className="pill-button pill-button-light" onClick={() => setOpen(true)}><span>REDEEM STAMPS</span><span className="arrow-icon" aria-hidden="true" /></button>
-      {open && <RedeemDialog onClose={() => setOpen(false)} />}
+      <button type="button" className={className} onClick={() => setOpen(true)}><span>REDEEM STAMPS</span><span className="arrow-icon" aria-hidden="true" /></button>
+      {open && <RedeemDialog onClose={() => setOpen(false)} onRedeemed={onRedeemed} />}
     </>
   );
 }
 
-function RedeemDialog({ onClose }: { onClose: () => void }) {
+function RedeemDialog({ onClose, onRedeemed }: { onClose: () => void; onRedeemed?: (newBalance: number) => void }) {
   const [step, setStep] = useState<Step>("loading");
   const [balance, setBalance] = useState(0);
   const [rewards, setRewards] = useState<Item[]>([]);
@@ -70,7 +71,9 @@ function RedeemDialog({ onClose }: { onClose: () => void }) {
     const { error } = await getSupabaseClient().rpc("redeem_my_reward", { p_reward_id: picked.id });
     setBusy(false);
     if (error) { setMessage(errorMessage(error, "Penukaran belum berhasil.")); setStep("error"); return; }
-    setBalance((value) => value - picked.stamps_cost);
+    const next = balance - picked.stamps_cost;
+    setBalance(next);
+    onRedeemed?.(next);
     setStep("done");
   }
 
