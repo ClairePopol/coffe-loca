@@ -99,21 +99,22 @@ function RedeemDialog({ onClose, onRedeemed }: { onClose: () => void; onRedeemed
         {step === "choose" && <>
           <h2 id="redeem-title">Redeem Stamps</h2>
           <div className="redeem-balance"><small>SALDO STAMP KAMU</small><strong>{balance}</strong><span>stamp</span></div>
-          {affordable.length > 0 ? <>
-            <p className="confirm-message">Dengan saldo ini, kamu bisa menukar:</p>
+          {rewards.length === 0 ? <p className="confirm-message">Belum ada hadiah yang tersedia saat ini. Cek lagi nanti, ya!</p> : <>
+            <p className="confirm-message">{affordable.length > 0 ? "Mau tukar stamp-mu dengan apa? Pilih salah satu:" : <>Saldomu belum cukup untuk hadiah apa pun. Hadiah terdekat, <b>{nextReward?.title}</b>, tinggal <b>{(nextReward?.stamps_cost ?? 0) - balance}</b> stamp lagi. Yuk, ngopi dulu ☕</>}</p>
             <ul className="redeem-options">
-              {affordable.map((reward) => (
-                <li key={reward.id}>
-                  <button type="button" onClick={() => { setPicked(reward); setStep("confirm"); }}>
-                    <span><strong>{reward.title}</strong>{reward.detail && <small>{reward.detail}</small>}</span>
-                    <b>{reward.stamps_cost}<i>stamp</i></b>
-                  </button>
-                </li>
-              ))}
+              {rewards.map((reward) => {
+                const enough = reward.stamps_cost <= balance;
+                return (
+                  <li key={reward.id}>
+                    <button type="button" disabled={!enough} onClick={() => { setPicked(reward); setStep("confirm"); }}>
+                      <span><strong>{reward.title}</strong>{reward.detail && <small>{reward.detail}</small>}{!enough && <em>Kurang {reward.stamps_cost - balance} stamp</em>}</span>
+                      <b>{reward.stamps_cost}<i>stamp</i></b>
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
-          </> : <p className="confirm-message">
-            {rewards.length === 0 ? "Belum ada hadiah yang tersedia saat ini. Cek lagi nanti, ya!" : <>Saldomu belum cukup untuk menukar hadiah. Hadiah terdekat, <b>{nextReward?.title}</b>, butuh <b>{nextReward?.stamps_cost}</b> stamp — tinggal <b>{(nextReward?.stamps_cost ?? 0) - balance}</b> lagi. Yuk, ngopi dulu ☕</>}
-          </p>}
+          </>}
           <div className="confirm-actions is-single"><button type="button" className="confirm-cancel" onClick={onClose}>TUTUP</button></div>
         </>}
 
