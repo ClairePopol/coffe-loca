@@ -185,3 +185,16 @@
 .profile-pending h2 { margin:0; }
 .profile-pending p { margin:0; color:var(--muted-2); line-height:1.6; }
 .profile-pending-check { border:0; background:none; padding:0; color:var(--terracotta); font-size:13px; font-weight:600; text-decoration:underline; cursor:pointer; }
+
+/* Etalase hadiah (member) */
+.showcase-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:12px; margin:0; padding:0; list-style:none; }
+.showcase-grid li { display:flex; flex-direction:column; align-items:flex-start; gap:6px; padding:14px; border:1px solid var(--line); border-radius:var(--radius); background:rgba(255,255,255,.5); }
+.showcase-grid li.is-ready { border-color:rgba(164,78,55,.45); background:rgba(232,189,119,.2); }
+.showcase-cost { display:inline-flex; align-items:baseline; gap:5px; color:var(--muted-2); font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.showcase-cost b { color:var(--olive); font-family:"Instrument Serif",serif; font-size:34px; font-weight:400; letter-spacing:0; line-height:1; }
+.showcase-grid strong { color:var(--olive); font-size:15px; font-weight:700; line-height:1.3; }
+.showcase-grid small { color:var(--muted-2); font-size:12px; line-height:1.45; }
+.showcase-grid em { margin-top:auto; color:var(--terracotta); font-size:11px; font-style:normal; font-weight:700; letter-spacing:.04em; }
+.showcase-meter { display:block; width:100%; height:4px; overflow:hidden; border-radius:99px; background:rgba(53,69,55,.1); }
+.showcase-meter b { display:block; height:100%; border-radius:inherit; background:var(--olive-2); }
+.showcase-note { margin:14px 0 0; color:var(--muted-2); font-size:12px; line-height:1.5; }
