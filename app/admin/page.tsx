@@ -454,9 +454,13 @@ export default function AdminPage() {
                     <span className="admin-log-icon" aria-hidden="true">{log.action === "redeem" ? "☕" : `+${log.amount}`}</span>
                     <div>
                       <p>
-                        <strong>{log.admin_name || "Admin"}</strong>
-                        {log.action === "redeem" ? <> menukar <b>{log.reward_title || "hadiah"}</b> ({log.amount} stamp) untuk </> : <> menambah <b>{log.amount} stamp</b> ke </>}
-                        <strong>{log.member_name || "member"}</strong>
+                        {log.action === "redeem" && !log.admin_id
+                          ? <><strong>{log.member_name || "member"}</strong> menukar sendiri <b>{log.reward_title || "hadiah"}</b> ({log.amount} stamp) lewat aplikasi</>
+                          : <>
+                            <strong>{log.admin_name || "Admin"}</strong>
+                            {log.action === "redeem" ? <> menukar <b>{log.reward_title || "hadiah"}</b> ({log.amount} stamp) untuk </> : <> menambah <b>{log.amount} stamp</b> ke </>}
+                            <strong>{log.member_name || "member"}</strong>
+                          </>}
                       </p>
                       <small><time dateTime={log.created_at}>{formatDateTime(log.created_at)}</time> · {log.stamps_before} → {log.stamps_after} stamp</small>
                     </div>

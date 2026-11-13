@@ -295,3 +295,44 @@ grant execute on function public.grant_voucher(bigint, uuid[]) to authenticated;
 grant execute on function public.grant_voucher_random(bigint, integer) to authenticated;
 
 notify pgrst, 'reload schema';
+
+-- ---------------------------------------------------------------------------
+-- Member self-service: the "Redeem Stamps" button on the home page.
+-- A verified member spends their OWN stamps on a reward they can afford (logged without an admin).
+-- ---------------------------------------------------------------------------
+create or replace function public.redeem_my_reward(p_reward_id bigint)
+returns public.stamp_logs
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  m public.profiles;
+  reward public.rewards;
+  log_row public.stamp_logs;
+begin
+  if uid is null then raise exception 'Silakan login dulu'; end if;
+
+  select * into m from public.profiles where id = uid for update;
+  if m.id is null then raise exception 'Profil tidak ditemukan'; end if;
+  if not (m.approved or m.role <> 'member') then raise exception 'Akunmu belum diverifikasi owner'; end if;
+
+  select * into reward from public.rewards where id = p_reward_id and is_active;
+  if reward.id is null then raise exception 'Hadiah tidak ditemukan atau sudah tidak tersedia'; end if;
+  if m.stamps < reward.stamps_cost then
+    raise exception 'Stamp belum cukup (% dari % stamp)', m.stamps, reward.stamps_cost;
+  end if;
+
+  update public.profiles set stamps = stamps - reward.stamps_cost, updated_at = now() where id = m.id;
+
+  insert into public.stamp_logs (action, amount, stamps_before, stamps_after, member_id, member_name, admin_id, admin_name, reward_title)
+  values ('redeem', reward.stamps_cost, m.stamps, m.stamps - reward.stamps_cost, m.id, m.full_name, null, null, reward.title)
+  returning * into log_row;
+  return log_row;
+end;
+$$;
+
+revoke all on function public.redeem_my_reward(bigint) from public, anon;
+grant execute on function public.redeem_my_reward(bigint) to authenticated;
+
+notify pgrst, 'reload schema';

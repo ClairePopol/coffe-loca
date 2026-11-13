@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import RedeemStamps from "@/components/RedeemStamps";
 
 const FRAME_COUNT = 161;
 const FRAME_PATH = "/image-sequence/ezgif-frame-";
@@ -148,14 +149,7 @@ export default function SequenceScroll() {
             <motion.div className="hero-cta-copy" style={{ opacity: ctaOpacity, y: ctaY }}>
               <span className="eyebrow"><i /> THE LOCA WAY</span>
               <h2>Temui sudut<br /><em>favoritmu.</em></h2>
-              <a className="pill-button pill-button-light" href="#reservation" onClick={(event) => {
-                event.preventDefault();
-                const reservation = document.getElementById("reservation");
-                if (!reservation) return;
-                const targetTop = reservation.getBoundingClientRect().top + window.scrollY - 18;
-                window.history.replaceState(null, "", "#reservation");
-                window.scrollTo({ top: targetTop, behavior: "smooth" });
-              }}><span>RESERVASI SEKARANG</span><span className="arrow-icon" aria-hidden="true" /></a>
+              <RedeemStamps />
             </motion.div>
           </div>
           <div className="sequence-footer"><span>01 — 04 <i /> THE LOCA STORY</span><span className="scroll-cue"><i /> SCROLL TO SLOW DOWN</span><span>GOOD COFFEE, GOOD COMPANY</span></div>
