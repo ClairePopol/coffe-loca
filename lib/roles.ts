@@ -14,6 +14,8 @@ const asRole = (role: string | null | undefined): Role => (role && role in ROLE_
 export const roleLabel = (role: string | null | undefined) => ROLE_LABEL[asRole(role)];
 export const isStaff = (role: string | null | undefined) => asRole(role) !== "member";
 export const canManageCoffee = (role: string | null | undefined) => ["admin_coffee", "admin", "owner"].includes(asRole(role));
+/** Admin Umum + Owner: verification list, member list, reward redeem, stamp & claim history, promos/events/vouchers. Admin Coffee only scans. */
+export const isAdminUp = (role: string | null | undefined) => ["admin", "owner"].includes(asRole(role));
 export const canManageStore = (role: string | null | undefined) => ["admin_store", "admin", "owner"].includes(asRole(role));
 export const canManageRoles = (role: string | null | undefined) => asRole(role) === "owner";
 

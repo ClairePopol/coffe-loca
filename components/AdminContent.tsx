@@ -1,13 +1,13 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { formatPhone } from "@/lib/phone";
 import { errorMessage, formatDateId, todayWib, type CafeEvent, type Promo, type Voucher, type VoucherGrant } from "@/lib/content";
 
 type MemberLite = { id: string; full_name: string | null; phone: string | null; role: string };
-type Tab = "voucher" | "promo" | "event";
+type Tab = "voucher" | "promo" | "event" | "claims";
 type Status = { tone: "ok" | "error"; text: string } | null;
 // How a voucher is handed out: to chosen members (multiple choice, incl. "select all") or to N random members.
 type GiveMode = "pick" | "random";
@@ -18,7 +18,7 @@ const memberName = (member: MemberLite) => member.full_name || (member.phone ? f
  * Admin panel → "Konten": vouchers (given to chosen or random members), monthly promos and monthly events.
  * Everything here is what members see on /profile.
  */
-export default function AdminContent({ members, userId, scan }: { members: MemberLite[]; userId: string; scan?: { id: number; nonce: number } | null }) {
+export default function AdminContent({ members, userId }: { members: MemberLite[]; userId: string }) {
   const [tab, setTab] = useState<Tab>("voucher");
   const [status, setStatus] = useState<Status>(null);
   const [loading, setLoading] = useState(true);
@@ -37,11 +37,6 @@ export default function AdminContent({ members, userId, scan }: { members: Membe
   const [randomCount, setRandomCount] = useState(1);
   const [holdersFor, setHoldersFor] = useState<number | null>(null);
 
-  // Cashier flow: a scanned voucher QR opens this card; one tap records the use (use_member_voucher).
-  type Redeem = { id: number; title: string; who: string; usesLeft: number; usesTotal: number; expires: string | null; problem: string | null; done: boolean };
-  const [redeem, setRedeem] = useState<Redeem | null>(null);
-  const redeemRef = useRef<HTMLDivElement>(null);
-
   const memberById = useMemo(() => new Map(members.map((member) => [member.id, member])), [members]);
 
   const load = useCallback(async () => {
@@ -51,7 +46,7 @@ export default function AdminContent({ members, userId, scan }: { members: Membe
         supabase.from("promos").select("*").order("created_at", { ascending: false }),
         supabase.from("events").select("*").order("event_date", { ascending: true }),
         supabase.from("vouchers").select("*").order("created_at", { ascending: false }),
-        supabase.from("member_vouchers").select("id, voucher_id, member_id, status, uses_total, uses_left, expires_at, granted_at, used_at").order("granted_at", { ascending: false }),
+        supabase.from("member_vouchers").select("id, voucher_id, member_id, granted_by, status, uses_total, uses_left, expires_at, granted_at, used_at").order("granted_at", { ascending: false }),
       ]);
       const failed = p.error || e.error || v.error || g.error;
       if (failed) throw failed;
@@ -67,38 +62,6 @@ export default function AdminContent({ members, userId, scan }: { members: Membe
   }, []);
 
   useEffect(() => { load(); }, [load]);
-
-  useEffect(() => {
-    if (!scan) return;
-    let active = true;
-    (async () => {
-      const { data, error } = await getSupabaseClient().from("member_vouchers").select("id, member_id, status, uses_left, uses_total, expires_at, vouchers(title, expires_at, is_active)").eq("id", scan.id).maybeSingle();
-      if (!active) return;
-      const row = data as unknown as { id: number; member_id: string; status: string; uses_left: number; uses_total: number; expires_at: string | null; vouchers: { title: string; expires_at: string | null; is_active: boolean } | null } | null;
-      if (error || !row) {
-        setRedeem({ id: scan.id, title: "Voucher tidak ditemukan", who: "", usesLeft: 0, usesTotal: 0, expires: null, problem: error ? errorMessage(error, "Voucher gagal dibaca.") : "QR ini tidak cocok dengan voucher mana pun.", done: false });
-      } else {
-        const member = memberById.get(row.member_id);
-        const expires = row.expires_at ?? row.vouchers?.expires_at ?? null;
-        const problem = row.status !== "active" || row.uses_left < 1 ? "Voucher ini sudah terpakai habis."
-          : expires && expires < todayWib() ? "Voucher ini sudah kedaluwarsa."
-          : row.vouchers && !row.vouchers.is_active ? "Voucher ini sudah dinonaktifkan." : null;
-        setRedeem({ id: row.id, title: row.vouchers?.title ?? "Voucher", who: member ? memberName(member) : "Member", usesLeft: row.uses_left, usesTotal: row.uses_total, expires, problem, done: false });
-      }
-      window.setTimeout(() => redeemRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
-    })();
-    return () => { active = false; };
-  }, [scan, memberById]);
-
-  async function redeemNow() {
-    if (!redeem) return;
-    setBusy(true);
-    const { error } = await getSupabaseClient().rpc("use_member_voucher", { p_member_voucher_id: redeem.id });
-    setBusy(false);
-    if (error) { setRedeem({ ...redeem, problem: errorMessage(error, "Gagal me-redeem voucher.") }); return; }
-    setRedeem({ ...redeem, usesLeft: redeem.usesLeft - 1, done: true });
-    await load();
-  }
 
   // Run a write, then reload. Shows the success text (or the error) in the status line.
   async function run(action: () => PromiseLike<{ error: unknown }>, okText: string, fallback: string) {
@@ -239,26 +202,13 @@ export default function AdminContent({ members, userId, scan }: { members: Membe
     setPicked(new Set());
   };
 
-  const tabs: [Tab, string, number][] = [["voucher", "Voucher", vouchers.length], ["promo", "Promo", promos.length], ["event", "Acara", events.length]];
+  const tabs: [Tab, string, number][] = [["voucher", "Voucher", vouchers.length], ["promo", "Promo", promos.length], ["event", "Acara", events.length], ["claims", "Riwayat claim", grants.length]];
 
   return (
     <>
-    {redeem && (
-      <div ref={redeemRef} className={`admin-panel card admin-redeem${redeem.problem ? " is-problem" : redeem.done ? " is-done" : ""}`} role="status">
-        <div className="card-topline"><span>REDEEM VOUCHER</span><button type="button" className="admin-redeem-close" onClick={() => setRedeem(null)} aria-label="Tutup">×</button></div>
-        <strong>{redeem.title}</strong>
-        {redeem.who && <p>{redeem.who}{redeem.expires ? ` · s/d ${formatDateId(redeem.expires)}` : ""}</p>}
-        {redeem.problem ? <p className="notice notice-error" role="alert">{redeem.problem}</p>
-          : redeem.done ? <p className="notice">✓ Berhasil di-redeem.{redeem.usesLeft > 0 ? ` Sisa ${redeem.usesLeft}/${redeem.usesTotal}x.` : " Voucher sudah habis dipakai."}</p>
-          : <>
-              <p>Sisa {redeem.usesLeft}/{redeem.usesTotal}x — redeem 1x sekarang?</p>
-              <button className="btn-primary" type="button" disabled={busy} onClick={redeemNow}><span>{busy ? "MEMPROSES..." : "REDEEM 1x"}</span><i className="arrow-icon" aria-hidden="true" /></button>
-            </>}
-      </div>
-    )}
     <div className="admin-panel card admin-content-card">
       <div className="card-topline"><span>KONTEN PROFIL</span><span>TAMPIL DI HALAMAN MEMBER</span></div>
-      <div className="admin-tabs is-three" role="tablist" aria-label="Jenis konten">
+      <div className="admin-tabs is-four" role="tablist" aria-label="Jenis konten">
         {tabs.map(([value, label, count]) => (
           <button key={value} type="button" role="tab" aria-selected={tab === value} className={tab === value ? "is-active" : ""} onClick={() => { setTab(value); setStatus(null); }}>{label} <span>{count}</span></button>
         ))}
@@ -279,7 +229,8 @@ export default function AdminContent({ members, userId, scan }: { members: Membe
             <ul className="admin-content-list">
               {vouchers.map((voucher) => {
                 const mine = grants.filter((grant) => grant.voucher_id === voucher.id);
-                const used = mine.filter((grant) => grant.status === "used").length;
+                const usesDone = mine.reduce((sum, grant) => sum + (grant.uses_total - grant.uses_left), 0);
+                const usesAll = mine.reduce((sum, grant) => sum + grant.uses_total, 0);
                 const holders = holdersOf(voucher.id);
                 const eligible = members.filter((member) => member.role === "member" && !holders.has(member.id)).length;
                 const q = pickQuery.trim().toLowerCase();
@@ -295,7 +246,7 @@ export default function AdminContent({ members, userId, scan }: { members: Membe
                       <div className="admin-content-info">
                         <strong>{voucher.title}{voucher.promo_id !== null && <em>DARI PROMO</em>}{!voucher.is_active && <em>NONAKTIF</em>}</strong>
                         {voucher.detail && <small>{voucher.detail}</small>}
-                        <span>{voucher.expires_at ? `Berlaku sampai ${formatDateId(voucher.expires_at)}` : "Tanpa batas waktu"} · {mine.length} penerima · {used} terpakai</span>
+                        <span>{voucher.expires_at ? `Berlaku sampai ${formatDateId(voucher.expires_at)}` : "Tanpa batas waktu"} · {mine.length} penerima · {usesDone}/{usesAll} pemakaian terpakai</span>
                       </div>
                       <div className="admin-content-actions">
                         <button type="button" className="admin-use-id" disabled={busy || !voucher.is_active || voucher.promo_id !== null} title={voucher.promo_id !== null ? "Voucher ini dibuat otomatis saat member mengklaim promo" : undefined} onClick={() => openGive(voucher.id)} aria-expanded={giveFor === voucher.id}>BERI</button>
@@ -454,6 +405,36 @@ export default function AdminContent({ members, userId, scan }: { members: Membe
               ))}
             </ul>
           )}
+        </div>
+      )}
+      {tab === "claims" && (
+        <div className="admin-tabpanel" role="tabpanel">
+          {loading ? <p className="admin-empty">Memuat…</p> : grants.length === 0 ? <p className="admin-empty">Belum ada voucher yang di-claim atau diberikan.</p> : (
+            <ol className="admin-claim-list">
+              {grants.slice(0, 200).map((grant) => {
+                const voucher = vouchers.find((item) => item.id === grant.voucher_id);
+                const member = memberById.get(grant.member_id);
+                const self = grant.granted_by === grant.member_id;
+                const done = grant.uses_total - grant.uses_left;
+                const expiry = grant.expires_at ?? voucher?.expires_at ?? null;
+                const expired = expiry !== null && expiry < todayWib() && grant.status !== "used";
+                return (
+                  <li key={grant.id}>
+                    <div>
+                      <strong>{member ? memberName(member) : "Member"}</strong>
+                      <p>{self ? "meng-claim" : "diberi"} <b>{voucher?.title ?? "Voucher"}</b></p>
+                      <small>{new Date(grant.granted_at).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}{grant.used_at ? ` · terakhir dipakai ${new Date(grant.used_at).toLocaleString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}` : ""}</small>
+                    </div>
+                    <span className={`admin-claim-uses${grant.status === "used" ? " is-used" : expired ? " is-expired" : ""}`}>
+                      <b>{done}/{grant.uses_total}</b>
+                      <small>{grant.status === "used" ? "HABIS" : expired ? "KEDALUWARSA" : "TERPAKAI"}</small>
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+          {grants.length > 200 && <p className="admin-empty">Menampilkan 200 terbaru dari {grants.length}.</p>}
         </div>
       )}
       {confirmDialog}

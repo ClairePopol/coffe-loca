@@ -8,24 +8,27 @@ import QrScanner from "@/components/QrScanner";
 import { useConfirm } from "@/components/ConfirmDialog";
 import MultiDatePicker, { dayKey } from "@/components/MultiDatePicker";
 import AdminContent from "@/components/AdminContent";
+import AdminRewards from "@/components/AdminRewards";
+import VoucherScan from "@/components/VoucherScan";
 import { VOUCHER_QR_PREFIX } from "@/lib/content";
 import { formatPhone } from "@/lib/phone";
-import { assignableRoles, canEditRoleOf, canManageCoffee, canManageStore, isStaff, roleLabel, type Role } from "@/lib/roles";
+import { assignableRoles, canEditRoleOf, canManageCoffee, canManageStore, isAdminUp, isStaff, roleLabel, type Role } from "@/lib/roles";
 
 type Member = { id: string; full_name: string | null; phone: string | null; stamps: number; role: string; approved: boolean; created_at: string };
-type StampLog = { id: number; created_at: string; action: "add" | "redeem"; amount: number; stamps_before: number; stamps_after: number; member_id: string; member_name: string | null; admin_id: string | null; admin_name: string | null };
+type StampLog = { id: number; created_at: string; action: "add" | "redeem"; amount: number; stamps_before: number; stamps_after: number; member_id: string; member_name: string | null; admin_id: string | null; admin_name: string | null; reward_title: string | null };
 type Status = { tone: "ok" | "error"; text: string } | null;
+type Scanned = { id: string; full_name: string | null; stamps: number; approved: boolean };
 type LogFilter = "all" | "add" | "redeem";
 
 const STAMP_GOAL = 10;
 const MEMBER_FIELDS = "id, full_name, phone, stamps, role, approved, created_at";
-const LOG_FIELDS = "id, created_at, action, amount, stamps_before, stamps_after, member_id, member_name, admin_id, admin_name";
+const LOG_FIELDS = "id, created_at, action, amount, stamps_before, stamps_after, member_id, member_name, admin_id, admin_name, reward_title";
 const LOG_PAGE = 15;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const errorText = (error: unknown, fallback: string) => {
   const message = error instanceof Error ? error.message : typeof error === "object" && error && "message" in error ? String((error as { message: unknown }).message) : "";
-  if (/stamp_logs|award_stamps|redeem_free_coffee|set_member_role|can_manage|profiles\.phone|column .*phone/.test(message) && /does not exist|not find|schema cache/i.test(message)) {
+  if (/stamp_logs|award_stamps|redeem_reward|rewards|scan_member|scan_voucher|reward_title|is_admin_up|set_member_role|can_manage|profiles\.phone|column .*phone/.test(message) && /does not exist|not find|schema cache/i.test(message)) {
     return "Fitur ini butuh update database. Jalankan supabase/profiles.sql di Supabase SQL Editor, lalu refresh.";
   }
   return message || fallback;
@@ -61,10 +64,13 @@ export default function AdminPage() {
   const closeScanner = useCallback(() => setScannerOpen(false), []);
   const [confirm, confirmDialog] = useConfirm();
 
-  const selected = members.find((member) => member.id === memberId.trim());
-  const selectedStamps = selected ? Math.min(selected.stamps, STAMP_GOAL) : 0;
-  const selectedRemaining = STAMP_GOAL - selectedStamps;
-  const selectedFull = Boolean(selected && selectedStamps >= STAMP_GOAL);
+  const [scanned, setScanned] = useState<Scanned | null>(null);
+  const listed = members.find((member) => member.id === memberId.trim());
+  const selected: { id: string; full_name: string | null; stamps: number } | undefined = listed ?? (scanned && scanned.id === memberId.trim() ? scanned : undefined);
+  // Stamps keep stacking: the card shows the current round (a full card stays 10/10 until the next stamp).
+  const selectedStamps = selected?.stamps ?? 0;
+  const selectedOnCard = selectedStamps > 0 && selectedStamps % STAMP_GOAL === 0 ? STAMP_GOAL : selectedStamps % STAMP_GOAL;
+  const adminUp = isAdminUp(role);
 
   const refresh = useCallback(async () => {
     const supabase = getSupabaseClient();
@@ -79,9 +85,22 @@ export default function AdminPage() {
     setLogsVersion((value) => value + 1);
   }, []);
 
+  // Admin Coffee cannot list members, so a scanned / pasted member ID is looked up through scan_member.
+  useEffect(() => {
+    const id = memberId.trim();
+    if (!user || !UUID_PATTERN.test(id) || members.some((member) => member.id === id)) return;
+    let active = true;
+    getSupabaseClient().rpc("scan_member", { p_member_id: id }).then(({ data, error }) => {
+      if (!active) return;
+      if (error || !data) setScanned(null);
+      else setScanned(data as Scanned);
+    });
+    return () => { active = false; };
+  }, [memberId, user, members]);
+
   // Stamp history: latest 300 by default, or everything inside the picked dates.
   useEffect(() => {
-    if (!user || !canManageCoffee(role)) return;
+    if (!user || !isAdminUp(role)) return;
     let active = true;
     (async () => {
       setLogsLoading(true);
@@ -145,7 +164,7 @@ export default function AdminPage() {
         setRole(current.role as Role);
         setSection(canManageCoffee(current.role) ? "coffee" : "store");
         setUser(authUser);
-        if (canManageCoffee(current.role)) await refresh();
+        if (isAdminUp(current.role)) await refresh();
       } catch (error) {
         if (active) setStatus({ tone: "error", text: errorText(error, "Gagal membuka admin panel.") });
       } finally {
@@ -157,11 +176,6 @@ export default function AdminPage() {
   }, [refresh]);
 
   useEffect(() => { setLogLimit(LOG_PAGE); }, [logFilter, logDays]);
-
-  // Keep the chosen amount within what still fits on the selected card.
-  useEffect(() => {
-    if (selected && !selectedFull && amount > selectedRemaining) setAmount(selectedRemaining);
-  }, [selected, selectedFull, selectedRemaining, amount]);
 
   function chooseMember(id: string, message?: string) {
     setMemberId(id);
@@ -180,10 +194,7 @@ export default function AdminPage() {
       setStatus({ tone: "error", text: "QR ini bukan QR member Coffe Loca. Minta member membuka kartu di halaman Profile." });
       return;
     }
-    const member = members.find((item) => item.id === text);
-    chooseMember(text, member
-      ? member.stamps >= STAMP_GOAL ? `QR terbaca: ${member.full_name || "member"} — kartu sudah penuh, bisa tukar kopi gratis.` : `QR terbaca: ${member.full_name || "member"} (${member.stamps}/${STAMP_GOAL} stamp). Pilih jumlah stamp.`
-      : "QR member terbaca. Pilih jumlah stamp.");
+    chooseMember(text, "QR member terbaca. Pilih jumlah stamp.");
   }
 
   async function awardStamps(event: FormEvent<HTMLFormElement>) {
@@ -200,35 +211,12 @@ export default function AdminPage() {
       if (error) throw error;
       const log = data as StampLog;
       const name = log?.member_name || selected?.full_name || "member";
-      const capped = log && log.amount < amount ? ` (hanya ${log.amount} yang masuk, kartu maksimal ${STAMP_GOAL})` : "";
-      setStatus({ tone: "ok", text: `+${log?.amount ?? amount} stamp untuk ${name}${capped}. Sekarang ${log?.stamps_after ?? "?"}/${STAMP_GOAL}.` });
+      setStatus({ tone: "ok", text: `+${log?.amount ?? amount} stamp untuk ${name}. Total sekarang ${log?.stamps_after ?? "?"} stamp.` });
+      if (log) setScanned((current) => (current && current.id === log.member_id ? { ...current, stamps: log.stamps_after } : current));
       setAmount(1);
       await refresh();
     } catch (error) {
       setStatus({ tone: "error", text: errorText(error, "Stamp gagal ditambahkan.") });
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  async function redeem(member: Member) {
-    const ok = await confirm({
-      title: `Tukar kopi gratis untuk ${member.full_name || "member ini"}?`,
-      message: <>Kartu member <b>{Math.min(member.stamps, STAMP_GOAL)}/{STAMP_GOAL}</b> akan kembali ke <b>0/{STAMP_GOAL}</b> dan tercatat di riwayat.</>,
-      confirmLabel: "☕ YA, TUKAR",
-      icon: <svg viewBox="0 0 24 24"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1 1 1.5 1 2.5M11.5 3.5c0 1 1 1.5 1 2.5" /></svg>,
-    });
-    if (!ok) return;
-    setStatus(null);
-    setSubmitting(true);
-    try {
-      const { error } = await getSupabaseClient().rpc("redeem_free_coffee", { target_user_id: member.id });
-      if (error) throw error;
-      setMemberId(member.id);
-      setStatus({ tone: "ok", text: `☕ Kopi gratis untuk ${member.full_name || "member"} sudah ditukar. Kartu kembali ke 0/${STAMP_GOAL}.` });
-      await refresh();
-    } catch (error) {
-      setStatus({ tone: "error", text: errorText(error, "Penukaran gagal.") });
     } finally {
       setSubmitting(false);
     }
@@ -297,6 +285,7 @@ export default function AdminPage() {
   const logDaySet = useMemo(() => new Set(logDays), [logDays]);
   const visibleLogs = useMemo(() => logs.filter((log) => (logFilter === "all" || log.action === logFilter) && (!logDaySet.size || logDaySet.has(localDay(log.created_at)))), [logs, logFilter, logDaySet]);
   const activeDays = useMemo(() => new Set([...logs, ...todayLogs].map((log) => localDay(log.created_at))), [logs, todayLogs]);
+  const pendingMembers = useMemo(() => members.filter((member) => member.role === "member" && !member.approved).sort((a, b) => a.created_at.localeCompare(b.created_at)), [members]);
   const readyForReward = members.filter((member) => member.stamps >= STAMP_GOAL).length;
   const stampsToday = todayLogs.filter((log) => log.action === "add").reduce((sum, log) => sum + log.amount, 0);
   const redeemedToday = todayLogs.filter((log) => log.action === "redeem").length;
@@ -308,20 +297,20 @@ export default function AdminPage() {
         <div className="admin-heading page-heading">
           <span className="eyebrow"><i /> PRIVATE / ADMIN ACCESS</span>
           <h1>{section === "store" ? <>Store<br /><em>control.</em></> : <>Member<br /><em>control.</em></>}</h1>
-          <p>{section === "store" ? "Kelola produk dan pesanan Loca Store." : "Kelola stamp, voucher, promo, dan acara Coffe Loca dari satu ruang."}</p>
+          <p>{section === "store" ? "Kelola produk dan pesanan Loca Store." : adminUp ? "Kelola stamp, hadiah, voucher, promo, dan acara Coffe Loca dari satu ruang." : "Scan kartu stamp dan voucher member di kasir."}</p>
           <span className="admin-role">{user ? <>MASUK SEBAGAI {(user.user_metadata?.full_name || user.email || "STAFF").toUpperCase()} <b>{roleLabel(role).toUpperCase()}</b></> : "AUTHORIZED STAFF ONLY"}</span>
-          {section === "coffee" && <dl className="admin-stats">
+          {section === "coffee" && adminUp && <dl className="admin-stats">
             <div><dt>MEMBER</dt><dd>{loading ? "—" : members.length}</dd></div>
             <div><dt>STAMP HARI INI</dt><dd>{loading ? "—" : stampsToday}</dd></div>
-            <div><dt>SIAP DITUKAR</dt><dd>{loading ? "—" : readyForReward}</dd></div>
+            <div><dt>MIN. 10 STAMP</dt><dd>{loading ? "—" : readyForReward}</dd></div>
           </dl>}
-          {section === "coffee" && redeemedToday > 0 && <p className="admin-today">☕ {redeemedToday} kopi gratis ditukar hari ini.</p>}
+          {section === "coffee" && adminUp && redeemedToday > 0 && <p className="admin-today">☕ {redeemedToday} hadiah ditukar hari ini.</p>}
         </div>
 
         <div className="admin-content">
           {user && (
             <div className="admin-sections" role="tablist" aria-label="Area admin">
-              {canManageCoffee(role) && <button type="button" role="tab" aria-selected={section === "coffee"} className={section === "coffee" ? "is-active" : ""} onClick={() => setSection("coffee")}><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1 1 1.5 1 2.5M11.5 3.5c0 1 1 1.5 1 2.5" /></svg></span><span><strong>Coffee</strong><small>Stamp, voucher &amp; member</small></span></button>}
+              {canManageCoffee(role) && <button type="button" role="tab" aria-selected={section === "coffee"} className={section === "coffee" ? "is-active" : ""} onClick={() => setSection("coffee")}><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1 1 1.5 1 2.5M11.5 3.5c0 1 1 1.5 1 2.5" /></svg></span><span><strong>Coffee</strong><small>{adminUp ? "Stamp, hadiah, voucher & member" : "Scan stamp & voucher"}</small></span></button>}
               {canManageStore(role) && <button type="button" role="tab" aria-selected={section === "store"} className={section === "store" ? "is-active" : ""} onClick={() => setSection("store")}><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2" /></svg></span><span><strong>Store</strong><small>Produk &amp; pesanan</small></span></button>}
             </div>
           )}
@@ -353,49 +342,56 @@ export default function AdminPage() {
               <label className="field"><span>MEMBER ID / QR VALUE</span><input value={memberId} onChange={(event) => setMemberId(event.target.value)} placeholder="Scan atau tempel ID member" spellCheck={false} /></label>
 
               {selected && (
-                <div className={`admin-selected${selectedFull ? " is-full" : ""}`}>
+                <div className="admin-selected">
                   <div className="admin-selected-head">
                     <div><small>MEMBER TERPILIH</small><strong>{selected.full_name || "Unnamed member"}</strong></div>
-                    <span className="admin-selected-count"><b>{selectedStamps}</b>/{STAMP_GOAL}</span>
+                    <span className="admin-selected-count"><b>{selectedStamps}</b> stamp</span>
                   </div>
                   <div className="admin-dots" aria-hidden="true">
                     {Array.from({ length: STAMP_GOAL }, (_, index) => {
-                      const filled = index < selectedStamps;
-                      const preview = !filled && index < selectedStamps + amount && !selectedFull;
+                      const filled = index < selectedOnCard;
+                      const preview = !filled && selectedOnCard < STAMP_GOAL && index < selectedOnCard + amount;
                       return <i key={index} className={`${filled ? "is-filled" : ""}${preview ? " is-preview" : ""}`} />;
                     })}
                   </div>
+                  <small className="admin-selected-note">{Math.floor(selectedStamps / STAMP_GOAL)} kartu penuh · 10 stamp = 1 kopi gratis{adminUp ? ", atau tabung untuk hadiah lain" : ""}</small>
                 </div>
               )}
 
-              {selectedFull && selected ? (
-                <div className="admin-redeem">
-                  <p><strong>Kartu penuh!</strong> Member ini bisa menukar 1 kopi gratis. Setelah ditukar, stamp kembali ke 0.</p>
-                  <button className="admin-redeem-button" type="button" disabled={submitting} onClick={() => redeem(selected)}>
-                    <span>☕ TUKAR KOPI GRATIS</span><i className="arrow-icon" aria-hidden="true" />
-                  </button>
+              <fieldset className="admin-amount">
+                <legend>JUMLAH STAMP</legend>
+                <div className="admin-amount-grid" role="radiogroup" aria-label="Jumlah stamp">
+                  {Array.from({ length: STAMP_GOAL }, (_, index) => {
+                    const value = index + 1;
+                    return <button key={value} type="button" role="radio" aria-checked={amount === value} className={amount === value ? "is-active" : ""} onClick={() => setAmount(value)}>{value}</button>;
+                  })}
                 </div>
-              ) : (
-                <>
-                  <fieldset className="admin-amount">
-                    <legend>JUMLAH STAMP</legend>
-                    <div className="admin-amount-grid" role="radiogroup" aria-label="Jumlah stamp">
-                      {Array.from({ length: STAMP_GOAL }, (_, index) => {
-                        const value = index + 1;
-                        const tooMany = Boolean(selected) && value > selectedRemaining;
-                        return (
-                          <button key={value} type="button" role="radio" aria-checked={amount === value} className={amount === value ? "is-active" : ""} disabled={tooMany} onClick={() => setAmount(value)} title={tooMany ? `Kartu hanya muat ${selectedRemaining} stamp lagi` : undefined}>{value}</button>
-                        );
-                      })}
-                    </div>
-                    {selected && <small>{selectedStamps} → <b>{Math.min(selectedStamps + amount, STAMP_GOAL)}</b> stamp{selectedStamps + amount >= STAMP_GOAL ? " · kartu jadi penuh" : ""}</small>}
-                  </fieldset>
-                  <button className="btn-primary" type="submit" disabled={submitting}><span>{submitting ? "MENYIMPAN..." : `TAMBAH ${amount} STAMP`}</span><i className="arrow-icon" aria-hidden="true" /></button>
-                </>
-              )}
+                {selected && <small>{selectedStamps} → <b>{selectedStamps + amount}</b> stamp{Math.floor((selectedStamps + amount) / STAMP_GOAL) > Math.floor(selectedStamps / STAMP_GOAL) ? " · kartu penuh bertambah" : ""}</small>}
+              </fieldset>
+              <button className="btn-primary" type="submit" disabled={submitting}><span>{submitting ? "MENYIMPAN..." : `TAMBAH ${amount} STAMP`}</span><i className="arrow-icon" aria-hidden="true" /></button>
             </form>
             {status && <p className={`notice${status.tone === "error" ? " notice-error" : ""}`} role={status.tone === "error" ? "alert" : "status"}>{status.text}</p>}
           </div>
+
+          <VoucherScan scan={voucherScan} />
+
+          {adminUp && user && (<>
+          <div className="admin-panel card admin-verify" id="verify-desk">
+            <div className="card-topline"><span>VERIFIKASI MEMBER</span><span>{pendingMembers.length} MENUNGGU</span></div>
+            {listStatus && <p className={`notice${listStatus.tone === "error" ? " notice-error" : ""}`} role={listStatus.tone === "error" ? "alert" : "status"}>{listStatus.text}</p>}
+            {loading ? <p className="admin-empty">Memuat…</p> : pendingMembers.length === 0 ? <p className="admin-empty">Tidak ada member yang menunggu verifikasi.</p> : (
+              <ul className="admin-verify-list">
+                {pendingMembers.map((member) => (
+                  <li key={member.id}>
+                    <div><strong>{member.full_name || "Unnamed member"}</strong>{member.phone ? <span>{formatPhone(member.phone)}</span> : null}<small>Daftar {formatDateTime(member.created_at)}</small></div>
+                    <button type="button" className="admin-use-id admin-use-redeem" onClick={() => setApproval(member, true)}>VERIFIKASI</button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <AdminRewards userId={user.id} member={selected ? { id: selected.id, name: selected.full_name || "member", stamps: selected.stamps } : null} onRedeemed={refresh} />
 
           <div className="admin-panel card">
             <div className="admin-tabs" role="tablist" aria-label="Data admin">
@@ -408,8 +404,9 @@ export default function AdminPage() {
             {loading ? <p className="admin-empty">Memuat member…</p> : filtered.length === 0 ? <p className="admin-empty">{members.length === 0 ? "Belum ada data profile." : "Tidak ada member yang cocok."}</p> : (
               <ul className="admin-member-list" ref={memberListRef}>
                 {filtered.map((member) => {
-                  const stamps = Math.min(member.stamps, STAMP_GOAL);
+                  const stamps = member.stamps;
                   const full = stamps >= STAMP_GOAL;
+                  const onCard = stamps > 0 && stamps % STAMP_GOAL === 0 ? STAMP_GOAL : stamps % STAMP_GOAL;
                   return (
                     <li key={member.id} className={full ? "is-full" : ""}>
                       <div className="admin-member-info">
@@ -427,13 +424,11 @@ export default function AdminPage() {
                         )}
                       </div>
                       <div className="admin-member-stamps">
-                        <span>{full ? "Siap ditukar ☕" : `${stamps} / ${STAMP_GOAL}`}</span>
-                        <i aria-hidden="true"><b style={{ width: `${(stamps / STAMP_GOAL) * 100}%` }} /></i>
+                        <span>{full ? `${stamps} stamp ☕` : `${stamps} / ${STAMP_GOAL}`}</span>
+                        <i aria-hidden="true"><b style={{ width: `${(onCard / STAMP_GOAL) * 100}%` }} /></i>
                       </div>
                       {member.role === "member" && !member.approved
                         ? <button type="button" className="admin-use-id admin-use-redeem" onClick={() => setApproval(member, true)}>VERIFIKASI</button>
-                        : full
-                        ? <button type="button" className="admin-use-id admin-use-redeem" disabled={submitting} onClick={() => redeem(member)}>TUKAR</button>
                         : <button type="button" className="admin-use-id" onClick={() => chooseMember(member.id)}>PILIH</button>}
                     </li>
                   );
@@ -445,13 +440,13 @@ export default function AdminPage() {
             <div className="admin-tabpanel" id="admin-panel-logs" role="tabpanel" aria-labelledby="admin-tab-logs" hidden={tab !== "logs"}>
             <div className="admin-log-filters">
               <div className="admin-chips" role="group" aria-label="Filter aktivitas">
-                {([["all", "Semua"], ["add", "Tambah stamp"], ["redeem", "Tukar kopi"]] as [LogFilter, string][]).map(([value, label]) => (
+                {([["all", "Semua"], ["add", "Tambah stamp"], ["redeem", "Tukar hadiah"]] as [LogFilter, string][]).map(([value, label]) => (
                   <button key={value} type="button" className={logFilter === value ? "is-active" : ""} aria-pressed={logFilter === value} onClick={() => setLogFilter(value)}>{label}</button>
                 ))}
               </div>
               <MultiDatePicker selected={logDays} onChange={setLogDays} activeDays={activeDays} />
             </div>
-            {logDays.length > 0 && !logsError && <p className="admin-log-summary">{visibleLogs.length} aktivitas pada {logDays.length} tanggal · <b>+{visibleLogs.filter((log) => log.action === "add").reduce((sum, log) => sum + log.amount, 0)} stamp</b> · <b>{visibleLogs.filter((log) => log.action === "redeem").length} kopi gratis</b></p>}
+            {logDays.length > 0 && !logsError && <p className="admin-log-summary">{visibleLogs.length} aktivitas pada {logDays.length} tanggal · <b>+{visibleLogs.filter((log) => log.action === "add").reduce((sum, log) => sum + log.amount, 0)} stamp</b> · <b>{visibleLogs.filter((log) => log.action === "redeem").length} hadiah ditukar</b></p>}
             {logsError ? <p className="notice notice-error">{logsError}</p> : loading || logsLoading ? <p className="admin-empty">Memuat riwayat…</p> : visibleLogs.length === 0 ? <p className="admin-empty">{logs.length === 0 ? "Belum ada aktivitas stamp." : "Tidak ada aktivitas untuk filter ini."}</p> : (
               <ol className="admin-log-list">
                 {visibleLogs.slice(0, logLimit).map((log) => (
@@ -460,7 +455,7 @@ export default function AdminPage() {
                     <div>
                       <p>
                         <strong>{log.admin_name || "Admin"}</strong>
-                        {log.action === "redeem" ? <> menukar <b>kopi gratis</b> untuk </> : <> menambah <b>{log.amount} stamp</b> ke </>}
+                        {log.action === "redeem" ? <> menukar <b>{log.reward_title || "hadiah"}</b> ({log.amount} stamp) untuk </> : <> menambah <b>{log.amount} stamp</b> ke </>}
                         <strong>{log.member_name || "member"}</strong>
                       </p>
                       <small><time dateTime={log.created_at}>{formatDateTime(log.created_at)}</time> · {log.stamps_before} → {log.stamps_after} stamp</small>
@@ -472,7 +467,8 @@ export default function AdminPage() {
             {visibleLogs.length > logLimit && <button type="button" className="admin-more" onClick={() => setLogLimit((value) => value + LOG_PAGE)}>TAMPILKAN LEBIH BANYAK <span>{logLimit} / {visibleLogs.length}</span></button>}
             </div>
           </div>
-          {user && <AdminContent members={members} userId={user.id} scan={voucherScan} />}
+          <AdminContent members={members} userId={user.id} />
+          </>)}
           </>)}
         </div>
       </section>

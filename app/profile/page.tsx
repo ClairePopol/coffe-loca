@@ -139,7 +139,10 @@ export default function ProfilePage() {
   const contact = phone ? formatPhone(phone) : isPhoneAuthEmail(user?.email) ? "" : user?.email ?? "";
   const initials = useMemo(() => displayName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "L", [displayName]);
   const memberCode = user?.id ?? "";
-  const stamps = Math.min(profile.stamps, STAMP_GOAL);
+  // Stamps keep stacking: the card shows the current round (a full card stays 10/10 until the next stamp).
+  const totalStamps = profile.stamps;
+  const stamps = totalStamps > 0 && totalStamps % STAMP_GOAL === 0 ? STAMP_GOAL : totalStamps % STAMP_GOAL;
+  const fullCards = Math.floor(totalStamps / STAMP_GOAL);
   const remaining = STAMP_GOAL - stamps;
   const isStaff = isStaffRole(profile.role);
   const memberNumber = memberCode ? `LOCA · ${memberCode.replace(/-/g, "").slice(0, 8).toUpperCase().replace(/(.{4})/, "$1 ")}` : "";
@@ -248,7 +251,7 @@ export default function ProfilePage() {
                       <footer className="mc-bottom"><span>{memberSince ? `SEJAK ${memberSince.toUpperCase()}` : "MEDAN"}</span><span>SCAN DI KASIR</span></footer>
                     </section>
                   ) : (
-                    <section className="member-card-face member-card-back" aria-label={`Kartu stamp: ${stamps} dari ${STAMP_GOAL}`}>
+                    <section className="member-card-face member-card-back" aria-label={`Kartu stamp: ${stamps} dari ${STAMP_GOAL}, total ${totalStamps} stamp`}>
                       <header className="mc-back-top">
                         <span className="mc-back-brand"><img src="/white-coffee-bean.png" alt="" /><span><small>COFFE <b>LOCA</b></small>Stamp card</span></span>
                         <span className="mc-count"><b>{stamps}</b>/ {STAMP_GOAL}</span>
@@ -272,7 +275,7 @@ export default function ProfilePage() {
                       </div>
                       <footer className="mc-back-bottom">
                         <span className="mc-meter" aria-hidden="true"><i style={{ width: `${(stamps / STAMP_GOAL) * 100}%` }} /></span>
-                        <span>{remaining === 0 ? "Penuh! Tunjukkan QR ke kasir untuk kopi gratis" : `${remaining} stamp lagi untuk kopi gratis`}</span>
+                        <span>{remaining === 0 ? `Penuh! Tunjukkan QR ke kasir: tukar kopi gratis atau tabung untuk hadiah lain · total ${totalStamps} stamp` : fullCards > 0 ? `${remaining} stamp lagi untuk kartu penuh ke-${fullCards + 1} · total ${totalStamps} stamp` : `${remaining} stamp lagi untuk kopi gratis`}</span>
                       </footer>
                     </section>
                   )}

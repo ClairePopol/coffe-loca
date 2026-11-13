@@ -295,3 +295,50 @@
 .admin-redeem-close { border:0; background:none; font-size:22px; line-height:1; cursor:pointer; color:inherit; }
 
 .admin-member-info strong em.is-pending { color:#9c4a32; background:rgba(196,96,74,.14); }
+
+/* Etalase hadiah, verifikasi member, riwayat claim */
+.admin-tabs.is-four { grid-template-columns:repeat(4,1fr); }
+.admin-tabs.is-four button { padding-inline:6px; font-size:12px; }
+.admin-selected-note { display:block; margin-top:10px; color:var(--muted-2); font-size:12px; line-height:1.5; }
+
+.admin-verify .card-topline, .admin-rewards .card-topline { margin-bottom:6px; }
+.admin-verify-list { margin:10px 0 0; padding:0; list-style:none; }
+.admin-verify-list li { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 0; border-top:1px solid var(--line); }
+.admin-verify-list li:first-child { border-top:0; }
+.admin-verify-list li>div { display:flex; min-width:0; flex-direction:column; gap:3px; }
+.admin-verify-list strong { overflow:hidden; color:var(--olive); font-size:15px; text-overflow:ellipsis; white-space:nowrap; }
+.admin-verify-list span, .admin-verify-list small { color:var(--muted-2); font-size:12px; }
+
+.admin-rewards { padding:26px clamp(20px,3vw,36px) 28px; }
+.admin-rewards h2 { margin:18px 0 8px; color:var(--olive); font-family:"Instrument Serif",serif; font-size:clamp(34px,3.2vw,42px); font-weight:400; line-height:1; }
+.admin-rewards-member { margin:0 0 14px; color:var(--muted-2); font-size:14px; line-height:1.5; }
+.admin-rewards-member b { color:var(--olive); }
+.admin-reward-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:14px; margin:16px 0 0; padding:0; list-style:none; }
+.admin-reward-grid li { display:flex; flex-direction:column; align-items:flex-start; gap:8px; padding:16px; border:1px solid var(--line); border-radius:var(--radius); background:rgba(255,255,255,.5); }
+.admin-reward-grid li.is-ready { border-color:rgba(164,78,55,.45); background:rgba(232,189,119,.2); }
+.admin-reward-grid li.is-off { opacity:.55; }
+.admin-reward-cost { display:inline-flex; align-items:baseline; gap:6px; color:var(--muted-2); font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.admin-reward-cost b { color:var(--olive); font-family:"Instrument Serif",serif; font-size:38px; font-weight:400; letter-spacing:0; line-height:1; }
+.admin-reward-grid strong { color:var(--olive); font-size:16px; line-height:1.3; }
+.admin-reward-grid strong em { margin-left:8px; color:var(--muted-2); font-size:10px; font-style:normal; letter-spacing:.1em; }
+.admin-reward-grid small { color:var(--muted-2); font-size:12px; line-height:1.45; }
+.admin-reward-grid .admin-use-id { align-self:stretch; margin-top:auto; justify-content:center; }
+.admin-reward-tools { display:flex; gap:14px; }
+.admin-reward-tools button { padding:0; border:0; color:var(--muted-2); background:none; font-size:11px; text-decoration:underline; cursor:pointer; }
+.admin-reward-tools button.is-danger { color:var(--terracotta); }
+.admin-reward-form { display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-top:22px; padding-top:20px; border-top:1px solid var(--line); }
+.admin-reward-form .admin-reward-detail, .admin-reward-form .btn-primary { grid-column:1 / -1; }
+@media (max-width:560px) { .admin-reward-form { grid-template-columns:1fr; } }
+
+.admin-claim-list { margin:12px 0 0; padding:0; list-style:none; }
+.admin-claim-list li { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:13px 0; border-top:1px solid var(--line); }
+.admin-claim-list li:first-child { border-top:0; }
+.admin-claim-list li>div { min-width:0; }
+.admin-claim-list strong { color:var(--olive); font-size:15px; }
+.admin-claim-list p { margin:2px 0; color:var(--olive); font-size:14px; line-height:1.45; }
+.admin-claim-list small { color:var(--muted-2); font-size:12px; }
+.admin-claim-uses { display:flex; flex-direction:column; align-items:center; flex:none; min-width:78px; padding:8px 10px; border:1px solid var(--line-strong); border-radius:var(--radius); color:var(--olive); }
+.admin-claim-uses b { font-family:"Instrument Serif",serif; font-size:24px; font-weight:400; line-height:1; }
+.admin-claim-uses small { margin-top:3px; font-size:9px; font-weight:700; letter-spacing:.12em; }
+.admin-claim-uses.is-used { background:rgba(53,69,55,.08); color:var(--muted-2); }
+.admin-claim-uses.is-expired { border-color:rgba(164,78,55,.4); color:var(--terracotta); }
