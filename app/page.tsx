@@ -239,7 +239,7 @@ function SmoothScroll() {
  * control back. Only drives the page scroll — the hero itself is untouched.
  */
 const AUTO_SCROLL_SECONDS = 22; // half the previous speed
-const AUTO_SCROLL_START_DELAY = 1200;
+const AUTO_SCROLL_START_DELAY = 800;
 
 function HeroAutoScroll() {
   useEffect(() => {
@@ -276,7 +276,8 @@ function HeroAutoScroll() {
       running = true;
       lenis.scrollTo(end, {
         duration: AUTO_SCROLL_SECONDS,
-        easing: (t) => -(Math.cos(Math.PI * t) - 1) / 2, // gentle ease-in-out
+        // Starts moving right away (a slow ease-in over 22s looked like nothing was happening), then settles gently on the Cerita section.
+        easing: (t) => 1 - Math.pow(1 - t, 1.7),
         onComplete: () => { running = false; stop(); },
       });
     };
