@@ -20,7 +20,7 @@ export default function Wordmark({
   return (
     <a className={`wordmark${inverse ? " wordmark-inverse" : ""}${className ? ` ${className}` : ""}`} href={href} aria-label={label}>
       <img className="wordmark-logo" src="/white-coffee-bean.png" alt="" />
-      <span className="wordmark-type"><span>{first} <b>{second}</b></span><small>{tagline}</small></span>
+      <span className="wordmark-type"><span>{first} <b>{second}</b><em aria-hidden="true">/</em></span><small>{tagline}</small></span>
     </a>
   );
 }
