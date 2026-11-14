@@ -253,7 +253,7 @@ export default function ProfilePage() {
                           <span className="mc-number">{memberNumber}</span>
                         </div>
                         <button ref={qrTriggerRef} className="mc-qr" type="button" onClick={(event) => { event.stopPropagation(); setQrOpen(true); }} aria-label="Perbesar QR member">
-                          <QRCodeSVG value={memberCode} size={112} bgColor="#ffffff" fgColor="#6e1010" level="M" />
+                          <QRCodeSVG value={memberCode} size={112} bgColor="#ffffff" fgColor="#141414" level="M" />
                           <i className="profile-scan-line" />
                         </button>
                       </div>
@@ -403,7 +403,7 @@ export default function ProfilePage() {
             {voucherRedeemed ? (
               <div className="profile-qr-large voucher-redeemed" role="status"><b>✓</b><span>Voucher berhasil dipakai</span></div>
             ) : (
-              <div className="profile-qr-large"><QRCodeSVG value={`${VOUCHER_QR_PREFIX}${shownVoucher.id}`} size={240} bgColor="#ffffff" fgColor="#a11d1d" level="M" /></div>
+              <div className="profile-qr-large"><QRCodeSVG value={`${VOUCHER_QR_PREFIX}${shownVoucher.id}`} size={240} bgColor="#ffffff" fgColor="#141414" level="M" /></div>
             )}
             <strong>{shownVoucher.title}</strong>
             <small>{voucherRedeemed ? "Terima kasih! Sisa pemakaian sudah diperbarui." : "Kasir akan scan QR ini, lalu voucher dipotong otomatis."}</small>
@@ -416,7 +416,7 @@ export default function ProfilePage() {
           <div className="profile-qr-modal-card" onClick={(event) => event.stopPropagation()}>
             <button ref={closeRef} className="profile-modal-close" type="button" onClick={() => setQrOpen(false)} aria-label="Tutup">×</button>
             <span id="qr-title">MEMBER CODE / STAMP</span>
-            <div className="profile-qr-large"><QRCodeSVG value={memberCode} size={240} bgColor="#ffffff" fgColor="#a11d1d" level="M" /></div>
+            <div className="profile-qr-large"><QRCodeSVG value={memberCode} size={240} bgColor="#ffffff" fgColor="#141414" level="M" /></div>
             <strong>{displayName}</strong>
             <small>Tunjukkan kode ini ke kasir Coffe Loca untuk mendapatkan stamp.</small>
           </div>

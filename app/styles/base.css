@@ -1,25 +1,60 @@
-/* Tokens + reset. Shared by every page. */
+/* Tokens + reset. Shared by every page.
+   Palette (from the brand reference): cream canvas, near-black ink, poster red, forest green, white cards. */
 :root {
-  --ink:#2a1412; --cream:#fbf5f0; --paper:#ffffff; --sand:#f6e9e3; --sand-2:#f2e3dc;
-  --olive:#a11d1d; --olive-deep:#6e1010; --olive-2:#b8403a; --olive-ink:#4a1010;
-  --rust:#d93532; --orange:#eb4841; --gold:#e8bd77; --terracotta:#2e7d4f; --terracotta-deep:#236240;
-  --muted:#8b887c; --muted-2:#66635a; --muted-3:#85826f;
-  --line:rgba(161,29,29,.16); --line-strong:rgba(161,29,29,.26);
-  --quiet-color:#c7c3b9; --reveal-color:#3d0d0d;
+  --cream:#f4efe6; --paper:#ffffff; --sand:#ebe4d8; --sand-2:#e4dccd;
+  --ink:#141414; --ink-2:#2b2b2b; --ink-3:#4b4b4b;
+  --red:#d4232a; --red-deep:#a8161c; --red-bright:#ef3a3a; --red-soft:#fbe9e8;
+  --green:#355a35; --green-deep:#27452a; --green-soft:#e7eee4;
+  --muted:#8a847a; --muted-2:#5e5a53; --muted-3:#7a756c;
+  --line:rgba(20,20,20,.1); --line-strong:rgba(20,20,20,.2);
+  --quiet-color:#cfc8bc; --reveal-color:#141414;
+
+  /* legacy aliases (older rules still reference these) */
+  --olive:var(--ink); --olive-deep:#000000; --olive-2:var(--ink-2); --olive-ink:var(--ink);
+  --rust:var(--red); --orange:var(--red); --gold:#ffffff; --terracotta:var(--red); --terracotta-deep:var(--red-deep);
+
   --fs-label:11px; --fs-small:13px; --fs-body:15px;
   --track-label:.14em;
-  --radius:14px; --radius-lg:22px;
-  --shadow-card:0 24px 70px rgba(161,29,29,.14),0 2px 6px rgba(161,29,29,.05);
+  --radius:12px; --radius-lg:18px; --radius-btn:10px;
+  --shadow-card:0 18px 50px rgba(20,20,20,.08),0 2px 6px rgba(20,20,20,.04);
+  --shadow-pop:0 30px 80px rgba(20,20,20,.22);
   --ease-out:cubic-bezier(.22,1,.36,1);
+  --font:Poppins,system-ui,sans-serif;
 }
 * { box-sizing:border-box; }
 html { background:#090502; scroll-behavior:auto; }
-body { margin:0; color:var(--ink); background:var(--cream); font-family:Poppins,sans-serif; font-weight:400; -webkit-font-smoothing:antialiased; }
+body { margin:0; color:var(--ink); background:var(--cream); font-family:var(--font); font-weight:400; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
 html:has(body.menu-is-open),html:has(body.entry-is-open),body.menu-is-open,body.entry-is-open { overflow:hidden; overscroll-behavior:none; }
 a { color:inherit; text-decoration:none; }
 button { color:inherit; font:inherit; }
-::selection { color:var(--paper); background:var(--rust); }
-:where(a,button,input,select,textarea,[tabindex]):focus-visible { outline:2px solid var(--terracotta); outline-offset:3px; }
+img { max-width:100%; }
+::selection { color:#fff; background:var(--red); }
+:where(a,button,input,select,textarea,[tabindex]):focus-visible { outline:2px solid var(--red); outline-offset:3px; }
+
+/* Display type: heavy Poppins, tight tracking (reference style) */
+h1,h2,h3,.display { font-family:var(--font); font-weight:800; letter-spacing:-.035em; line-height:.98; }
+h1 em,h2 em,h3 em { font-style:normal; font-weight:800; color:inherit; }
+
+/* "/ LABEL" kicker used across all pages */
+.eyebrow { display:inline-flex; align-items:center; gap:8px; color:var(--red); font-size:var(--fs-label); font-weight:700; letter-spacing:.16em; line-height:1.5; text-transform:uppercase; }
+.eyebrow::before { content:"/"; font-weight:800; }
+.eyebrow i { display:none; }
+
+/* Buttons */
+.btn,.btn-red,.btn-green,.btn-white,.btn-outline { display:inline-flex; min-height:48px; align-items:center; justify-content:center; gap:12px; padding:0 22px; border:0; border-radius:var(--radius-btn); font-family:var(--font); font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; cursor:pointer; transition:transform .3s var(--ease-out),background .25s,color .25s,border-color .25s,box-shadow .25s; }
+.btn-red { color:#fff; background:var(--red); box-shadow:0 10px 24px rgba(212,35,42,.25); }
+.btn-red:hover { background:var(--red-deep); transform:translateY(-2px); }
+.btn-green { color:#fff; background:var(--green); box-shadow:0 10px 24px rgba(53,90,53,.22); }
+.btn-green:hover { background:var(--green-deep); transform:translateY(-2px); }
+.btn-white { color:var(--red); background:#fff; box-shadow:0 10px 24px rgba(0,0,0,.12); }
+.btn-white:hover { color:#fff; background:var(--ink); transform:translateY(-2px); }
+.btn-outline { color:var(--ink); border:1.5px solid var(--ink); background:transparent; }
+.btn-outline:hover { color:#fff; background:var(--ink); }
+.btn:active,.btn-red:active,.btn-green:active,.btn-white:active,.btn-outline:active { transform:scale(.97); }
+.btn-red .arrow-icon,.btn-green .arrow-icon { color:#fff; }
+
+/* Checkered brand accent (red / white squares, as on the reference) */
+.checker { position:absolute; width:96px; height:96px; pointer-events:none; background:conic-gradient(var(--red) 25%,transparent 0 50%,var(--red) 0 75%,transparent 0) 0 0/50% 50%; opacity:.9; }
 
 /* Shared keyframes (used by several pages) */
 @keyframes locationOrbit { to { transform:rotate(360deg); } }
