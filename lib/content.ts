@@ -32,7 +32,15 @@ export const errorMessage = (error: unknown, fallback: string) => {
   return message || fallback;
 };
 
-/** Shrinks a photo to max 800px WebP in the browser, uploads it to the public "reward-images" bucket and returns its URL. */
+/** Uploads an already-processed image blob (WebP from PhotoCropper) to the public "reward-images" bucket and returns its URL. */
+export async function uploadRewardBlob(supabase: import("@supabase/supabase-js").SupabaseClient, blob: Blob): Promise<string> {
+  const path = `${crypto.randomUUID()}.webp`;
+  const { error } = await supabase.storage.from("reward-images").upload(path, blob, { contentType: "image/webp", cacheControl: "31536000" });
+  if (error) throw error;
+  return supabase.storage.from("reward-images").getPublicUrl(path).data.publicUrl;
+}
+
+/** Shrinks a photo to max 800px WebP in the browser (no cropping) and uploads it. */
 export async function uploadRewardImage(supabase: import("@supabase/supabase-js").SupabaseClient, file: File): Promise<string> {
   if (!file.type.startsWith("image/")) throw new Error("File harus berupa gambar.");
   const bitmap = await createImageBitmap(file);
@@ -43,8 +51,5 @@ export async function uploadRewardImage(supabase: import("@supabase/supabase-js"
   canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
   const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/webp", 0.85));
   if (!blob) throw new Error("Gambar gagal diproses.");
-  const path = `${crypto.randomUUID()}.webp`;
-  const { error } = await supabase.storage.from("reward-images").upload(path, blob, { contentType: "image/webp", cacheControl: "31536000" });
-  if (error) throw error;
-  return supabase.storage.from("reward-images").getPublicUrl(path).data.publicUrl;
+  return uploadRewardBlob(supabase, blob);
 }
