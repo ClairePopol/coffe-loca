@@ -24,7 +24,7 @@ export default function ProfilePage() {
   const [promos, setPromos] = useState<Pick<Promo, "id" | "title" | "detail" | "badge" | "valid_until" | "claim_uses">[]>([]);
   const [events, setEvents] = useState<Pick<CafeEvent, "id" | "title" | "detail" | "event_date" | "time_text">[]>([]);
   const [vouchers, setVouchers] = useState<{ id: number; usesLeft: number; usesTotal: number; expires: string | null; voucher: Pick<Voucher, "id" | "title" | "detail" | "expires_at"> }[]>([]);
-  const [rewards, setRewards] = useState<Pick<Reward, "id" | "title" | "detail" | "stamps_cost">[]>([]);
+  const [rewards, setRewards] = useState<(Pick<Reward, "id" | "title" | "detail" | "stamps_cost"> & { image_url?: string | null })[]>([]);
   const [claimedPromoIds, setClaimedPromoIds] = useState<Set<number>>(new Set());
   const [claimingId, setClaimingId] = useState<number | null>(null);
   const [claimNote, setClaimNote] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
@@ -50,9 +50,14 @@ export default function ProfilePage() {
       supabase.from("promos").select("id, title, detail, badge, valid_until, claim_uses").eq("is_active", true).or(`valid_until.is.null,valid_until.gte.${today}`).order("created_at", { ascending: false }),
       supabase.from("events").select("id, title, detail, event_date, time_text").eq("is_active", true).gte("event_date", today).lte("event_date", monthBounds(today).end).order("event_date", { ascending: true }),
       supabase.from("member_vouchers").select("id, status, uses_left, uses_total, expires_at, vouchers(id, title, detail, expires_at, is_active, promo_id)").eq("member_id", userId).order("granted_at", { ascending: false }),
-      supabase.from("rewards").select("id, title, detail, stamps_cost").eq("is_active", true).order("stamps_cost", { ascending: true }).order("id", { ascending: true }),
+      supabase.from("rewards").select("id, title, detail, stamps_cost, image_url").eq("is_active", true).order("stamps_cost", { ascending: true }).order("id", { ascending: true }),
     ]);
     if (!rewardRes.error) setRewards(rewardRes.data ?? []);
+    else {
+      // photo column not migrated yet (supabase/reward-images.sql): fall back to the plain list
+      const plain = await supabase.from("rewards").select("id, title, detail, stamps_cost").eq("is_active", true).order("stamps_cost", { ascending: true }).order("id", { ascending: true });
+      if (!plain.error) setRewards(plain.data ?? []);
+    }
     if (!promoRes.error) setPromos(promoRes.data ?? []);
     if (!eventRes.error) setEvents(eventRes.data ?? []);
     if (!voucherRes.error) {
@@ -196,7 +201,7 @@ export default function ProfilePage() {
     try {
       await getSupabaseClient().auth.signOut();
     } finally {
-      window.location.href = "/";
+      window.location.href = "/profile";
     }
   }
 
@@ -248,7 +253,7 @@ export default function ProfilePage() {
                           <span className="mc-number">{memberNumber}</span>
                         </div>
                         <button ref={qrTriggerRef} className="mc-qr" type="button" onClick={(event) => { event.stopPropagation(); setQrOpen(true); }} aria-label="Perbesar QR member">
-                          <QRCodeSVG value={memberCode} size={112} bgColor="#f8f4eb" fgColor="#26372d" level="M" />
+                          <QRCodeSVG value={memberCode} size={112} bgColor="#ffffff" fgColor="#6e1010" level="M" />
                           <i className="profile-scan-line" />
                         </button>
                       </div>
@@ -371,6 +376,7 @@ export default function ProfilePage() {
                     const ready = totalStamps >= reward.stamps_cost;
                     return (
                       <li key={reward.id} className={ready ? "is-ready" : ""}>
+                        {reward.image_url && <img className="reward-photo" src={reward.image_url} alt={reward.title} loading="lazy" />}
                         <span className="showcase-cost"><b>{reward.stamps_cost}</b>stamp</span>
                         <strong>{reward.title}</strong>
                         {reward.detail && <small>{reward.detail}</small>}
@@ -397,7 +403,7 @@ export default function ProfilePage() {
             {voucherRedeemed ? (
               <div className="profile-qr-large voucher-redeemed" role="status"><b>✓</b><span>Voucher berhasil dipakai</span></div>
             ) : (
-              <div className="profile-qr-large"><QRCodeSVG value={`${VOUCHER_QR_PREFIX}${shownVoucher.id}`} size={240} bgColor="#f8f4eb" fgColor="#354537" level="M" /></div>
+              <div className="profile-qr-large"><QRCodeSVG value={`${VOUCHER_QR_PREFIX}${shownVoucher.id}`} size={240} bgColor="#ffffff" fgColor="#a11d1d" level="M" /></div>
             )}
             <strong>{shownVoucher.title}</strong>
             <small>{voucherRedeemed ? "Terima kasih! Sisa pemakaian sudah diperbarui." : "Kasir akan scan QR ini, lalu voucher dipotong otomatis."}</small>
@@ -410,7 +416,7 @@ export default function ProfilePage() {
           <div className="profile-qr-modal-card" onClick={(event) => event.stopPropagation()}>
             <button ref={closeRef} className="profile-modal-close" type="button" onClick={() => setQrOpen(false)} aria-label="Tutup">×</button>
             <span id="qr-title">MEMBER CODE / STAMP</span>
-            <div className="profile-qr-large"><QRCodeSVG value={memberCode} size={240} bgColor="#f8f4eb" fgColor="#354537" level="M" /></div>
+            <div className="profile-qr-large"><QRCodeSVG value={memberCode} size={240} bgColor="#ffffff" fgColor="#a11d1d" level="M" /></div>
             <strong>{displayName}</strong>
             <small>Tunjukkan kode ini ke kasir Coffe Loca untuk mendapatkan stamp.</small>
           </div>

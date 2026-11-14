@@ -3,7 +3,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { useConfirm } from "@/components/ConfirmDialog";
-import { errorMessage, type Reward } from "@/lib/content";
+import { errorMessage, uploadRewardImage, type Reward } from "@/lib/content";
 
 type Status = { tone: "ok" | "error"; text: string } | null;
 export const STAMP_CARD = 10;
@@ -21,9 +21,12 @@ export default function AdminRewards({ userId, member, onRedeemed }: { userId: s
   const [confirm, confirmDialog] = useConfirm();
 
   const load = useCallback(async () => {
-    const { data, error } = await getSupabaseClient().from("rewards").select("id, title, detail, stamps_cost, is_active, created_at").order("stamps_cost", { ascending: true }).order("id", { ascending: true });
+    const q = (cols: string) => getSupabaseClient().from("rewards").select(cols).order("stamps_cost", { ascending: true }).order("id", { ascending: true });
+    let res = await q("id, title, detail, stamps_cost, is_active, created_at, image_url");
+    if (res.error) res = await q("id, title, detail, stamps_cost, is_active, created_at"); // photo column not migrated yet
+    const { data, error } = res;
     if (error) setStatus({ tone: "error", text: errorMessage(error, "Hadiah gagal dimuat.") });
-    else setRewards((data ?? []) as Reward[]);
+    else setRewards((data ?? []) as unknown as Reward[]);
     setLoading(false);
   }, []);
   useEffect(() => { load(); }, [load]);
@@ -38,7 +41,13 @@ export default function AdminRewards({ userId, member, onRedeemed }: { userId: s
     if (!title || !Number.isFinite(cost) || cost < 1) { setStatus({ tone: "error", text: "Isi nama hadiah dan jumlah stamp (minimal 1)." }); return; }
     setBusy(true);
     setStatus(null);
-    const { error } = await getSupabaseClient().from("rewards").insert({ title, detail: detail || null, stamps_cost: cost, created_by: userId });
+    let image_url: string | null = null;
+    const file = data.get("image");
+    if (file instanceof File && file.size > 0) {
+      try { image_url = await uploadRewardImage(getSupabaseClient(), file); }
+      catch (error) { setBusy(false); setStatus({ tone: "error", text: errorMessage(error, "Foto gagal diunggah.") }); return; }
+    }
+    const { error } = await getSupabaseClient().from("rewards").insert({ title, detail: detail || null, stamps_cost: cost, created_by: userId, image_url });
     setBusy(false);
     if (error) { setStatus({ tone: "error", text: errorMessage(error, "Hadiah gagal ditambahkan.") }); return; }
     form.reset();
@@ -52,6 +61,21 @@ export default function AdminRewards({ userId, member, onRedeemed }: { userId: s
     setBusy(false);
     if (error) setStatus({ tone: "error", text: errorMessage(error, "Status hadiah gagal diubah.") });
     else await load();
+  }
+
+  async function changeImage(reward: Reward, file: File | undefined) {
+    if (!file) return;
+    setBusy(true);
+    setStatus(null);
+    try {
+      const url = await uploadRewardImage(getSupabaseClient(), file);
+      const { error } = await getSupabaseClient().from("rewards").update({ image_url: url }).eq("id", reward.id);
+      if (error) throw error;
+      await load();
+    } catch (error) {
+      setStatus({ tone: "error", text: errorMessage(error, "Foto gagal diunggah.") });
+    }
+    setBusy(false);
   }
 
   async function remove(reward: Reward) {
@@ -97,6 +121,7 @@ export default function AdminRewards({ userId, member, onRedeemed }: { userId: s
             const cards = reward.stamps_cost / STAMP_CARD;
             return (
               <li key={reward.id} className={`${reward.is_active ? "" : "is-off"}${enough && reward.is_active ? " is-ready" : ""}`}>
+                {reward.image_url && <img className="reward-photo" src={reward.image_url} alt="" loading="lazy" />}
                 <span className="admin-reward-cost"><b>{reward.stamps_cost}</b>stamp</span>
                 <strong>{reward.title}{!reward.is_active && <em>NONAKTIF</em>}</strong>
                 {reward.detail && <small>{reward.detail}</small>}
@@ -105,6 +130,7 @@ export default function AdminRewards({ userId, member, onRedeemed }: { userId: s
                   {!member ? "PILIH MEMBER" : !reward.is_active ? "NONAKTIF" : enough ? "TUKAR" : `KURANG ${reward.stamps_cost - member.stamps}`}
                 </button>
                 <span className="admin-reward-tools">
+                  <label className={`reward-upload${busy ? " is-disabled" : ""}`}>{reward.image_url ? "Ganti foto" : "Tambah foto"}<input type="file" accept="image/*" hidden disabled={busy} onChange={(event) => { changeImage(reward, event.target.files?.[0]); event.target.value = ""; }} /></label>
                   <button type="button" disabled={busy} onClick={() => toggle(reward)}>{reward.is_active ? "Nonaktifkan" : "Aktifkan"}</button>
                   <button type="button" className="is-danger" disabled={busy} onClick={() => remove(reward)}>Hapus</button>
                 </span>
@@ -118,6 +144,7 @@ export default function AdminRewards({ userId, member, onRedeemed }: { userId: s
         <label className="field"><span>NAMA HADIAH</span><input name="title" maxLength={80} placeholder="mis. Kaos Coffe Loca" required /></label>
         <label className="field"><span>STAMP DIBUTUHKAN</span><input name="cost" type="number" min={1} max={1000} step={1} inputMode="numeric" placeholder="40" required /></label>
         <label className="field admin-reward-detail"><span>KETERANGAN (OPSIONAL)</span><input name="detail" maxLength={200} placeholder="mis. 4 kartu penuh" /></label>
+        <label className="field"><span>FOTO HADIAH (OPSIONAL)</span><input name="image" type="file" accept="image/*" /></label>
         <button className="btn-primary" type="submit" disabled={busy}><span>TAMBAH HADIAH</span><i className="arrow-icon" aria-hidden="true" /></button>
       </form>
       {confirmDialog}

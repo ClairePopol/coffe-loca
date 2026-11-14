@@ -55,6 +55,7 @@ export default function LoginPage() {
     const identifier = String(formData.get("phone") ?? "").trim();
     const password = String(formData.get("password") ?? "");
     const name = String(formData.get("name") ?? "").trim();
+    const birthDate = String(formData.get("birth_date") ?? "").trim();
 
     // Old accounts registered with email can still log in with their email address.
     const usesEmail = !isRegister && identifier.includes("@");
@@ -79,7 +80,7 @@ export default function LoginPage() {
       const supabase = getSupabaseClient();
       const email = usesEmail ? identifier : phoneToAuthEmail(phone!);
       if (isRegister) {
-        const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name, phone } } });
+        const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name, phone, ...(birthDate ? { birth_date: birthDate } : {}) } } });
         if (error) throw error;
         // Supabase returns a user without identities when the address is already registered.
         if (data.user && data.user.identities?.length === 0) throw new Error("User already registered");
@@ -95,7 +96,7 @@ export default function LoginPage() {
       const { data: me } = await supabase.auth.getUser();
       const { data: row } = me.user ? await supabase.from("profiles").select("role, approved").eq("id", me.user.id).maybeSingle() : { data: null };
       if (row && row.role === "member" && row.approved === false) { await holdForApproval("login"); return; }
-      router.push("/");
+      router.push("/profile");
       router.refresh();
     } catch (error) {
       setErrorMessage(friendlyAuthError(error, isRegister));
@@ -142,6 +143,7 @@ export default function LoginPage() {
                 <small className="field-hint">{isRegister ? "Pakai nomor WhatsApp aktif. Nomor ini jadi ID login kamu." : "Akun lama dengan email? Ketik email di sini."}</small>
               </label>
               <label className="field"><span>PASSWORD</span><div className="auth-password"><input name="password" type={showPassword ? "text" : "password"} placeholder="Minimal 6 karakter" autoComplete={isRegister ? "new-password" : "current-password"} minLength={6} required /><button type="button" onClick={() => setShowPassword((value) => !value)} aria-pressed={showPassword}>{showPassword ? "SEMBUNYIKAN" : "LIHAT"}</button></div></label>
+              {isRegister && <label className="field"><span>TANGGAL LAHIR <em className="field-optional">OPSIONAL</em></span><input name="birth_date" type="date" max={new Date().toISOString().slice(0, 10)} autoComplete="bday" /><small className="field-hint">🎂 Isi tanggal lahirmu, ada voucher spesial untuk merayakan ulang tahun kamu.</small></label>}
               {isRegister && <label className="field"><span>KONFIRMASI PASSWORD</span><input name="password-confirmation" type={showPassword ? "text" : "password"} placeholder="Ulangi password" autoComplete="new-password" minLength={6} required /></label>}
               {!isRegister && <div className="auth-form-meta"><span className="auth-forgot">Lupa password? <b>Minta bantuan kasir Coffe Loca.</b></span></div>}
               <button className="btn-primary" type="submit" disabled={loading}><span>{loading ? "MENGHUBUNGKAN..." : isRegister ? "BUAT AKUN" : "MASUK KE LOCA"}</span><span className="arrow-icon" aria-hidden="true" /></button>

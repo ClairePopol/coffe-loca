@@ -18,6 +18,7 @@ type Member = { id: string; full_name: string | null; phone: string | null; stam
 type StampLog = { id: number; created_at: string; action: "add" | "redeem"; amount: number; stamps_before: number; stamps_after: number; member_id: string; member_name: string | null; admin_id: string | null; admin_name: string | null; reward_title: string | null };
 type Status = { tone: "ok" | "error"; text: string } | null;
 type Scanned = { id: string; full_name: string | null; stamps: number; approved: boolean };
+type Pending = { id: string; full_name: string | null; phone: string | null; created_at: string };
 type LogFilter = "all" | "add" | "redeem";
 
 const STAMP_GOAL = 10;
@@ -40,6 +41,7 @@ const startOfKey = (key: string) => { const [y, m, d] = key.split("-").map(Numbe
 export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
+  const [pendingMembers, setPendingMembers] = useState<Pending[]>([]);
   const [logs, setLogs] = useState<StampLog[]>([]);
   const [logsError, setLogsError] = useState("");
   const [memberId, setMemberId] = useState("");
@@ -83,6 +85,13 @@ export default function AdminPage() {
     setMembers((membersResult.data ?? []) as Member[]);
     if (!todayResult.error) setTodayLogs((todayResult.data ?? []) as StampLog[]);
     setLogsVersion((value) => value + 1);
+  }, []);
+
+  // Verification queue (name + phone only) — every staff role may use it, nobody else's data is exposed.
+  const loadPending = useCallback(async () => {
+    const { data, error } = await getSupabaseClient().rpc("list_pending_members");
+    if (error) setListStatus({ tone: "error", text: errorText(error, "Antrean verifikasi gagal dimuat.") });
+    else setPendingMembers((data ?? []) as Pending[]);
   }, []);
 
   // Admin Coffee cannot list members, so a scanned / pasted member ID is looked up through scan_member.
@@ -164,6 +173,7 @@ export default function AdminPage() {
         setRole(current.role as Role);
         setSection(canManageCoffee(current.role) ? "coffee" : "store");
         setUser(authUser);
+        await loadPending();
         if (isAdminUp(current.role)) await refresh();
       } catch (error) {
         if (active) setStatus({ tone: "error", text: errorText(error, "Gagal membuka admin panel.") });
@@ -173,7 +183,7 @@ export default function AdminPage() {
     }
     load();
     return () => { active = false; };
-  }, [refresh]);
+  }, [refresh, loadPending]);
 
   useEffect(() => { setLogLimit(LOG_PAGE); }, [logFilter, logDays]);
 
@@ -242,7 +252,7 @@ export default function AdminPage() {
     }
   }
 
-  async function setApproval(member: Member, approve: boolean) {
+  async function setApproval(member: { id: string; full_name: string | null }, approve: boolean) {
     const ok = await confirm({
       title: approve ? `Verifikasi ${member.full_name || "member"}?` : `Cabut verifikasi ${member.full_name || "member"}?`,
       message: approve ? "Akun ini akan aktif dan bisa memakai kartu member, voucher, dan promo." : "Akun ini kembali ke status menunggu verifikasi.",
@@ -255,15 +265,55 @@ export default function AdminPage() {
       const { error } = await getSupabaseClient().rpc("set_member_approval", { target_user_id: member.id, is_approved: approve });
       if (error) throw error;
       setListStatus({ tone: "ok", text: approve ? `${member.full_name || "Member"} sudah diverifikasi.` : `Verifikasi ${member.full_name || "member"} dicabut.` });
-      await refresh();
+      await loadPending();
+      if (adminUp) await refresh();
     } catch (error) {
       setListStatus({ tone: "error", text: errorText(error, "Verifikasi gagal diubah.") });
     }
   }
 
+  async function deletePending(member: Pending) {
+    const ok = await confirm({
+      title: `Hapus permintaan ${member.full_name || "akun ini"}?`,
+      message: "Akun yang belum diverifikasi ini dihapus permanen. Orangnya bisa mendaftar ulang.",
+      confirmLabel: "YA, HAPUS",
+      tone: "danger",
+    });
+    if (!ok) return;
+    setListStatus(null);
+    try {
+      const { error } = await getSupabaseClient().rpc("delete_pending_member", { target_user_id: member.id });
+      if (error) throw error;
+      setListStatus({ tone: "ok", text: "Permintaan verifikasi dihapus." });
+      await loadPending();
+      if (adminUp) await refresh();
+    } catch (error) {
+      setListStatus({ tone: "error", text: errorText(error, "Permintaan gagal dihapus.") });
+    }
+  }
+
+  async function deleteMember(member: Member) {
+    const ok = await confirm({
+      title: `Hapus member ${member.full_name || "ini"}?`,
+      message: "Akun, stamp, dan voucher member ini dihapus permanen dan tidak bisa dikembalikan.",
+      confirmLabel: "YA, HAPUS MEMBER",
+      tone: "danger",
+    });
+    if (!ok) return;
+    setListStatus(null);
+    try {
+      const { error } = await getSupabaseClient().rpc("delete_member", { target_user_id: member.id });
+      if (error) throw error;
+      if (memberId.trim() === member.id) setMemberId("");
+      setListStatus({ tone: "ok", text: `${member.full_name || "Member"} dihapus.` });
+      await refresh();
+    } catch (error) {
+      setListStatus({ tone: "error", text: errorText(error, "Member gagal dihapus.") });
+    }
+  }
+
   // Members still waiting for verification only appear in the "Verifikasi member" card, not in the lists below.
   const verifiedMembers = useMemo(() => members.filter((member) => member.role !== "member" || member.approved), [members]);
-  const pendingMembers = useMemo(() => members.filter((member) => member.role === "member" && !member.approved).sort((a, b) => a.created_at.localeCompare(b.created_at)), [members]);
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const qDigits = q.replace(/\D/g, "");
@@ -292,6 +342,26 @@ export default function AdminPage() {
   const stampsToday = todayLogs.filter((log) => log.action === "add").reduce((sum, log) => sum + log.amount, 0);
   const redeemedToday = todayLogs.filter((log) => log.action === "redeem").length;
 
+  const verifyCard = (
+        <div className="admin-panel card admin-verify" id="verify-desk">
+            <div className="card-topline"><span>VERIFIKASI MEMBER</span><span>{pendingMembers.length} MENUNGGU</span></div>
+            {listStatus && <p className={`notice${listStatus.tone === "error" ? " notice-error" : ""}`} role={listStatus.tone === "error" ? "alert" : "status"}>{listStatus.text}</p>}
+            {loading ? <p className="admin-empty">Memuat…</p> : pendingMembers.length === 0 ? <p className="admin-empty">Tidak ada member yang menunggu verifikasi.</p> : (
+              <ul className="admin-verify-list">
+                {pendingMembers.map((member) => (
+                  <li key={member.id}>
+                    <div><strong>{member.full_name || "Unnamed member"}</strong>{member.phone ? <span>{formatPhone(member.phone)}</span> : null}<small>Daftar {formatDateTime(member.created_at)}</small></div>
+                    <span className="admin-verify-actions">
+                      <button type="button" className="admin-use-id admin-use-redeem" onClick={() => setApproval(member, true)}>VERIFIKASI</button>
+                      <button type="button" className="admin-use-id admin-use-delete" onClick={() => deletePending(member)}>HAPUS</button>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+  );
+
   return (
     <main className="page-shell admin-page">
       <PageHeader backHref="/profile" backLabel="KE PROFILE" />
@@ -317,7 +387,8 @@ export default function AdminPage() {
             </div>
           )}
 
-          {section === "store" && user && (
+          {section === "store" && user && (<>
+            {verifyCard}
             <div className="admin-store card">
               <div className="card-topline"><span>LOCA STORE</span><span>SEGERA HADIR</span></div>
               <h2>Panel Store sedang disiapkan.</h2>
@@ -328,9 +399,10 @@ export default function AdminPage() {
                 <li><b>03</b><strong>Pesanan</strong><small>Proses &amp; kirim pesanan</small></li>
               </ul>
             </div>
-          )}
+          </>)}
 
           {section === "coffee" && canManageCoffee(role) && (<>
+          {verifyCard}
           <div className="admin-award-card card" id="stamp-desk">
             <div className="card-topline"><span>STAMP DESK</span><span>SCAN / ADD 1–10</span></div>
             <h2>Tambahkan stamp.</h2>
@@ -378,21 +450,6 @@ export default function AdminPage() {
           <VoucherScan scan={voucherScan} />
 
           {adminUp && user && (<>
-          <div className="admin-panel card admin-verify" id="verify-desk">
-            <div className="card-topline"><span>VERIFIKASI MEMBER</span><span>{pendingMembers.length} MENUNGGU</span></div>
-            {listStatus && <p className={`notice${listStatus.tone === "error" ? " notice-error" : ""}`} role={listStatus.tone === "error" ? "alert" : "status"}>{listStatus.text}</p>}
-            {loading ? <p className="admin-empty">Memuat…</p> : pendingMembers.length === 0 ? <p className="admin-empty">Tidak ada member yang menunggu verifikasi.</p> : (
-              <ul className="admin-verify-list">
-                {pendingMembers.map((member) => (
-                  <li key={member.id}>
-                    <div><strong>{member.full_name || "Unnamed member"}</strong>{member.phone ? <span>{formatPhone(member.phone)}</span> : null}<small>Daftar {formatDateTime(member.created_at)}</small></div>
-                    <button type="button" className="admin-use-id admin-use-redeem" onClick={() => setApproval(member, true)}>VERIFIKASI</button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
           <AdminRewards userId={user.id} member={selected ? { id: selected.id, name: selected.full_name || "member", stamps: selected.stamps } : null} onRedeemed={refresh} />
 
           <div className="admin-panel card">
@@ -429,7 +486,10 @@ export default function AdminPage() {
                         <span>{full ? `${stamps} stamp ☕` : `${stamps} / ${STAMP_GOAL}`}</span>
                         <i aria-hidden="true"><b style={{ width: `${(onCard / STAMP_GOAL) * 100}%` }} /></i>
                       </div>
-                      <button type="button" className="admin-use-id" onClick={() => chooseMember(member.id)}>PILIH</button>
+                      <span className="admin-verify-actions admin-member-actions">
+                        <button type="button" className="admin-use-id" onClick={() => chooseMember(member.id)}>PILIH</button>
+                        {member.id !== user?.id && (member.role === "member" || role === "owner") && <button type="button" className="admin-use-id admin-use-delete" onClick={() => deleteMember(member)}>HAPUS</button>}
+                      </span>
                     </li>
                   );
                 })}
