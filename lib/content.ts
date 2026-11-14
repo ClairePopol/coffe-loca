@@ -5,7 +5,7 @@ export type CafeEvent = { id: number; title: string; detail: string | null; even
 export type Voucher = { id: number; title: string; detail: string | null; expires_at: string | null; promo_id: number | null; is_active: boolean; created_at: string };
 export type VoucherGrant = { id: number; voucher_id: number; member_id: string; granted_by: string | null; status: "active" | "used"; uses_total: number; uses_left: number; expires_at: string | null; granted_at: string; used_at: string | null };
 
-export type Reward = { id: number; title: string; detail: string | null; stamps_cost: number; is_active: boolean; created_at: string };
+export type Reward = { id: number; title: string; detail: string | null; stamps_cost: number; is_active: boolean; created_at: string; image_url: string | null };
 
 /** What the member's voucher QR encodes ("LOCA-VOUCHER:<member_voucher id>"); the cashier scans it in the admin panel. */
 export const VOUCHER_QR_PREFIX = "LOCA-VOUCHER:";
@@ -31,3 +31,20 @@ export const errorMessage = (error: unknown, fallback: string) => {
   }
   return message || fallback;
 };
+
+/** Shrinks a photo to max 800px WebP in the browser, uploads it to the public "reward-images" bucket and returns its URL. */
+export async function uploadRewardImage(supabase: import("@supabase/supabase-js").SupabaseClient, file: File): Promise<string> {
+  if (!file.type.startsWith("image/")) throw new Error("File harus berupa gambar.");
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, 800 / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  const blob: Blob | null = await new Promise((resolve) => canvas.toBlob(resolve, "image/webp", 0.85));
+  if (!blob) throw new Error("Gambar gagal diproses.");
+  const path = `${crypto.randomUUID()}.webp`;
+  const { error } = await supabase.storage.from("reward-images").upload(path, blob, { contentType: "image/webp", cacheControl: "31536000" });
+  if (error) throw error;
+  return supabase.storage.from("reward-images").getPublicUrl(path).data.publicUrl;
+}

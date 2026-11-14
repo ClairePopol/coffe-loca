@@ -423,6 +423,7 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
                     <div>
                       <strong>{member ? memberName(member) : "Member"}</strong>
                       <p>{self ? "meng-claim" : "diberi"} <b>{voucher?.title ?? "Voucher"}</b></p>
+                      {done > 0 && <p className="admin-claim-used">✓ Menggunakan voucher{grant.uses_total > 1 ? ` (${done}x dari ${grant.uses_total})` : ""}</p>}
                       <small>{new Date(grant.granted_at).toLocaleString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}{grant.used_at ? ` · terakhir dipakai ${new Date(grant.used_at).toLocaleString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}` : ""}</small>
                     </div>
                     <span className={`admin-claim-uses${grant.status === "used" ? " is-used" : expired ? " is-expired" : ""}`}>

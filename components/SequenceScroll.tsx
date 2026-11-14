@@ -16,7 +16,7 @@ function drawFrame(canvas: HTMLCanvasElement, image: HTMLImageElement) {
   if (!image.complete || !image.naturalWidth) return;
   const rect = canvas.getBoundingClientRect();
   if (!rect.width || !rect.height) return;
-  const dpr = Math.min(window.devicePixelRatio || 1, 1.8);
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const width = Math.round(rect.width * dpr);
   const height = Math.round(rect.height * dpr);
   if (canvas.width !== width || canvas.height !== height) {
@@ -26,6 +26,8 @@ function drawFrame(canvas: HTMLCanvasElement, image: HTMLImageElement) {
   const ctx = canvas.getContext("2d", { alpha: false });
   if (!ctx) return;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
   ctx.fillStyle = BACKGROUND;
   ctx.fillRect(0, 0, rect.width, rect.height);
 
@@ -132,8 +134,8 @@ export default function SequenceScroll() {
           <div className="sequence-copy">
             <motion.div className="hero-copy" style={{ opacity: titleOpacity, y: titleY }}>
               <span className="eyebrow"><i /> SLOW MADE · FRESH POURED</span>
-              <h1>A little<br /><em>Loca moment.</em></h1>
-              <p>Kopi yang baik, teman yang baik, dan jeda kecil yang memang kamu butuhkan.</p>
+              <h1>Coffee<br /><em>LOCA-tion for</em></h1>
+              <p className="hero-slogan"><b>coffee · food · hangout</b><br />now get TCG, boardgame &amp; mahjong</p>
               <a className="text-link hero-link" href="#cerita">MASUK KE CERITA <span className="arrow-icon arrow-down-right" aria-hidden="true" /></a>
             </motion.div>
             <motion.div className="story-copy story-left" style={{ opacity: firstOpacity, x: firstX }}>

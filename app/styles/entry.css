@@ -1,15 +1,15 @@
 /* First-visit destination choice (Loca Coffee / Loca Store) */
 .entry-choice { position:fixed; z-index:250; inset:0; display:flex; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; touch-action:pan-y; color:#f7f2e7; background:var(--olive); }
 .entry-choice:focus { outline:none; }
-.entry-choice::before { position:fixed; z-index:-1; inset:0; content:""; background:radial-gradient(circle at 80% 20%,rgba(217,183,122,.24),transparent 30%),radial-gradient(circle at 10% 90%,rgba(164,78,55,.18),transparent 34%),linear-gradient(135deg,#3a4236,#263128); }
+.entry-choice::before { position:fixed; z-index:-1; inset:0; content:""; background:radial-gradient(circle at 80% 20%,rgba(217,183,122,.24),transparent 30%),radial-gradient(circle at 10% 90%,rgba(46,125,79,.18),transparent 34%),linear-gradient(135deg,#8a1717,#4a0b0b); }
 .entry-choice-orbit { position:fixed; contain:strict; z-index:-1; right:-16vw; bottom:-28vw; width:70vw; height:70vw; border:1px solid rgba(217,183,122,.25); border-radius:50%; box-shadow:0 0 0 35px rgba(217,183,122,.04),0 0 0 70px rgba(217,183,122,.025); animation:locationOrbit 24s linear infinite; pointer-events:none; }
 .entry-choice-top,.entry-choice-bottom { display:flex; justify-content:space-between; gap:16px; padding:28px 7vw; color:rgba(247,242,231,.66); font-size:var(--fs-label); font-weight:700; letter-spacing:var(--track-label); }
 .entry-choice-content { width:min(760px,86vw); margin:auto; padding:12px 0; text-align:center; }
-.entry-choice-mark { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:34px; color:#f7f2e7; font-family:Manrope,sans-serif; font-size:24px; font-weight:800; letter-spacing:.12em; }
+.entry-choice-mark { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:34px; color:#f7f2e7; font-family:Poppins,sans-serif; font-size:24px; font-weight:800; letter-spacing:.12em; }
 .entry-choice-mark b { color:#ef4741; font-weight:800; }
 .entry-choice-mark img { width:40px; height:40px; object-fit:contain; }
 .entry-choice .eyebrow { color:#e2bd93; font-size:var(--fs-label); letter-spacing:var(--track-label); }
-.entry-choice h1 { margin:26px 0 16px; color:#f7f2e7; font-family:Manrope,sans-serif; font-size:clamp(56px,8vw,104px); font-weight:400; letter-spacing:-.085em; line-height:.84; }
+.entry-choice h1 { margin:26px 0 16px; color:#f7f2e7; font-family:Poppins,sans-serif; font-size:clamp(56px,8vw,104px); font-weight:400; letter-spacing:-.04em; line-height:.84; }
 .entry-choice h1 em { color:var(--gold); font-family:"Instrument Serif",serif; font-weight:400; }
 .entry-choice-content>p { margin:0; color:rgba(247,242,231,.74); font-size:var(--fs-body); }
 .entry-choice-actions { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:46px; text-align:left; }

@@ -3,10 +3,10 @@
 .store-content .page-heading>p { max-width:440px; }
 .store-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:56px 0 0; padding:0; list-style:none; }
 .store-item { display:flex; flex-direction:column; padding:22px 22px 24px; border:1px solid var(--line); border-radius:var(--radius-lg); background:rgba(250,246,235,.66); transition:transform .4s var(--ease-out),border-color .4s,box-shadow .4s; }
-.store-item:hover { transform:translateY(-6px); border-color:rgba(164,78,55,.35); box-shadow:var(--shadow-card); }
+.store-item:hover { transform:translateY(-6px); border-color:rgba(46,125,79,.35); box-shadow:var(--shadow-card); }
 .store-item-top { display:flex; align-items:center; justify-content:space-between; }
 .store-item-top b { color:var(--terracotta); font-family:"Instrument Serif",serif; font-size:22px; font-weight:400; }
-.store-item-top small { padding:4px 10px; border:1px solid rgba(164,78,55,.3); border-radius:99px; color:var(--terracotta); font-size:10px; font-weight:700; letter-spacing:.12em; }
+.store-item-top small { padding:4px 10px; border:1px solid rgba(46,125,79,.3); border-radius:99px; color:var(--terracotta); font-size:10px; font-weight:700; letter-spacing:.12em; }
 .store-item-art { display:grid; height:150px; margin:18px 0; place-items:center; border-radius:var(--radius); background:radial-gradient(circle at 50% 60%,rgba(232,189,119,.35),transparent 60%),var(--olive); }
 .store-item-art img { width:58px; height:58px; object-fit:contain; opacity:.9; transition:transform .6s var(--ease-out); }
 .store-item:hover .store-item-art img { transform:rotate(-12deg) scale(1.08); }

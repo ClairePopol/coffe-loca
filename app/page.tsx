@@ -238,7 +238,7 @@ function SmoothScroll() {
  * Any user input (swipe/touch, wheel, click, key) stops it immediately and hands
  * control back. Only drives the page scroll — the hero itself is untouched.
  */
-const AUTO_SCROLL_SECONDS = 11;
+const AUTO_SCROLL_SECONDS = 22; // half the previous speed
 const AUTO_SCROLL_START_DELAY = 1200;
 
 function HeroAutoScroll() {

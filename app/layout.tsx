@@ -3,11 +3,11 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "COFFE LOCA — Good Coffee, Good Company",
+  title: "COFFE LOCA — Coffee LOCA-tion for coffee, food & hangout",
   description:
-    "Kopi yang baik, teman yang baik, dan jeda kecil untuk dinikmati pelan-pelan.",
+    "Coffee LOCA-tion for coffee, food & hangout — now get TCG, boardgame & mahjong. Medan.",
   openGraph: {
-    title: "COFFE LOCA — Good Coffee, Good Company",
+    title: "COFFE LOCA — Coffee LOCA-tion for coffee, food & hangout",
     description: "Kopi yang baik, teman yang baik, dan jeda kecil untuk dinikmati pelan-pelan. Medan.",
     siteName: "Coffe Loca",
     locale: "id_ID",
