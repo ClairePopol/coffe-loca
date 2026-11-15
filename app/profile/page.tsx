@@ -241,32 +241,29 @@ export default function ProfilePage() {
                   {side === "front" ? (
                     <section className="member-card-face member-card-front" aria-label="Kartu member Coffe Loca">
                       <span className="mc-shine" aria-hidden="true" />
-                      <div className="mc-main">
-                        <span className="mc-bean" aria-hidden="true"><img src="/white-coffee-bean.png" alt="" /></span>
-                        <header className="mc-top">
-                          <span className="mc-brand"><img src="/white-coffee-bean.png" alt="" /><span>COFFE <b>LOCA</b></span></span>
-                        </header>
+                      <span className="mc-bean" aria-hidden="true"><img src="/white-coffee-bean.png" alt="" /></span>
+                      <header className="mc-top">
+                        <span className="mc-brand"><img src="/white-coffee-bean.png" alt="" /><span>COFFE <b>LOCA</b></span></span>
+                        <span className="mc-tier">{roleLabel(profile.role).toUpperCase()}</span>
+                      </header>
+                      <div className="mc-body">
                         <div className="mc-identity">
                           <small>NAMA MEMBER</small>
                           <strong>{displayName}</strong>
                           <span className="mc-number">{memberNumber}</span>
                         </div>
-                        <footer className="mc-bottom"><span>{memberSince ? `SEJAK ${memberSince.toUpperCase()}` : "MEDAN"}</span></footer>
-                      </div>
-                      <div className="mc-stub">
-                        <span className="mc-tier">{roleLabel(profile.role).toUpperCase()}</span>
                         <button ref={qrTriggerRef} className="mc-qr" type="button" onClick={(event) => { event.stopPropagation(); setQrOpen(true); }} aria-label="Perbesar QR member">
-                          <QRCodeSVG value={memberCode} size={112} bgColor="#ffffff" fgColor="#141414" level="M" />
+                          <QRCodeSVG value={memberCode} size={112} bgColor="#f8f4eb" fgColor="#26372d" level="M" />
                           <i className="profile-scan-line" />
                         </button>
-                        <small className="mc-scan">SCAN DI KASIR</small>
                       </div>
+                      <footer className="mc-bottom"><span>{memberSince ? `SEJAK ${memberSince.toUpperCase()}` : "MEDAN"}</span><span>SCAN DI KASIR</span></footer>
                     </section>
                   ) : (
                     <section className="member-card-face member-card-back" aria-label={`Kartu stamp: ${stamps} dari ${STAMP_GOAL}, total ${totalStamps} stamp`}>
-                      <header className="mc-back-top">
-                        <span className="mc-back-brand"><img src="/white-coffee-bean.png" alt="" /><span><small>COFFE <b>LOCA</b></small>Stamp card</span></span>
-                        <span className="mc-count"><b>{stamps}</b>/ {STAMP_GOAL}</span>
+                      <header className="mc-top">
+                        <span className="mc-back-title"><small>COFFE LOCA</small>Coffee stamp card</span>
+                        <span className="mc-count"><b>{stamps}</b>/{STAMP_GOAL}</span>
                       </header>
                       <div className="mc-stamps">
                         {Array.from({ length: STAMP_GOAL }, (_, index) => {
@@ -274,21 +271,12 @@ export default function ProfilePage() {
                           const free = index === STAMP_GOAL - 1;
                           return (
                             <span key={index} className={`mc-stamp${filled ? " is-filled" : ""}${free ? " is-free" : ""}`} style={{ ["--i" as string]: index, ["--tilt" as string]: `${((index * 37) % 21) - 10}deg` }}>
-                              {free ? (
-                                <><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.9z" /></svg><b>{filled ? "YEY!" : "10"}</b></>
-                              ) : filled ? (
-                                <img src="/white-coffee-bean.png" alt="" />
-                              ) : (
-                                <em>{index + 1}</em>
-                              )}
+                              {free ? <b>FREE<br />COFFEE</b> : <img src="/white-coffee-bean.png" alt="" />}
                             </span>
                           );
                         })}
                       </div>
-                      <footer className="mc-back-bottom">
-                        <span className="mc-meter" aria-hidden="true"><i style={{ width: `${(stamps / STAMP_GOAL) * 100}%` }} /></span>
-                        <span>{remaining === 0 ? `Yey, you made it! 🎉 Kartu penuh — tukar hadiahmu atau lanjut menabung · total ${totalStamps} stamp` : fullCards > 0 ? `${remaining} stamp lagi untuk kartu penuh ke-${fullCards + 1} · total ${totalStamps} stamp` : `${remaining} stamp lagi untuk kopi gratis`}</span>
-                      </footer>
+                      <footer className="mc-bottom"><span>{remaining === 0 ? `Yey, you made it! 🎉 Kartu penuh — tukar hadiahmu atau lanjut menabung · total ${totalStamps} stamp` : fullCards > 0 ? `${remaining} stamp lagi untuk kartu penuh ke-${fullCards + 1} · total ${totalStamps} stamp` : `${remaining} stamp lagi untuk kopi gratis`}</span><span>1 KOPI = 1 STAMP</span></footer>
                     </section>
                   )}
                 </div>
