@@ -241,23 +241,26 @@ export default function ProfilePage() {
                   {side === "front" ? (
                     <section className="member-card-face member-card-front" aria-label="Kartu member Coffe Loca">
                       <span className="mc-shine" aria-hidden="true" />
-                      <span className="mc-bean" aria-hidden="true"><img src="/white-coffee-bean.png" alt="" /></span>
-                      <header className="mc-top">
-                        <span className="mc-brand"><img src="/white-coffee-bean.png" alt="" /><span>COFFE <b>LOCA</b></span></span>
-                        <span className="mc-tier">{roleLabel(profile.role).toUpperCase()}</span>
-                      </header>
-                      <div className="mc-body">
+                      <div className="mc-main">
+                        <span className="mc-bean" aria-hidden="true"><img src="/white-coffee-bean.png" alt="" /></span>
+                        <header className="mc-top">
+                          <span className="mc-brand"><img src="/white-coffee-bean.png" alt="" /><span>COFFE <b>LOCA</b></span></span>
+                        </header>
                         <div className="mc-identity">
                           <small>NAMA MEMBER</small>
                           <strong>{displayName}</strong>
                           <span className="mc-number">{memberNumber}</span>
                         </div>
+                        <footer className="mc-bottom"><span>{memberSince ? `SEJAK ${memberSince.toUpperCase()}` : "MEDAN"}</span></footer>
+                      </div>
+                      <div className="mc-stub">
+                        <span className="mc-tier">{roleLabel(profile.role).toUpperCase()}</span>
                         <button ref={qrTriggerRef} className="mc-qr" type="button" onClick={(event) => { event.stopPropagation(); setQrOpen(true); }} aria-label="Perbesar QR member">
                           <QRCodeSVG value={memberCode} size={112} bgColor="#ffffff" fgColor="#141414" level="M" />
                           <i className="profile-scan-line" />
                         </button>
+                        <small className="mc-scan">SCAN DI KASIR</small>
                       </div>
-                      <footer className="mc-bottom"><span>{memberSince ? `SEJAK ${memberSince.toUpperCase()}` : "MEDAN"}</span><span>SCAN DI KASIR</span></footer>
                     </section>
                   ) : (
                     <section className="member-card-face member-card-back" aria-label={`Kartu stamp: ${stamps} dari ${STAMP_GOAL}, total ${totalStamps} stamp`}>
