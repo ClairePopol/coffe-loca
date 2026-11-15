@@ -134,7 +134,7 @@ export default function SequenceScroll() {
           <div className="sequence-copy">
             <motion.div className="hero-copy" style={{ opacity: titleOpacity, y: titleY }}>
               <span className="eyebrow"><i /> SLOW MADE · FRESH POURED</span>
-              <h1>Coffee<br /><em>LOCA-tion for</em></h1>
+              <h1>Coffee<br /><em><span className="hero-loca">LOCA</span>-tion for</em></h1>
               <p className="hero-slogan"><b>coffee · food · hangout</b><br />now get TCG, boardgame &amp; mahjong</p>
               <a className="text-link hero-link" href="#cerita">MASUK KE CERITA <span className="arrow-icon arrow-down-right" aria-hidden="true" /></a>
             </motion.div>
