@@ -37,7 +37,6 @@ h1 em,h2 em,h3 em { font-style:normal; font-weight:800; color:inherit; }
 
 /* "/ LABEL" kicker used across all pages */
 .eyebrow { display:inline-flex; align-items:center; gap:8px; color:var(--red); font-size:var(--fs-label); font-weight:700; letter-spacing:.16em; line-height:1.5; text-transform:uppercase; }
-.eyebrow::before { content:"/"; font-weight:800; }
 .eyebrow i { display:none; }
 
 /* Buttons */
