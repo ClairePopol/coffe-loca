@@ -44,7 +44,8 @@
 .mc-top { display:flex; align-items:center; justify-content:space-between; gap:12px; }
 .mc-brand { display:inline-flex; align-items:center; gap:8px; font-size:15px; font-style:italic; font-weight:800; letter-spacing:-.02em; }
 .mc-brand img { width:26px; height:26px; object-fit:contain; }
-.mc-brand b,.mc-back-brand b { font-weight:800; }
+.mc-brand b { color:var(--red-bright); font-weight:800; }
+.mc-back-brand b { font-weight:800; }
 .mc-brand b::after,.mc-back-brand b::after { content:"/"; margin-left:1px; color:var(--red-bright); }
 .mc-tier { padding:5px 11px; border:0; border-radius:99px; color:#fff; background:var(--red); font-size:10px; font-weight:700; letter-spacing:.14em; }
 .mc-body { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; }
