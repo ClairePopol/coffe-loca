@@ -13,6 +13,8 @@
 .wordmark-type em { color:var(--red); font-style:italic; font-weight:800; margin-left:1px; }
 .wordmark-type small { display:none; }
 .wordmark-inverse { color:#fff; }
+.wordmark-inverse .wordmark-type em,.footer-brand .wordmark-type em { color:var(--red-bright); }
+.site-header.header-on-light .wordmark-type em { color:var(--red); }
 .page-header .wordmark-logo { filter:brightness(0); }
 .page-header .wordmark,.page-header .wordmark-type { color:var(--ink); }
 

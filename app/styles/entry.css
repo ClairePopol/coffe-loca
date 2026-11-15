@@ -19,7 +19,6 @@
 .entry-choice-actions button:focus-visible { outline:2px solid #fff; outline-offset:4px; }
 .entry-choice-actions button>span { display:flex; flex-direction:column; gap:8px; }
 .entry-choice-actions button small { color:var(--red); font-size:var(--fs-label); font-weight:700; letter-spacing:var(--track-label); }
-.entry-choice-actions button small::before { content:"/ "; }
 .entry-choice-actions button strong { font-family:var(--font); font-size:32px; font-weight:800; letter-spacing:-.03em; line-height:1; }
 .entry-choice-actions button em { color:inherit; opacity:.7; font-size:14px; font-style:normal; }
 .entry-choice-actions button .arrow-icon { align-self:flex-start; width:18px; height:18px; color:var(--red); }
