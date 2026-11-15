@@ -9,12 +9,12 @@
 .wordmark-logo { display:block; width:34px; height:34px; flex:none; object-fit:contain; }
 .wordmark-type { display:flex; flex-direction:column; font-family:var(--font); font-size:17px; font-weight:800; font-style:italic; letter-spacing:-.02em; line-height:.92; text-transform:uppercase; }
 .wordmark-type>span { white-space:nowrap; }
-.wordmark-type b { font-weight:800; }
+.wordmark-type b { color:var(--red); font-weight:800; }
 .wordmark-type em { color:var(--red); font-style:italic; font-weight:800; margin-left:1px; }
 .wordmark-type small { display:none; }
 .wordmark-inverse { color:#fff; }
-.wordmark-inverse .wordmark-type em,.footer-brand .wordmark-type em { color:var(--red-bright); }
-.site-header.header-on-light .wordmark-type em { color:var(--red); }
+.wordmark-inverse .wordmark-type em,.footer-brand .wordmark-type em,.wordmark-inverse .wordmark-type b,.footer-brand .wordmark-type b { color:var(--red-bright); }
+.site-header.header-on-light .wordmark-type em,.site-header.header-on-light .wordmark-type b { color:var(--red); }
 .page-header .wordmark-logo { filter:brightness(0); }
 .page-header .wordmark,.page-header .wordmark-type { color:var(--ink); }
 
