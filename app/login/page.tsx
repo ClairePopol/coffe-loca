@@ -96,7 +96,8 @@ export default function LoginPage() {
       const { data: me } = await supabase.auth.getUser();
       const { data: row } = me.user ? await supabase.from("profiles").select("role, approved").eq("id", me.user.id).maybeSingle() : { data: null };
       if (row && row.role === "member" && row.approved === false) { await holdForApproval("login"); return; }
-      router.push("/profile");
+      // only the store may ask to be returned to (whitelist, never echo arbitrary URLs)
+      router.push(new URLSearchParams(window.location.search).get("next") === "/store" ? "/store" : "/profile");
       router.refresh();
     } catch (error) {
       setErrorMessage(friendlyAuthError(error, isRegister));
