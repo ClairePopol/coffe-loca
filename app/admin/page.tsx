@@ -9,6 +9,7 @@ import { useConfirm } from "@/components/ConfirmDialog";
 import MultiDatePicker, { dayKey } from "@/components/MultiDatePicker";
 import AdminContent from "@/components/AdminContent";
 import AdminRewards from "@/components/AdminRewards";
+import AdminStore from "@/components/AdminStore";
 import VoucherScan from "@/components/VoucherScan";
 import { VOUCHER_QR_PREFIX } from "@/lib/content";
 import { formatPhone } from "@/lib/phone";
@@ -389,16 +390,7 @@ export default function AdminPage() {
 
           {section === "store" && user && (<>
             {verifyCard}
-            <div className="admin-store card">
-              <div className="card-topline"><span>LOCA STORE</span><span>SEGERA HADIR</span></div>
-              <h2>Panel Store sedang disiapkan.</h2>
-              <p>Begitu Loca Store dibuka, semua pengelolaan toko ada di sini. Hanya Admin Store, Admin Umum, dan Owner yang bisa membuka area ini.</p>
-              <ul className="admin-store-grid">
-                <li><b>01</b><strong>Produk</strong><small>Tambah beans, merchandise &amp; harga</small></li>
-                <li><b>02</b><strong>Stok</strong><small>Pantau sisa barang</small></li>
-                <li><b>03</b><strong>Pesanan</strong><small>Proses &amp; kirim pesanan</small></li>
-              </ul>
-            </div>
+            <AdminStore userId={user.id} />
           </>)}
 
           {section === "coffee" && canManageCoffee(role) && (<>

@@ -7,6 +7,7 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { PageFooter, PageHeader } from "@/components/PageShell";
 import { useConfirm } from "@/components/ConfirmDialog";
 import RedeemStamps from "@/components/RedeemStamps";
+import MyOrders from "@/components/store/MyOrders";
 import { isStaff as isStaffRole, roleLabel } from "@/lib/roles";
 import { formatPhone, isPhoneAuthEmail, userPhone } from "@/lib/phone";
 import { OWNER_WHATSAPP_URL } from "@/lib/owner";
@@ -380,6 +381,8 @@ export default function ProfilePage() {
               )}
               <p className="showcase-note">Tunjukkan QR member ke kasir untuk menukar. Stamp bisa ditabung, jadi kamu bebas pilih hadiah mana pun.</p>
             </section>
+
+            {user && <MyOrders userId={user.id} />}
           </aside>
         )}
       </section>
