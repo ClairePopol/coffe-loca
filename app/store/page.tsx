@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { PageFooter, PageHeader } from "@/components/PageShell";
+import { PageFooter } from "@/components/PageShell";
+import StoreHeader from "@/components/store/StoreHeader";
 import StoreApp from "@/components/store/StoreApp";
 
 export const metadata: Metadata = {
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 export default function StorePage() {
   return (
     <main className="page-shell store-page">
-      <PageHeader backLabel="BACK TO COFFEE" wordmark={{ first: "LOCA", second: "STORE", tagline: "BOARDGAME · POKÉMON" }} />
+      <StoreHeader />
       <StoreApp />
       <PageFooter items={["COFFE LOCA · MEDAN", "PESAN LEWAT WHATSAPP", "© 2026"]} />
     </main>

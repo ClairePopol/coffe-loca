@@ -1,4 +1,5 @@
 /* Loca Store — public catalogue, cart */
+.store-page { padding-top:76px; } /* room for the fixed .site-header */
 .store-content { display:flex; width:min(1180px,86vw); flex:1; flex-direction:column; margin:0 auto; padding:40px 0 96px; }
 .store-content .page-heading>p { max-width:520px; }
 
