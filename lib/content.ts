@@ -1,7 +1,7 @@
 /** Types + helpers for the profile content that staff manage in the admin panel (supabase/content.sql). */
 
 export type Promo = { id: number; title: string; detail: string | null; badge: string | null; valid_until: string | null; claim_uses: number; is_active: boolean; created_at: string };
-export type CafeEvent = { id: number; title: string; detail: string | null; event_date: string; time_text: string | null; is_active: boolean; created_at: string };
+export type CafeEvent = { id: number; title: string; detail: string | null; event_date: string; time_text: string | null; is_active: boolean; created_at: string; category_id?: number | null; fee?: number | null; registration_url?: string | null };
 export type Voucher = { id: number; title: string; detail: string | null; expires_at: string | null; promo_id: number | null; is_active: boolean; created_at: string };
 export type VoucherGrant = { id: number; voucher_id: number; member_id: string; granted_by: string | null; status: "active" | "used"; uses_total: number; uses_left: number; expires_at: string | null; granted_at: string; used_at: string | null };
 
@@ -26,6 +26,9 @@ export const formatDateId = (iso: string) => new Date(`${iso}T00:00:00`).toLocal
 
 export const errorMessage = (error: unknown, fallback: string) => {
   const message = error instanceof Error ? error.message : typeof error === "object" && error && "message" in error ? String((error as { message: unknown }).message) : "";
+  if (/event_categories|category_id|registration_url|events_registration_url_check/.test(message) && /does not exist|not find|schema cache|violates check constraint/i.test(message)) {
+    return /violates check constraint/i.test(message) ? "Link pendaftaran harus diawali http:// atau https://." : "Fitur acara butuh update database. Jalankan supabase/events-page.sql di Supabase SQL Editor, lalu refresh.";
+  }
   if (/promos|events|vouchers|member_vouchers|grant_voucher|use_member_voucher|claim_promo|claim_uses|uses_left|rewards|redeem_reward|scan_member|scan_voucher|reward_title/.test(message) && /does not exist|not find|schema cache/i.test(message)) {
     return "Fitur ini butuh update database. Jalankan supabase/content.sql, promo-claim.sql, lalu rewards.sql di Supabase SQL Editor, lalu refresh.";
   }
