@@ -130,3 +130,32 @@
   .admin-product-list>li { grid-template-columns:56px 1fr; }
   .admin-product-list .admin-stock,.admin-product-list .admin-order-actions { grid-column:1 / -1; }
 }
+
+/* Events page */
+.events-content .store-cats { margin-top:36px; }
+.events-heading { margin:32px 0 14px; color:var(--ink); font-size:13px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+.event-list { display:grid; gap:12px; margin:0; padding:0; list-style:none; }
+.event-card { display:grid; grid-template-columns:84px 1fr; gap:18px; padding:16px; border-radius:var(--radius-lg); background:#fff; box-shadow:var(--shadow-card); transition:transform .4s var(--ease-out),box-shadow .4s; }
+.event-card:hover { transform:translateY(-3px); box-shadow:0 22px 50px rgba(20,20,20,.12); }
+.event-card.is-past { opacity:.6; }
+.event-date { display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius); color:#fff; background:var(--ink); }
+.event-card.is-past .event-date { background:var(--muted-2); }
+.event-date b { font-size:30px; font-weight:800; letter-spacing:-.03em; line-height:1; }
+.event-date span { margin-top:4px; font-size:11px; font-weight:800; letter-spacing:.14em; }
+.event-body { display:flex; min-width:0; flex-direction:column; gap:6px; }
+.event-meta { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.event-meta small { color:var(--muted-2); font-size:12px; font-weight:600; }
+.event-tag { padding:3px 10px; border-radius:99px; color:var(--red-deep); background:var(--red-soft); font-size:10px; font-style:normal; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+.event-tag.is-today { color:var(--green); background:var(--green-soft); }
+.event-body strong { color:var(--ink); font-size:20px; font-weight:800; letter-spacing:-.02em; line-height:1.2; }
+.event-body p { margin:0; color:var(--muted-2); font-size:14px; line-height:1.6; white-space:pre-line; }
+.event-foot { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:6px; }
+.event-fee { color:var(--red); font-size:15px; font-weight:800; }
+.event-register { display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:0 22px; font-size:12px; text-decoration:none; }
+.events-past { margin-top:36px; }
+.events-past summary { margin-bottom:14px; color:var(--muted-2); font-size:13px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; }
+@media (max-width:760px) {
+  .event-card { grid-template-columns:64px 1fr; gap:14px; padding:14px; }
+  .event-date b { font-size:24px; }
+  .event-body strong { font-size:18px; }
+}

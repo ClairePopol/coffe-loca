@@ -19,6 +19,7 @@ const menuItems = [
   { title: "Menu kami", href: "#menu", number: "02", note: "PILIH YANG KAMU SUKA" },
   { title: "Reservation", href: "#reservation", number: "03", note: "SIAPKAN JEDA TERBAIKMU" },
   { title: "Lokasi & jam buka", href: "#lokasi-loca", number: "04", note: "TEMUKAN COFFEE LOCA" },
+  { title: "Event & turnamen", href: "/events", number: "05", note: "JADWAL KEGIATAN LOCA" },
 ];
 
 type CategoryId = "comfort" | "snack" | "drinks";
@@ -50,6 +51,7 @@ function Navigation() {
   useScrollLock(open);
 
   function goTo(event: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    if (!href.startsWith("#")) return; // other pages (e.g. /events): let the browser navigate normally
     event.preventDefault();
     setOpen(false);
     // Wait until the menu has released the scroll lock (Lenis running again), then glide to the section.
@@ -192,7 +194,7 @@ function EntryChoice() {
             <p>Satu rumah, dua cara menikmati Loca.</p>
             <div className="entry-choice-actions">
               <button type="button" onClick={() => choose("coffee")}><span><small>01 / COFFEE HOUSE</small><strong>Loca Coffee</strong><em>Good coffee, good company.</em></span><i className="arrow-icon" aria-hidden="true" /></button>
-              <button type="button" onClick={() => choose("store")}><span><small>02 / ONLINE STORE</small><strong>Loca Store</strong><em>Coming soon — take Loca home.</em></span><i className="arrow-icon" aria-hidden="true" /></button>
+              <button type="button" onClick={() => choose("store")}><span><small>02 / ONLINE STORE</small><strong>Loca Store</strong><em>Boardgame &amp; Pokémon, pesan lewat WhatsApp.</em></span><i className="arrow-icon" aria-hidden="true" /></button>
             </div>
           </div>
           <div className="entry-choice-bottom"><span>TAKE YOUR TIME</span><span>COFFEE · STORE · COMMUNITY</span></div>
