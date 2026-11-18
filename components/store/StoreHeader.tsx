@@ -55,7 +55,7 @@ export default function StoreHeader({ brand = STORE_BRAND }: { brand?: Brand }) 
         <Wordmark first="LOCA" second={brand.second} tagline={brand.tagline} label={brand.label} href={brand.href} />
         <div className="header-actions">
           {user
-            ? <a className="header-profile-link" href="/profile" aria-label={`Buka profil ${name}`} title={name}>{user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : <span>{initials}</span>}</a>
+            ? <a className="header-profile-link" href="/store/profile" aria-label={`Buka profil ${name}`} title={name}>{user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} alt="" /> : <span>{initials}</span>}</a>
             : <a className="header-account-link" href={`/login?next=${brand.next}`}>LOGIN <span className="arrow-icon" aria-hidden="true" /></a>}
           <button type="button" className={`menu-toggle${open ? " is-open" : ""}`} onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls="store-menu" aria-label={open ? "Tutup navigasi" : "Buka navigasi"}>
             <span className={`menu-icon${open ? " menu-icon-open" : ""}`} aria-hidden="true"><i /><i /></span>
@@ -77,7 +77,7 @@ export default function StoreHeader({ brand = STORE_BRAND }: { brand?: Brand }) 
                 ))}
               </nav>
               <motion.div className="menu-bottom" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 0.5 }}>
-                <div><span className="menu-bottom-label">AREA MEMBER</span><a href={user ? "/profile" : `/login?next=${brand.next}`} onClick={close}>{user ? "Lihat profile" : "Login / Register"} <i className="arrow-icon" aria-hidden="true" /></a><a href="/">Kembali ke Coffee Loca <i className="arrow-icon" aria-hidden="true" /></a></div>
+                <div><span className="menu-bottom-label">AREA MEMBER</span><a href={user ? "/store/profile" : `/login?next=${brand.next}`} onClick={close}>{user ? "Lihat profile" : "Login / Register"} <i className="arrow-icon" aria-hidden="true" /></a><a href="/">Kembali ke Coffee Loca <i className="arrow-icon" aria-hidden="true" /></a></div>
                 <div><span className="menu-bottom-label">KUNJUNGI KAMI</span><a href={SITE.mapsUrl} target="_blank" rel="noreferrer">{SITE.addressLine} <i className="arrow-icon" aria-hidden="true" /></a></div>
                 <div><span className="menu-bottom-label">SAPA KAMI</span><a href={`mailto:${SITE.email}`}>{SITE.email} <i className="arrow-icon" aria-hidden="true" /></a></div>
                 <div><span className="menu-bottom-label">IKUTI CERITA</span><div className="social-links"><a href={SITE.instagram} target="_blank" rel="noreferrer">Instagram</a><a href={SITE.tiktok} target="_blank" rel="noreferrer">TikTok</a></div></div>

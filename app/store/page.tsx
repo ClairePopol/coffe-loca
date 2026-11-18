@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageFooter } from "@/components/PageShell";
 import StoreHeader from "@/components/store/StoreHeader";
 import StoreApp from "@/components/store/StoreApp";
+import ReloadToChooser from "@/components/store/ReloadToChooser";
 
 export const metadata: Metadata = {
   title: "LOCA STORE — Boardgame & Pokémon",
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 export default function StorePage() {
   return (
     <main className="page-shell store-page">
+      <ReloadToChooser />
       <StoreHeader />
       <StoreApp />
       <PageFooter items={["COFFE LOCA · MEDAN", "PESAN LEWAT WHATSAPP", "© 2026"]} />
