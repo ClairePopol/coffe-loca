@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageFooter } from "@/components/PageShell";
 import StoreHeader, { type Brand } from "@/components/store/StoreHeader";
 import EventsApp from "@/components/events/EventsApp";
+import ReloadToChooser from "@/components/store/ReloadToChooser";
 
 export const metadata: Metadata = {
   title: "EVENT — Coffe Loca",
@@ -13,6 +14,7 @@ const EVENTS_BRAND: Brand = { second: "EVENT", tagline: "TURNAMEN & KEGIATAN", h
 export default function EventsPage() {
   return (
     <main className="page-shell store-page events-page">
+      <ReloadToChooser />
       <StoreHeader brand={EVENTS_BRAND} />
       <EventsApp />
       <PageFooter items={["COFFE LOCA · MEDAN", "SEMUA WAKTU DALAM WIB", "© 2026"]} />

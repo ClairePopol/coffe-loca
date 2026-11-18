@@ -159,3 +159,40 @@
   .event-date b { font-size:24px; }
   .event-body strong { font-size:18px; }
 }
+
+/* Refresh on a store-room page → back to the room chooser (see ReloadToChooser) */
+.room-cover { position:fixed; inset:0; z-index:200; background:var(--cream); }
+
+/* Store profile (/store/profile) */
+.sprofile-card { display:flex; align-items:center; gap:16px; margin:32px 0 0; padding:18px; border-radius:var(--radius-lg); background:#fff; box-shadow:var(--shadow-card); }
+.sprofile-card>div { min-width:0; flex:1; }
+.sprofile-card strong { display:block; color:var(--ink); font-size:18px; font-weight:800; }
+.sprofile-card small { color:var(--muted-2); font-size:13px; }
+.sprofile-avatar { display:grid; width:52px; height:52px; flex:none; place-items:center; border-radius:50%; color:#fff; background:var(--ink); border:2px solid var(--red); font-size:15px; font-weight:800; }
+.sprofile-logout { min-height:42px; padding:0 20px; font-size:12px; }
+.sprofile-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin:36px 0 14px; }
+.sprofile-head h2 { margin:0; color:var(--ink); font-size:22px; font-weight:800; letter-spacing:-.02em; }
+.sprofile-head span { color:var(--muted-2); font-size:11px; font-weight:800; letter-spacing:.12em; }
+.sprofile-orders,.sprofile-wishes { display:grid; gap:10px; margin:0; padding:0; list-style:none; }
+.sprofile-orders>li { display:grid; gap:8px; padding:16px; border-radius:14px; background:#fff; box-shadow:var(--shadow-card); }
+.sprofile-orders>li.is-cancelled { opacity:.6; }
+.sprofile-order-top { display:flex; flex-wrap:wrap; align-items:center; gap:10px; color:var(--muted-2); font-size:12px; }
+.sprofile-order-top b { color:var(--ink); font-size:15px; }
+.sprofile-items { display:grid; gap:4px; margin:0; padding:0; list-style:none; font-size:14px; }
+.sprofile-items li { display:flex; justify-content:space-between; gap:12px; }
+.sprofile-orders small { color:var(--muted-2); font-size:13px; }
+.sprofile-total { display:flex; justify-content:space-between; padding-top:8px; border-top:1px solid var(--line); color:var(--muted-2); font-size:12px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+.sprofile-total b { color:var(--ink); font-size:17px; letter-spacing:0; text-transform:none; }
+.sprofile-wishes>li { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; border-radius:14px; background:#fff; box-shadow:var(--shadow-card); }
+.sprofile-wishes strong { display:block; color:var(--ink); font-size:15px; }
+.sprofile-wishes small { color:var(--muted-2); font-size:12px; }
+.sprofile-remove { height:34px; padding:0 14px; border:1.5px solid var(--red-soft); border-radius:99px; color:var(--red-deep); background:transparent; font:inherit; font-size:12px; font-weight:700; cursor:pointer; }
+.sprofile-btn { display:inline-flex; align-items:center; justify-content:center; min-height:50px; padding:0 28px; text-decoration:none; }
+.sprofile .store-actions { margin-top:40px; }
+@media (max-width:760px) {
+  .sprofile-card { flex-wrap:wrap; }
+  .sprofile-logout { width:100%; }
+  .sprofile .store-actions { flex-direction:column; align-items:stretch; }
+}
+
+.store-actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:36px; }

@@ -98,7 +98,7 @@ export default function LoginPage() {
       if (row && row.role === "member" && row.approved === false) { await holdForApproval("login"); return; }
       // only these pages may ask to be returned to (whitelist, never echo arbitrary URLs)
       const next = new URLSearchParams(window.location.search).get("next");
-      router.push(next === "/store" || next === "/events" ? next : "/profile");
+      router.push(next === "/store" || next === "/events" || next === "/store/profile" ? next : "/profile");
       router.refresh();
     } catch (error) {
       setErrorMessage(friendlyAuthError(error, isRegister));
