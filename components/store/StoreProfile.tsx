@@ -6,6 +6,7 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { useConfirm } from "@/components/ConfirmDialog";
 import { formatPhone, isPhoneAuthEmail, userPhone } from "@/lib/phone";
 import { roleLabel } from "@/lib/roles";
+import StoreHero from "@/components/store/StoreHero";
 import { ORDER_COLUMNS, formatIDR, statusLabel, storeError, type Order } from "@/lib/store";
 
 type Wish = { id: number; note: string; created_at: string };
@@ -67,28 +68,23 @@ export default function StoreProfile() {
     try { await getSupabaseClient().auth.signOut(); } finally { window.location.href = "/store/profile"; }
   }
 
-  if (loading) return <section className="store-content"><p className="store-empty">Memuat profil…</p></section>;
+  if (loading) return <section className="store-content store-shop"><p className="store-empty">Memuat profil…</p></section>;
 
   if (!user) {
     return (
-      <section className="store-content" aria-labelledby="sp-title">
-        <div className="page-heading">
-          <span className="eyebrow"><i /> LOCA STORE / AKUN</span>
-          <h1 id="sp-title">Masuk untuk<br /><em>lihat pesananmu.</em></h1>
+      <>
+        <StoreHero id="sp-title" kicker="LOCA STORE" side="AKUN" title={<>Masuk untuk<br /><em>lihat pesananmu.</em></>}>
           <p>Pesanan dan titipan Loca Store tersimpan di akun member kamu.</p>
-        </div>
-        <div className="store-actions"><a className="btn-red sprofile-btn" href="/login?next=/store/profile">LOGIN / REGISTER</a></div>
-      </section>
+        </StoreHero>
+        <section className="store-content store-shop"><div className="store-actions" style={{ marginTop: 0 }}><a className="btn-red sprofile-btn" href="/login?next=/store/profile">LOGIN / REGISTER</a></div></section>
+      </>
     );
   }
 
   return (
-    <section className="store-content sprofile" aria-labelledby="sp-title">
-      <div className="page-heading">
-        <span className="eyebrow"><i /> LOCA STORE / AKUN</span>
-        <h1 id="sp-title">Halo,<br /><em>{name.split(" ")[0]}.</em></h1>
-      </div>
-
+    <>
+    <StoreHero id="sp-title" kicker="LOCA STORE" side="AKUN" title={<>Halo,<br /><em>{name.split(" ")[0]}.</em></>} />
+    <section className="store-content store-shop sprofile" aria-label="Akun">
       <div className="sprofile-card">
         <span className="sprofile-avatar" aria-hidden="true">{initials}</span>
         <div>
@@ -131,5 +127,6 @@ export default function StoreProfile() {
       </div>
       {confirmDialog}
     </section>
+    </>
   );
 }

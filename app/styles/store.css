@@ -79,6 +79,65 @@
   .store-line-total { grid-column:1 / -1; text-align:left; }
 }
 
+/* Store redesign — same language as the Coffee home: black hero, rounded cream sheet, numbered red tabs */
+.store-hero { position:relative; isolation:isolate; padding-top:40px; padding-bottom:150px; overflow:hidden; color:#fff; background:var(--ink); }
+.store-hero::before { position:absolute; z-index:-1; top:-30%; right:-12%; width:min(64vw,860px); aspect-ratio:1; content:""; border-radius:50%; background:radial-gradient(circle,rgba(212,35,42,.26),rgba(212,35,42,.06) 40%,transparent 70%); pointer-events:none; animation:menuGlow 13s ease-in-out infinite alternate; }
+.store-hero::after { position:absolute; z-index:-1; right:-3%; bottom:-6%; width:min(30vw,380px); aspect-ratio:1; content:""; opacity:.07; background:#fff; -webkit-mask:url("/white-coffee-bean.png") center / contain no-repeat; mask:url("/white-coffee-bean.png") center / contain no-repeat; pointer-events:none; animation:beanFloat 11s ease-in-out infinite alternate; }
+.store-hero-body { display:flex; align-items:flex-end; justify-content:space-between; gap:40px; margin-top:9vh; animation:fadeUp .8s var(--ease-out) both; }
+.store-hero h1 { margin:0; color:#fff; font-size:clamp(52px,7.6vw,112px); font-weight:800; letter-spacing:-.04em; line-height:.92; }
+.store-hero h1 em { color:var(--red-bright); }
+.store-hero-body>p { max-width:340px; margin:0 0 8px; padding-left:20px; border-left:2px solid var(--red); color:rgba(255,255,255,.72); font-size:var(--fs-body); line-height:1.75; }
+.store-hero-checker { position:absolute; z-index:0; right:9vw; bottom:84px; width:56px; height:56px; background:conic-gradient(var(--red) 25%,transparent 0 50%,var(--red) 0 75%,transparent 0) 0 0/50% 50%; }
+
+.store-shop { position:relative; z-index:2; width:auto; margin:-72px 0 0; padding:56px 9vw 110px; border-radius:clamp(28px,4.2vw,62px) clamp(28px,4.2vw,62px) 0 0; background:var(--cream); box-shadow:0 -24px 80px rgba(0,0,0,.28); }
+.store-shop .store-cats { margin:0; gap:12px; }
+.store-tabs { display:flex; flex-wrap:wrap; }
+.store-tabs button { flex:1 1 200px; }
+.store-tabs button { position:relative; display:grid; height:auto; min-height:84px; grid-template-columns:36px minmax(0,1fr) auto; align-items:center; gap:12px; padding:16px 18px; border:1.5px solid var(--line-strong); border-radius:var(--radius); background:#fff; text-align:left; letter-spacing:0; transition:background .28s,border-color .28s,transform .28s,box-shadow .28s; }
+.store-tabs button:hover { transform:translateY(-3px); border-color:var(--ink); }
+.store-tabs button.is-active { border-color:var(--red); color:#fff; background:var(--red); box-shadow:0 14px 34px rgba(212,35,42,.3); }
+.store-tab-no { color:var(--red); font-size:13px; font-weight:800; letter-spacing:.1em; }
+.store-tab-copy { display:flex; min-width:0; flex-direction:column; gap:6px; }
+.store-tab-copy strong { font-size:18px; font-weight:800; letter-spacing:-.03em; line-height:1.05; }
+.store-tab-copy small { color:var(--muted-2); font-size:10px; font-weight:700; letter-spacing:.12em; }
+.store-tab-count { align-self:start; min-width:30px; padding:4px 7px; border:1.5px solid var(--line-strong); border-radius:99px; font-size:10px; font-weight:700; text-align:center; }
+.store-tabs .is-active .store-tab-no,.store-tabs .is-active .store-tab-copy small { color:rgba(255,255,255,.85); }
+.store-tabs .is-active .store-tab-count { border-color:rgba(255,255,255,.6); }
+
+.store-toolbar { margin-top:16px; }
+.store-toolbar .field input,.store-toolbar .field select { background:#fff; }
+.store-products { gap:20px; margin-top:32px; }
+.store-card { position:relative; overflow:hidden; padding:16px 16px 18px; border:1.5px solid transparent; animation:cardIn .6s var(--ease-out) both; }
+.store-card::before { position:absolute; inset:0 0 auto; height:5px; content:""; background:var(--red); transform:scaleX(0); transform-origin:left; transition:transform .45s var(--ease-out); z-index:2; }
+.store-card:hover::before { transform:scaleX(1); }
+.store-card:hover { transform:translateY(-6px); box-shadow:0 26px 60px rgba(20,20,20,.14); }
+.store-card-no { position:absolute; z-index:3; top:26px; right:26px; color:#fff; font-size:11px; font-weight:800; letter-spacing:.1em; text-shadow:0 1px 6px rgba(0,0,0,.5); }
+.store-card-no::before { content:"/ "; color:var(--red-bright); }
+.store-card-art { aspect-ratio:1; margin-bottom:16px; background:radial-gradient(circle at 50% 40%,#2b2b2b,var(--ink)); }
+.store-card-art img { transition:transform .6s var(--ease-out); }
+.store-card:hover .store-card-art img:not(.store-card-placeholder) { transform:scale(1.06); }
+.store-card-cat { color:var(--red); }
+.store-card strong { margin:8px 0 6px; font-size:17px; }
+.store-price { margin-bottom:16px; font-size:19px; letter-spacing:-.02em; }
+.store-card .store-add { height:46px; }
+.store-cartbar { background:var(--red); box-shadow:0 18px 40px rgba(212,35,42,.4); }
+.store-cartbar:hover { background:var(--red-deep); }
+.store-sheet { border-radius:22px 22px 0 0; }
+.store-sheet::before { position:absolute; inset:0 0 auto; height:5px; content:""; background:var(--red); }
+.store-empty { padding:56px 0; }
+
+@media (max-width:760px) {
+  .store-hero { padding-bottom:120px; }
+  .store-hero-body { flex-direction:column; align-items:flex-start; gap:24px; margin-top:6vh; }
+  .store-hero-checker { right:6vw; bottom:70px; width:40px; height:40px; }
+  .store-shop { width:auto; margin-top:-56px; padding:36px 6vw 96px; }
+  .store-tabs { flex-wrap:nowrap; margin-right:-6vw; padding-right:6vw; }
+  .store-tabs button { flex:none; min-width:230px; }
+  .store-products { gap:12px; }
+  .store-card { padding:10px 10px 14px; }
+  .store-card-no { top:18px; right:18px; }
+}
+
 /* Admin → Store panel */
 .admin-storepanel { display:grid; gap:16px; }
 .admin-store-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:0; }
@@ -196,3 +255,5 @@
 }
 
 .store-actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:36px; }
+
+@media (min-width:1500px) { .store-shop { padding-right:max(9vw,calc((100vw - 1280px)/2)); padding-left:max(9vw,calc((100vw - 1280px)/2)); } }
