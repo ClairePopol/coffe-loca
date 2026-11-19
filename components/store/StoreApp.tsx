@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getSupabaseClient } from "@/lib/supabase";
+import StoreHero from "@/components/store/StoreHero";
 import {
   CATEGORIES, PRODUCT_COLUMNS, type CartLine, type Product, type StoreCategory,
   categoryLabel, formatIDR, hasStoreWhatsapp, orderMessage, readCart, stockState, storeError, whatsappUrl, writeCart,
@@ -151,17 +152,20 @@ export default function StoreApp() {
   const noticeEl = notice && <p className={`notice store-notice${notice.tone === "error" ? " notice-error" : ""}`} role={notice.tone === "error" ? "alert" : "status"}>{notice.text}</p>;
 
   return (
-    <section className="store-content" aria-labelledby="store-title">
-      <div className="page-heading">
-        <span className="eyebrow"><i /> LOCA STORE / BOARDGAME &amp; POKÉMON</span>
-        <h1 id="store-title">Bawa pulang<br /><em>serunya Loca.</em></h1>
-        <p>Boardgame, kartu Pokémon, dan aksesori. Pilih barangnya, kirim pesanan lewat WhatsApp, lalu ambil di kedai atau kami atur pengirimannya.</p>
-      </div>
+    <>
+    <StoreHero id="store-title" kicker="LOCA STORE" side="BOARDGAME & POKÉMON" title={<>Bawa pulang<br /><em>serunya Loca.</em></>}>
+      <p>Boardgame, kartu Pokémon, dan aksesori. Pilih barangnya, kirim pesanan lewat WhatsApp, lalu ambil di kedai atau kami atur pengirimannya.</p>
+    </StoreHero>
 
-      <div className="store-cats" role="tablist" aria-label="Kategori">
-        <button type="button" role="tab" aria-selected={category === "all"} className={category === "all" ? "is-active" : ""} onClick={() => setCategory("all")}>Semua <small>{products.length}</small></button>
-        {CATEGORIES.map((c) => (
-          <button key={c.id} type="button" role="tab" aria-selected={category === c.id} className={category === c.id ? "is-active" : ""} onClick={() => setCategory(c.id)}>{c.label} <small>{counts.get(c.id) ?? 0}</small></button>
+    <section className="store-content store-shop" aria-label="Katalog">
+      <div className="store-cats store-tabs" role="tablist" aria-label="Kategori">
+        <button type="button" role="tab" aria-selected={category === "all"} className={category === "all" ? "is-active" : ""} onClick={() => setCategory("all")}>
+          <span className="store-tab-no">00</span><span className="store-tab-copy"><strong>Semua</strong><small>SEMUA BARANG</small></span><span className="store-tab-count">{products.length}</span>
+        </button>
+        {CATEGORIES.map((c, i) => (
+          <button key={c.id} type="button" role="tab" aria-selected={category === c.id} className={category === c.id ? "is-active" : ""} onClick={() => setCategory(c.id)}>
+            <span className="store-tab-no">{String(i + 1).padStart(2, "0")}</span><span className="store-tab-copy"><strong>{c.label}</strong><small>KATEGORI</small></span><span className="store-tab-count">{counts.get(c.id) ?? 0}</span>
+          </button>
         ))}
       </div>
 
@@ -181,10 +185,11 @@ export default function StoreApp() {
         : visible.length === 0 ? <p className="store-empty">{products.length === 0 ? "Katalog belum diisi. Segera hadir." : "Tidak ada barang yang cocok."}</p>
         : (
           <ul className="store-products">
-            {visible.map((p) => {
+            {visible.map((p, i) => {
               const s = stockState(p.stock);
               return (
                 <li key={p.id} className={`store-card${s.tone === "out" ? " is-out" : ""}`}>
+                  <span className="store-card-no">{String(i + 1).padStart(2, "0")}</span>
                   <button type="button" className="store-card-art" onClick={() => setDetail(p)} aria-label={`Lihat ${p.name}`}>
                     {p.image_url ? <img src={p.image_url} alt="" loading="lazy" /> : <img className="store-card-placeholder" src="/white-coffee-bean.png" alt="" />}
                     <span className={`store-badge is-${s.tone}`}>{s.label}</span>
@@ -277,5 +282,6 @@ export default function StoreApp() {
         </div>
       )}
     </section>
+    </>
   );
 }

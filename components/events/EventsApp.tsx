@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import StoreHero from "@/components/store/StoreHero";
 import { getSupabaseClient } from "@/lib/supabase";
 import { todayWib } from "@/lib/content";
 import { CATEGORY_COLUMNS, EVENT_COLUMNS, dateParts, eventsError, feeLabel, safeHttpUrl, type EventCategory, type EventItem } from "@/lib/events";
@@ -69,18 +70,17 @@ export default function EventsApp() {
   };
 
   return (
-    <section className="store-content events-content" aria-labelledby="events-title">
-      <div className="page-heading">
-        <span className="eyebrow"><i /> LOCA EVENT / TURNAMEN &amp; KEGIATAN</span>
-        <h1 id="events-title">Ada apa<br /><em>di Loca.</em></h1>
-        <p>Turnamen kartu, malam boardgame, dan kegiatan komunitas. Pilih game favoritmu, lalu daftar langsung dari sini.</p>
-      </div>
+    <>
+    <StoreHero id="events-title" kicker="LOCA EVENT" side="TURNAMEN & KEGIATAN" title={<>Ada apa<br /><em>di Loca.</em></>}>
+      <p>Turnamen kartu, malam boardgame, dan kegiatan komunitas. Pilih game favoritmu, lalu daftar langsung dari sini.</p>
+    </StoreHero>
 
+    <section className="store-content store-shop events-content" aria-label="Jadwal">
       {categories.length > 0 && (
-        <div className="store-cats" role="tablist" aria-label="Kategori acara">
-          <button type="button" role="tab" aria-selected={category === "all"} className={category === "all" ? "is-active" : ""} onClick={() => setCategory("all")}>Semua <small>{totalUpcoming}</small></button>
-          {categories.map((c) => (
-            <button key={c.id} type="button" role="tab" aria-selected={category === c.id} className={category === c.id ? "is-active" : ""} onClick={() => setCategory(c.id)}>{c.name} <small>{countFor(c.id)}</small></button>
+        <div className="store-cats store-tabs" role="tablist" aria-label="Kategori acara">
+          <button type="button" role="tab" aria-selected={category === "all"} className={category === "all" ? "is-active" : ""} onClick={() => setCategory("all")}><span className="store-tab-no">00</span><span className="store-tab-copy"><strong>Semua</strong><small>SEMUA ACARA</small></span><span className="store-tab-count">{totalUpcoming}</span></button>
+          {categories.map((c, i) => (
+            <button key={c.id} type="button" role="tab" aria-selected={category === c.id} className={category === c.id ? "is-active" : ""} onClick={() => setCategory(c.id)}><span className="store-tab-no">{String(i + 1).padStart(2, "0")}</span><span className="store-tab-copy"><strong>{c.name}</strong><small>KATEGORI</small></span><span className="store-tab-count">{countFor(c.id)}</span></button>
           ))}
         </div>
       )}
@@ -102,5 +102,6 @@ export default function EventsApp() {
           </>
         )}
     </section>
+    </>
   );
 }
