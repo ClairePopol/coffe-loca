@@ -1,5 +1,5 @@
-/* Shared shell for Login, Profile, Admin, Store — flat cream canvas, white cards, red actions */
-.page-shell { position:relative; isolation:isolate; display:flex; min-height:100svh; flex-direction:column; overflow:hidden; overflow:clip; color:var(--ink); background:var(--cream); }
+/* Shared shell for Login, Profile, Admin, Store — flat white canvas, white cards, red actions */
+.page-shell { position:relative; isolation:isolate; display:flex; min-height:100svh; flex-direction:column; overflow:hidden; overflow:clip; color:var(--ink); background:var(--paper); }
 .page-shell::before { position:absolute; z-index:-1; top:-10%; right:-8%; width:min(60vw,760px); aspect-ratio:1; content:""; border-radius:50%; background:radial-gradient(circle,rgba(212,35,42,.07),transparent 64%); pointer-events:none; }
 .page-header { position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:20px; padding:24px 7vw; }
 .page-back { display:inline-flex; min-height:44px; align-items:center; gap:8px; color:var(--ink); font-size:var(--fs-label); font-weight:700; letter-spacing:var(--track-label); transition:color .25s; }
@@ -17,7 +17,7 @@
 .card-topline>span:first-child::before { content:"/ "; }
 .field { display:block; min-width:0; }
 .field>span { display:block; margin-bottom:8px; color:var(--muted-2); font-size:var(--fs-label); font-weight:700; letter-spacing:.12em; }
-.field input { display:block; width:100%; min-width:0; height:50px; padding:0 14px; border:1.5px solid var(--line-strong); border-radius:10px; outline:none; color:var(--ink); background:var(--cream); font:inherit; font-size:15px; transition:border-color .25s,box-shadow .25s,background .25s; }
+.field input { display:block; width:100%; min-width:0; height:50px; padding:0 14px; border:1.5px solid var(--line-strong); border-radius:10px; outline:none; color:var(--ink); background:var(--sand); font:inherit; font-size:15px; transition:border-color .25s,box-shadow .25s,background .25s; }
 .field input:focus { border-color:var(--red); background:#fff; box-shadow:0 0 0 3px rgba(212,35,42,.12); }
 .field input::placeholder { color:var(--muted); }
 .btn-primary { display:flex; min-height:54px; width:100%; align-items:center; justify-content:space-between; gap:16px; padding:0 20px; border:0; border-radius:var(--radius-btn); color:#fff; background:var(--red); box-shadow:0 12px 26px rgba(212,35,42,.26); font-size:12px; font-weight:700; letter-spacing:.12em; cursor:pointer; transition:transform .3s var(--ease-out),background .3s,opacity .3s; }
@@ -47,7 +47,7 @@
 .confirm-actions button { min-height:52px; border-radius:var(--radius-btn); font-size:12px; font-weight:700; letter-spacing:.1em; cursor:pointer; transition:transform .2s,background .2s; }
 .confirm-actions button:active { transform:scale(.97); }
 .confirm-cancel { border:1.5px solid var(--ink); color:var(--ink); background:transparent; }
-.confirm-cancel:hover { background:var(--cream); }
+.confirm-cancel:hover { background:var(--sand); }
 .confirm-ok { border:0; color:#fff; background:var(--ink); }
 .confirm-ok:hover { background:#000; }
 .is-danger .confirm-ok { background:var(--red); box-shadow:0 10px 22px rgba(212,35,42,.25); }
@@ -76,7 +76,7 @@
 .redeem-sheet { max-height:calc(100dvh - 40px); overflow-y:auto; }
 .confirm-actions.is-single { grid-template-columns:1fr; }
 .confirm-actions a.confirm-ok { display:grid; place-items:center; min-height:52px; border-radius:var(--radius-btn); font-size:12px; font-weight:700; letter-spacing:.1em; text-decoration:none; }
-.redeem-balance { display:flex; align-items:baseline; justify-content:center; gap:8px; margin-top:14px; padding:14px 22px; border:0; border-radius:var(--radius); background:var(--cream); }
+.redeem-balance { display:flex; align-items:baseline; justify-content:center; gap:8px; margin-top:14px; padding:14px 22px; border:0; border-radius:var(--radius); background:var(--sand); }
 .redeem-balance small { align-self:center; margin-right:4px; color:var(--muted-2); font-size:10px; font-weight:700; letter-spacing:.12em; }
 .redeem-balance strong { color:var(--red); font-size:44px; font-weight:800; letter-spacing:-.04em; line-height:1; }
 .redeem-balance span { color:var(--muted-2); font-size:13px; font-weight:600; }
@@ -88,6 +88,6 @@
 .redeem-options small { display:block; margin-top:2px; color:var(--muted-2); font-size:12px; line-height:1.4; }
 .redeem-options b { display:flex; align-items:baseline; gap:4px; flex:none; color:var(--red); font-size:26px; font-weight:800; letter-spacing:-.03em; }
 .redeem-options i { color:var(--muted-2); font-size:11px; font-style:normal; font-weight:600; }
-.redeem-options button:disabled { opacity:.5; cursor:not-allowed; background:var(--cream); border-color:var(--line); }
-.redeem-options button:disabled:hover { background:var(--cream); }
+.redeem-options button:disabled { opacity:.5; cursor:not-allowed; background:var(--sand); border-color:var(--line); }
+.redeem-options button:disabled:hover { background:var(--sand); }
 .redeem-options em { display:block; margin-top:3px; color:var(--red); font-size:11px; font-style:normal; font-weight:700; letter-spacing:.04em; }

@@ -253,7 +253,7 @@ export default function ProfilePage() {
                           <span className="mc-number">{memberNumber}</span>
                         </div>
                         <button ref={qrTriggerRef} className="mc-qr" type="button" onClick={(event) => { event.stopPropagation(); setQrOpen(true); }} aria-label="Perbesar QR member">
-                          <QRCodeSVG value={memberCode} size={112} bgColor="#f8f4eb" fgColor="#26372d" level="M" />
+                          <QRCodeSVG value={memberCode} size={112} bgColor="#ffffff" fgColor="#141414" level="M" />
                           <i className="profile-scan-line" />
                         </button>
                       </div>

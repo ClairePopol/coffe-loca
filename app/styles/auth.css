@@ -1,5 +1,5 @@
-/* Login / Register — cream left, red poster panel right */
-.auth-page { background:var(--cream); }
+/* Login / Register — white left, red poster panel right */
+.auth-page { background:var(--paper); }
 .auth-page::before { top:auto; right:0; bottom:0; left:auto; width:44%; height:100%; aspect-ratio:auto; border-radius:0; background:linear-gradient(160deg,var(--red),var(--red-deep)); }
 .auth-page::after { position:absolute; z-index:-1; right:-3vw; bottom:-6vw; content:"LOCA"; color:rgba(255,255,255,.08); font-family:var(--font); font-size:clamp(200px,26vw,440px); font-weight:800; letter-spacing:-.06em; line-height:.7; pointer-events:none; }
 .auth-page .page-back { color:#fff; }
@@ -15,9 +15,9 @@
 .auth-art img { position:absolute; top:50%; left:50%; width:100px; height:100px; object-fit:contain; opacity:.5; filter:brightness(0); transform:translate(-50%,-50%) rotate(-18deg); animation:authBeanFloat 5s ease-in-out infinite alternate; }
 .auth-art-ring { position:absolute; inset:20px; border:1.5px solid rgba(20,20,20,.14); border-radius:50%; }
 .auth-art-ring-one { transform:rotate(28deg) scaleX(.58); border-color:rgba(212,35,42,.35); }
-.auth-art-ring-two { inset:0; transform:rotate(-35deg) scaleY(.54); border-color:rgba(53,90,53,.35); }
+.auth-art-ring-two { inset:0; transform:rotate(-35deg) scaleY(.54); border-color:rgba(31,122,58,.35); }
 .auth-card { width:min(100%,480px); justify-self:end; padding:30px clamp(24px,3.6vw,44px) 28px; box-shadow:0 30px 90px rgba(0,0,0,.28); animation:cardIn .8s var(--ease-out) both; }
-.auth-tabs { display:grid; grid-template-columns:1fr 1fr; margin-top:22px; padding:4px; border-radius:12px; background:var(--cream); }
+.auth-tabs { display:grid; grid-template-columns:1fr 1fr; margin-top:22px; padding:4px; border-radius:12px; background:var(--sand); }
 .auth-tabs button { min-height:42px; border:0; border-radius:9px; color:var(--muted-2); background:none; font-size:12px; font-weight:700; letter-spacing:.12em; cursor:pointer; transition:color .3s,background .3s,box-shadow .3s; }
 .auth-tabs button.is-active { color:#fff; background:var(--ink); box-shadow:0 6px 14px rgba(20,20,20,.18); }
 .auth-card-heading { margin:28px 0 24px; animation:fadeUp .45s var(--ease-out) both; }

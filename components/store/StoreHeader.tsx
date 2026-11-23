@@ -8,7 +8,7 @@ import { SITE } from "@/lib/site";
 import Wordmark from "@/components/Wordmark";
 
 // Same pattern as the Coffee header in app/page.tsx (profile link + hamburger + fullscreen red menu),
-// but always on the light surface because /store has a cream background.
+// but always on the light surface because /store has a white background.
 const menuItems = [
   { title: "Katalog", href: "/store", number: "01", note: "BOARDGAME & POKÉMON" },
   { title: "Event", href: "/events", number: "02", note: "TURNAMEN & KEGIATAN LOCA" },
