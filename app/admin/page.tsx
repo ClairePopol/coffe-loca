@@ -373,7 +373,7 @@ export default function AdminPage() {
           <div className="admin-heading">
             <span className="eyebrow"><i /> PRIVATE / ADMIN ACCESS</span>
             <h1>{section === "store" ? <>Store <em>control.</em></> : <>Coffee <em>control.</em></>}</h1>
-            <p>{section === "store" ? "Kelola pesanan, produk, jenis produk, dan titipan Loca Store." : adminUp ? "Stamp, hadiah, member, voucher, promo, dan acara Coffe Loca." : "Scan kartu stamp dan voucher member di kasir."}</p>
+            <p>{section === "store" ? "Kelola pesanan, produk, jenis produk, acara, dan titipan Loca Store." : adminUp ? "Stamp, hadiah, member, voucher, dan promo Coffe Loca." : "Scan kartu stamp dan voucher member di kasir."}</p>
             <span className="admin-role">{user ? <>MASUK SEBAGAI {(user.user_metadata?.full_name || user.email || "STAFF").toUpperCase()} <b>{roleLabel(role).toUpperCase()}</b></> : "AUTHORIZED STAFF ONLY"}</span>
           </div>
           {user && (canManageCoffee(role) && canManageStore(role)) && (
@@ -395,7 +395,7 @@ export default function AdminPage() {
 
         {section === "coffee" && adminUp && user && (
           <nav className="admin-subnav" role="tablist" aria-label="Menu Coffee">
-            {([["kasir", "Kasir", pendingMembers.length], ["hadiah", "Hadiah", 0], ["member", "Member & riwayat", 0], ["konten", "Voucher, promo & acara", 0]] as ["kasir" | "hadiah" | "member" | "konten", string, number][]).map(([id, label, badge]) => (
+            {([["kasir", "Kasir", pendingMembers.length], ["hadiah", "Hadiah", 0], ["member", "Member & riwayat", 0], ["konten", "Voucher & promo", 0]] as ["kasir" | "hadiah" | "member" | "konten", string, number][]).map(([id, label, badge]) => (
               <button key={id} type="button" role="tab" aria-selected={coffeeTab === id} className={coffeeTab === id ? "is-active" : ""} onClick={() => setCoffeeTab(id)}>
                 {label}{badge > 0 && <i aria-label={`${badge} menunggu verifikasi`}>{badge}</i>}
               </button>

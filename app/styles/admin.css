@@ -444,7 +444,7 @@
 .admin-page .admin-store-stats div { display:flex; flex-direction:column; justify-content:space-between; gap:12px; padding:14px 16px; border:1px solid var(--line); border-radius:var(--radius); background:#fff; }
 .admin-page .admin-store-stats dt { font-size:10.5px; }
 .admin-page .admin-store-stats dd { margin:0; font-size:26px; }
-.admin-page .admin-store-tabs { display:grid; grid-template-columns:repeat(4,1fr); gap:0; padding:4px; border-radius:12px; background:var(--sand); }
+.admin-page .admin-store-tabs { display:grid; grid-template-columns:repeat(5,1fr); gap:0; padding:4px; border-radius:12px; background:var(--sand); }
 .admin-page .admin-store-tabs button { height:42px; padding:0 8px; border:0; border-radius:9px; color:var(--muted-2); background:none; font-size:13px; }
 .admin-page .admin-store-tabs button.is-active { color:#fff; background:var(--ink); box-shadow:0 6px 14px rgba(20,20,20,.18); }
 .admin-page .admin-store-filter { gap:6px; }
@@ -472,6 +472,7 @@
   .admin-page .admin-stats>div { padding:12px 14px; }
   .admin-page .admin-stats dd { font-size:26px; }
   .admin-page .admin-store-tabs { grid-template-columns:repeat(2,1fr); }
+  .admin-page .admin-store-tabs button:last-child:nth-child(odd) { grid-column:span 2; }
   .admin-page .admin-store-stats div { padding:12px; }
   .admin-page .admin-store-stats dd { font-size:20px; }
 }
@@ -484,3 +485,4 @@
   .admin-page .admin-scan-button strong { font-size:18px; }
   .admin-page .admin-scan-icon { width:40px; height:40px; }
 }
+.admin-page .admin-events-panel .admin-categories { margin-top:24px; padding-top:22px; border-top:1px solid var(--line); }

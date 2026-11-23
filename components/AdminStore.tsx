@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { getSupabaseClient } from "@/lib/supabase";
 import { useConfirm } from "@/components/ConfirmDialog";
 import PhotoCropper from "@/components/PhotoCropper";
+import AdminEvents from "@/components/AdminEvents";
 import {
   DEFAULT_CATEGORIES, LOW_STOCK, ORDER_COLUMNS, ORDER_STATUS, PRODUCT_COLUMNS, type Category, type Order, type OrderStatus, type Product, type StoreCategory,
   buyerWhatsappUrl, categoryLabel, categorySlug, fetchCategories, formatIDR, statusLabel, storeError, uploadStoreBlob,
@@ -11,7 +12,7 @@ import {
 
 type Status = { tone: "ok" | "error"; text: string } | null;
 type Wish = { id: number; note: string; created_at: string; product_id: number | null; product_name: string | null; buyer_name: string | null; buyer_phone: string | null };
-type Tab = "orders" | "products" | "categories" | "wishlist";
+type Tab = "orders" | "products" | "categories" | "events" | "wishlist";
 type Crop = { source: Blob; title: string };
 type Draft = { id: number | null; name: string; category: StoreCategory; card_info: string; price: string; stock: string; description: string; is_active: boolean; image_url: string | null };
 const EMPTY: Draft = { id: null, name: "", category: "boardgame", card_info: "", price: "", stock: "1", description: "", is_active: true, image_url: null };
@@ -27,6 +28,7 @@ export default function AdminStore({ userId }: { userId: string }) {
   const [editingCat, setEditingCat] = useState<{ id: string; label: string } | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [wishes, setWishes] = useState<Wish[]>([]);
+  const [eventCount, setEventCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<Status>(null);
@@ -170,7 +172,7 @@ export default function AdminStore({ userId }: { userId: string }) {
 
   return (
     <div className="admin-panel card admin-storepanel">
-      <div className="card-topline"><span>LOCA STORE</span><span>PESANAN · PRODUK · TITIPAN</span></div>
+      <div className="card-topline"><span>LOCA STORE</span><span>PESANAN · PRODUK · ACARA · TITIPAN</span></div>
       <dl className="admin-store-stats">
         <div><dt>Pesanan baru</dt><dd>{stats.fresh}</dd></div>
         <div><dt>Belum selesai</dt><dd>{stats.open}</dd></div>
@@ -178,8 +180,8 @@ export default function AdminStore({ userId }: { userId: string }) {
         <div><dt>Omzet bulan ini</dt><dd>{formatIDR(stats.revenue)}</dd></div>
       </dl>
       <div className="admin-store-tabs" role="tablist">
-        {([["orders", `Pesanan (${stats.open})`], ["products", `Produk (${products.length})`], ["categories", `Jenis produk (${categories.length})`], ["wishlist", `Titipan (${wishes.length})`]] as [Tab, string][]).map(([id, label]) => (
-          <button key={id} type="button" role="tab" aria-selected={tab === id} className={tab === id ? "is-active" : ""} onClick={() => setTab(id)}>{label}</button>
+        {([["orders", `Pesanan (${stats.open})`], ["products", `Produk (${products.length})`], ["categories", `Jenis produk (${categories.length})`], ["events", eventCount === null ? "Acara" : `Acara (${eventCount})`], ["wishlist", `Titipan (${wishes.length})`]] as [Tab, string][]).map(([id, label]) => (
+          <button key={id} type="button" role="tab" aria-selected={tab === id} className={tab === id ? "is-active" : ""} onClick={() => { setTab(id); setStatus(null); }}>{label}</button>
         ))}
       </div>
       {status && <p className={`notice${status.tone === "error" ? " notice-error" : ""}`} role={status.tone === "error" ? "alert" : "status"}>{status.text}</p>}
@@ -307,6 +309,8 @@ export default function AdminStore({ userId }: { userId: string }) {
           )}
         </div>
       ))}
+
+      {tab === "events" && <AdminEvents userId={userId} onCount={setEventCount} />}
 
       {!loading && tab === "wishlist" && (wishes.length === 0 ? <p className="admin-empty">Belum ada titipan dari member.</p> : (
         <ul className="admin-order-list">
