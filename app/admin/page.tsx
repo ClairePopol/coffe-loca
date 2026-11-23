@@ -62,6 +62,7 @@ export default function AdminPage() {
   const [section, setSection] = useState<"coffee" | "store">("coffee");
   const [listStatus, setListStatus] = useState<Status>(null);
   const [tab, setTab] = useState<"members" | "logs">("members");
+  const [coffeeTab, setCoffeeTab] = useState<"kasir" | "hadiah" | "member" | "konten">("kasir");
   const memberListRef = useRef<HTMLUListElement>(null);
   const [logLimit, setLogLimit] = useState(LOG_PAGE);
   const closeScanner = useCallback(() => setScannerOpen(false), []);
@@ -192,7 +193,8 @@ export default function AdminPage() {
     setMemberId(id);
     setAmount(1);
     setStatus(message ? { tone: "ok", text: message } : null);
-    document.getElementById("stamp-desk")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setCoffeeTab("kasir");
+    window.setTimeout(() => document.getElementById("stamp-desk")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
   }
 
   function handleScan(text: string) {
@@ -367,34 +369,51 @@ export default function AdminPage() {
     <main className="page-shell admin-page">
       <PageHeader backHref="/profile" backLabel="KE PROFILE" />
       <section className="admin-layout">
-        <div className="admin-heading page-heading">
-          <span className="eyebrow"><i /> PRIVATE / ADMIN ACCESS</span>
-          <h1>{section === "store" ? <>Store<br /><em>control.</em></> : <>Member<br /><em>control.</em></>}</h1>
-          <p>{section === "store" ? "Kelola produk dan pesanan Loca Store." : adminUp ? "Kelola stamp, hadiah, voucher, promo, dan acara Coffe Loca dari satu ruang." : "Scan kartu stamp dan voucher member di kasir."}</p>
-          <span className="admin-role">{user ? <>MASUK SEBAGAI {(user.user_metadata?.full_name || user.email || "STAFF").toUpperCase()} <b>{roleLabel(role).toUpperCase()}</b></> : "AUTHORIZED STAFF ONLY"}</span>
-          {section === "coffee" && adminUp && <dl className="admin-stats">
-            <div><dt>MEMBER</dt><dd>{loading ? "—" : verifiedMembers.length}</dd></div>
-            <div><dt>STAMP HARI INI</dt><dd>{loading ? "—" : stampsToday}</dd></div>
-            <div><dt>MIN. 10 STAMP</dt><dd>{loading ? "—" : readyForReward}</dd></div>
-          </dl>}
-          {section === "coffee" && adminUp && redeemedToday > 0 && <p className="admin-today">☕ {redeemedToday} hadiah ditukar hari ini.</p>}
-        </div>
-
-        <div className="admin-content">
-          {user && (
+        <header className="admin-top">
+          <div className="admin-heading">
+            <span className="eyebrow"><i /> PRIVATE / ADMIN ACCESS</span>
+            <h1>{section === "store" ? <>Store <em>control.</em></> : <>Coffee <em>control.</em></>}</h1>
+            <p>{section === "store" ? "Kelola pesanan, produk, jenis produk, dan titipan Loca Store." : adminUp ? "Stamp, hadiah, member, voucher, promo, dan acara Coffe Loca." : "Scan kartu stamp dan voucher member di kasir."}</p>
+            <span className="admin-role">{user ? <>MASUK SEBAGAI {(user.user_metadata?.full_name || user.email || "STAFF").toUpperCase()} <b>{roleLabel(role).toUpperCase()}</b></> : "AUTHORIZED STAFF ONLY"}</span>
+          </div>
+          {user && (canManageCoffee(role) && canManageStore(role)) && (
             <div className="admin-sections" role="tablist" aria-label="Area admin">
-              {canManageCoffee(role) && <button type="button" role="tab" aria-selected={section === "coffee"} className={section === "coffee" ? "is-active" : ""} onClick={() => setSection("coffee")}><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1 1 1.5 1 2.5M11.5 3.5c0 1 1 1.5 1 2.5" /></svg></span><span><strong>Coffee</strong><small>{adminUp ? "Stamp, hadiah, voucher & member" : "Scan stamp & voucher"}</small></span></button>}
-              {canManageStore(role) && <button type="button" role="tab" aria-selected={section === "store"} className={section === "store" ? "is-active" : ""} onClick={() => setSection("store")}><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2" /></svg></span><span><strong>Store</strong><small>Produk &amp; pesanan</small></span></button>}
+              <button type="button" role="tab" aria-selected={section === "coffee"} className={section === "coffee" ? "is-active" : ""} onClick={() => setSection("coffee")}><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c0 1 1 1.5 1 2.5M11.5 3.5c0 1 1 1.5 1 2.5" /></svg></span><span><strong>Coffee</strong><small>{adminUp ? "Stamp, hadiah & member" : "Scan stamp & voucher"}</small></span></button>
+              <button type="button" role="tab" aria-selected={section === "store"} className={section === "store" ? "is-active" : ""} onClick={() => setSection("store")}><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2" /></svg></span><span><strong>Store</strong><small>Produk &amp; pesanan</small></span></button>
             </div>
           )}
+        </header>
 
+        {section === "coffee" && adminUp && (
+          <dl className="admin-stats">
+            <div><dt>Member terverifikasi</dt><dd>{loading ? "—" : verifiedMembers.length}</dd></div>
+            <div><dt>Stamp hari ini</dt><dd>{loading ? "—" : stampsToday}</dd></div>
+            <div><dt>Hadiah ditukar hari ini</dt><dd>{loading ? "—" : redeemedToday}</dd></div>
+            <div className={readyForReward > 0 ? "is-accent" : ""}><dt>Siap tukar (≥ 10 stamp)</dt><dd>{loading ? "—" : readyForReward}</dd></div>
+          </dl>
+        )}
+
+        {section === "coffee" && adminUp && user && (
+          <nav className="admin-subnav" role="tablist" aria-label="Menu Coffee">
+            {([["kasir", "Kasir", pendingMembers.length], ["hadiah", "Hadiah", 0], ["member", "Member & riwayat", 0], ["konten", "Voucher, promo & acara", 0]] as ["kasir" | "hadiah" | "member" | "konten", string, number][]).map(([id, label, badge]) => (
+              <button key={id} type="button" role="tab" aria-selected={coffeeTab === id} className={coffeeTab === id ? "is-active" : ""} onClick={() => setCoffeeTab(id)}>
+                {label}{badge > 0 && <i aria-label={`${badge} menunggu verifikasi`}>{badge}</i>}
+              </button>
+            ))}
+          </nav>
+        )}
+
+        <div className="admin-content">
           {section === "store" && user && (<>
-            {verifyCard}
+            {pendingMembers.length > 0 && verifyCard}
             <AdminStore userId={user.id} />
           </>)}
 
           {section === "coffee" && canManageCoffee(role) && (<>
-          {verifyCard}
+          {(!adminUp || coffeeTab === "kasir") && (
+          <div className="admin-kasir">
+          <div className="admin-kasir-main">
+          <VoucherScan scan={voucherScan} />
           <div className="admin-award-card card" id="stamp-desk">
             <div className="card-topline"><span>STAMP DESK</span><span>SCAN / ADD 1–10</span></div>
             <h2>Tambahkan stamp.</h2>
@@ -438,12 +457,16 @@ export default function AdminPage() {
             </form>
             {status && <p className={`notice${status.tone === "error" ? " notice-error" : ""}`} role={status.tone === "error" ? "alert" : "status"}>{status.text}</p>}
           </div>
+          </div>
+          <aside className="admin-kasir-side">{verifyCard}</aside>
+          </div>
+          )}
 
-          <VoucherScan scan={voucherScan} />
-
-          {adminUp && user && (<>
+          {adminUp && user && coffeeTab === "hadiah" && (
           <AdminRewards userId={user.id} member={selected ? { id: selected.id, name: selected.full_name || "member", stamps: selected.stamps } : null} onRedeemed={refresh} />
+          )}
 
+          {adminUp && user && coffeeTab === "member" && (
           <div className="admin-panel card">
             <div className="admin-tabs" role="tablist" aria-label="Data admin">
               <button id="admin-tab-members" type="button" role="tab" aria-selected={tab === "members"} aria-controls="admin-panel-members" className={tab === "members" ? "is-active" : ""} onClick={() => setTab("members")}>Member <span>{verifiedMembers.length}</span></button>
@@ -523,8 +546,9 @@ export default function AdminPage() {
             {visibleLogs.length > logLimit && <button type="button" className="admin-more" onClick={() => setLogLimit((value) => value + LOG_PAGE)}>TAMPILKAN LEBIH BANYAK <span>{logLimit} / {visibleLogs.length}</span></button>}
             </div>
           </div>
-          <AdminContent members={verifiedMembers} userId={user.id} />
-          </>)}
+          )}
+
+          {adminUp && user && coffeeTab === "konten" && <AdminContent members={verifiedMembers} userId={user.id} />}
           </>)}
         </div>
       </section>

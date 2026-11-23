@@ -438,7 +438,7 @@ export default function AdminContent({ members, userId }: { members: MemberLite[
                   <label className="field"><span>KATEGORI</span>
                     <select name="category" defaultValue=""><option value="">Tanpa kategori</option>{categories.filter((c) => c.is_active).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
                   </label>
-                  <label className="field"><span>BIAYA (RP, OPSIONAL)</span><input name="fee" type="number" min={0} step={1000} inputMode="numeric" placeholder="0 = gratis, kosong = tidak ditampilkan" /></label>
+                  <label className="field"><span>BIAYA (RP, OPSIONAL)</span><input name="fee" type="number" min={0} step={1} inputMode="numeric" placeholder="0 = gratis, kosong = tidak ditampilkan" /></label>
                 </div>
                 <label className="field"><span>LINK PENDAFTARAN (OPSIONAL)</span><input name="url" type="url" maxLength={300} placeholder="https://…" /></label>
               </>

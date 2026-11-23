@@ -386,3 +386,101 @@
 .admin-categories-add { display:grid; grid-template-columns:1fr auto; align-items:end; gap:10px; margin-bottom:14px; }
 .admin-category-edit { width:100%; height:40px; padding:0 12px; border:1.5px solid var(--line-strong); border-radius:10px; font:inherit; font-size:15px; }
 @media (max-width:760px) { .admin-categories-add { grid-template-columns:1fr; } }
+
+/* ---------------------------------------------------------------------------
+   Admin layout v2: full-width header + switch, stat row, Coffee sub-tabs,
+   and one shared look for Coffee & Store (tabs, stats, action buttons).
+   --------------------------------------------------------------------------- */
+.admin-page .admin-layout { display:flex; width:min(1180px,90vw); flex-direction:column; align-items:stretch; gap:22px; margin:0 auto; padding:36px 0 90px; }
+.admin-page .admin-top { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:24px 40px; padding-bottom:26px; border-bottom:1.5px solid var(--line); }
+.admin-page .admin-heading { position:static; min-width:0; }
+.admin-page .admin-heading .eyebrow { color:var(--red); }
+.admin-page .admin-heading h1 { margin:14px 0 10px; color:var(--ink); font-size:clamp(40px,5vw,64px); line-height:.95; }
+.admin-page .admin-heading h1 em { color:var(--red); }
+.admin-page .admin-heading>p { max-width:520px; margin:0; color:var(--muted-2); font-size:15px; line-height:1.6; }
+.admin-page .admin-role { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:14px; padding-top:0; border-top:0; color:var(--muted-2); }
+.admin-page .admin-role b { margin-left:2px; }
+.admin-page .admin-top .admin-sections { width:min(100%,460px); }
+.admin-page .admin-sections button { padding:12px 14px; }
+.admin-page .admin-sections strong { font-size:20px; }
+
+.admin-page .admin-stats { grid-template-columns:repeat(4,1fr); gap:12px; margin:0; }
+.admin-page .admin-stats>div { gap:14px; padding:16px 18px; border:1px solid var(--line); border-radius:var(--radius); background:#fff; box-shadow:var(--shadow-card); }
+.admin-page .admin-stats dt { font-size:10.5px; text-transform:uppercase; }
+.admin-page .admin-stats dd { font-size:34px; }
+.admin-page .admin-stats>div.is-accent { border-color:var(--red); }
+.admin-page .admin-stats>div.is-accent dd { color:var(--red); }
+
+.admin-page .admin-subnav { display:flex; gap:4px; overflow-x:auto; border-bottom:1.5px solid var(--line); scrollbar-width:none; }
+.admin-page .admin-subnav::-webkit-scrollbar { display:none; }
+.admin-page .admin-subnav button { position:relative; display:inline-flex; flex:none; align-items:center; gap:8px; padding:12px 16px 14px; border:0; color:var(--muted-2); background:none; font:inherit; font-size:14px; font-weight:700; white-space:nowrap; cursor:pointer; transition:color .2s; }
+.admin-page .admin-subnav button::after { position:absolute; right:12px; bottom:-1.5px; left:12px; height:3px; border-radius:3px 3px 0 0; content:""; background:transparent; transition:background .2s; }
+.admin-page .admin-subnav button:hover { color:var(--ink); }
+.admin-page .admin-subnav button.is-active { color:var(--ink); }
+.admin-page .admin-subnav button.is-active::after { background:var(--red); }
+.admin-page .admin-subnav i { display:grid; min-width:20px; height:20px; place-items:center; padding:0 6px; border-radius:99px; color:#fff; background:var(--red); font-size:11px; font-style:normal; }
+
+.admin-page .admin-content { gap:20px; }
+.admin-page .admin-kasir { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); align-items:start; gap:20px; }
+.admin-page .admin-kasir-main,.admin-page .admin-kasir-side { display:flex; min-width:0; flex-direction:column; gap:20px; }
+.admin-page .admin-kasir-side { position:sticky; top:20px; }
+
+/* one card header size everywhere */
+.admin-page .admin-award-card h2,.admin-page .admin-rewards h2 { margin:20px 0 16px; font-size:clamp(28px,2.6vw,34px); }
+.admin-page .admin-award-card,.admin-page .admin-panel,.admin-page .admin-rewards,.admin-page .admin-content-card { padding:24px clamp(18px,2.6vw,30px) 26px; }
+
+/* action buttons: one style for Coffee + Store */
+.admin-page .admin-use-id,.admin-page .admin-order-actions button,.admin-page .admin-order-actions a { display:inline-flex; height:34px; min-height:34px; align-items:center; justify-content:center; padding:0 12px; border:1.5px solid var(--line-strong); border-radius:8px; color:var(--ink); background:#fff; font-size:11px; font-weight:700; letter-spacing:.08em; line-height:1; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:background .2s,color .2s,border-color .2s; }
+.admin-page .admin-use-id:hover:not(:disabled),.admin-page .admin-order-actions button:hover:not(:disabled),.admin-page .admin-order-actions a:hover { border-color:var(--ink); color:#fff; background:var(--ink); }
+.admin-page .admin-order-actions .is-danger,.admin-page .admin-use-delete { border-color:rgba(212,35,42,.35); color:var(--red); background:#fff; }
+.admin-page .admin-order-actions .is-danger:hover:not(:disabled),.admin-page .admin-use-delete:hover:not(:disabled) { border-color:var(--red); color:#fff; background:var(--red); }
+.admin-page .admin-use-redeem { border-color:var(--green); color:#fff; background:var(--green); }
+.admin-page .admin-use-redeem:hover:not(:disabled) { border-color:var(--green-deep); background:var(--green-deep) !important; }
+.admin-page .admin-use-redeem:disabled { border-color:var(--line-strong); color:var(--muted); background:#fff; opacity:1; }
+
+/* Store panel uses the same building blocks as Coffee */
+.admin-page .admin-storepanel { gap:18px; }
+.admin-page .admin-store-stats { gap:12px; }
+.admin-page .admin-store-stats div { display:flex; flex-direction:column; justify-content:space-between; gap:12px; padding:14px 16px; border:1px solid var(--line); border-radius:var(--radius); background:#fff; }
+.admin-page .admin-store-stats dt { font-size:10.5px; }
+.admin-page .admin-store-stats dd { margin:0; font-size:26px; }
+.admin-page .admin-store-tabs { display:grid; grid-template-columns:repeat(4,1fr); gap:0; padding:4px; border-radius:12px; background:var(--sand); }
+.admin-page .admin-store-tabs button { height:42px; padding:0 8px; border:0; border-radius:9px; color:var(--muted-2); background:none; font-size:13px; }
+.admin-page .admin-store-tabs button.is-active { color:#fff; background:var(--ink); box-shadow:0 6px 14px rgba(20,20,20,.18); }
+.admin-page .admin-store-filter { gap:6px; }
+.admin-page .admin-store-filter button { height:34px; padding:0 14px; font-size:12.5px; font-weight:600; }
+.admin-page .admin-order-list>li,.admin-page .admin-product-list>li { border:1px solid var(--line); border-radius:var(--radius); }
+.admin-page .admin-order-list>li.is-new { border-color:rgba(212,35,42,.45); box-shadow:inset 3px 0 0 var(--red); }
+.admin-page .admin-order-head b { font-size:16px; }
+.admin-page .admin-order-foot>b { font-size:20px; letter-spacing:-.02em; }
+.admin-page .admin-product-form { border:1px solid var(--line); background:var(--sand); }
+.admin-page .admin-categories:first-child { margin-top:0; padding-top:0; border-top:0; }
+
+@media (max-width:960px) {
+  .admin-page .admin-layout { padding:22px 0 60px; }
+  .admin-page .admin-kasir { grid-template-columns:1fr; }
+  .admin-page .admin-kasir-side { position:static; }
+  .admin-page .admin-stats { grid-template-columns:repeat(2,1fr); }
+  .admin-page .admin-top .admin-sections { width:100%; }
+}
+@media (max-width:760px) {
+  .admin-page .admin-layout { width:90vw; gap:18px; }
+  .admin-page .admin-top { gap:18px; padding-bottom:18px; }
+  .admin-page .admin-heading h1 { font-size:clamp(36px,11vw,48px); }
+  .admin-page .admin-heading>p { font-size:14px; }
+  .admin-page .admin-stats { gap:8px; }
+  .admin-page .admin-stats>div { padding:12px 14px; }
+  .admin-page .admin-stats dd { font-size:26px; }
+  .admin-page .admin-store-tabs { grid-template-columns:repeat(2,1fr); }
+  .admin-page .admin-store-stats div { padding:12px; }
+  .admin-page .admin-store-stats dd { font-size:20px; }
+}
+.admin-page .admin-use-danger { border-color:rgba(212,35,42,.35); color:var(--red); }
+.admin-page .admin-use-danger:hover:not(:disabled) { border-color:var(--red); color:#fff; background:var(--red) !important; }
+.admin-page .admin-content-actions { max-width:none; }
+.admin-page .admin-storepanel .admin-categories { margin-top:0; padding-top:0; border-top:0; }
+@media (max-width:560px) {
+  .admin-page .admin-scan-button { gap:12px; padding:14px; }
+  .admin-page .admin-scan-button strong { font-size:18px; }
+  .admin-page .admin-scan-icon { width:40px; height:40px; }
+}
