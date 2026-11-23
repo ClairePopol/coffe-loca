@@ -1,14 +1,33 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { OWNER_WHATSAPP_URL } from "@/lib/owner";
 
-export type StoreCategory = "boardgame" | "pokemon_single" | "pokemon_sealed" | "accessories";
-export const CATEGORIES: { id: StoreCategory; label: string; note: string }[] = [
-  { id: "boardgame", label: "Boardgame", note: "Untuk meja bareng teman" },
-  { id: "pokemon_single", label: "Pokémon Singles", note: "Kartu satuan" },
-  { id: "pokemon_sealed", label: "Pokémon Sealed", note: "Booster, box & deck" },
-  { id: "accessories", label: "Accessories", note: "Sleeves, deck box, playmat" },
+/** A category id is a short slug stored in store_products.category (see supabase/store-categories.sql). */
+export type StoreCategory = string;
+export type Category = { id: StoreCategory; label: string; note: string | null; sort_order: number; is_active: boolean };
+export const CATEGORY_COLUMNS = "id, label, note, sort_order, is_active";
+/** Used until store-categories.sql has run (the table is missing), so the store keeps working. */
+export const DEFAULT_CATEGORIES: Category[] = [
+  { id: "boardgame", label: "Boardgame", note: "Untuk meja bareng teman", sort_order: 1, is_active: true },
+  { id: "pokemon_single", label: "Pokémon Singles", note: "Kartu satuan", sort_order: 2, is_active: true },
+  { id: "pokemon_sealed", label: "Pokémon Sealed", note: "Booster, box & deck", sort_order: 3, is_active: true },
+  { id: "accessories", label: "Accessories", note: "Sleeves, deck box, playmat", sort_order: 4, is_active: true },
 ];
-export const categoryLabel = (id: string) => CATEGORIES.find((c) => c.id === id)?.label ?? id;
+export const categoryLabel = (id: string, list: Category[] = DEFAULT_CATEGORIES) => list.find((c) => c.id === id)?.label ?? id;
+
+/** Loads categories (store staff also get hidden ones via RLS). Falls back to the defaults if the table is not there yet. */
+export async function fetchCategories(supabase: SupabaseClient): Promise<{ list: Category[]; missing: boolean }> {
+  const { data, error } = await supabase.from("store_categories").select(CATEGORY_COLUMNS).order("sort_order", { ascending: true }).order("label", { ascending: true });
+  if (error) return { list: DEFAULT_CATEGORIES, missing: true };
+  return { list: (data ?? []) as Category[], missing: false };
+}
+
+/** "Pokémon Sealed!" -> "pokemon_sealed"; adds _2, _3… when the slug is taken. */
+export function categorySlug(label: string, taken: string[]) {
+  const base = label.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 34) || "kategori";
+  let slug = base;
+  for (let n = 2; taken.includes(slug); n++) slug = `${base}_${n}`;
+  return slug;
+}
 
 export type Product = {
   id: number;
@@ -68,9 +87,12 @@ export async function uploadStoreBlob(supabase: SupabaseClient, blob: Blob): Pro
 /** Friendlier message when store.sql has not been run yet. */
 export const storeError = (error: unknown, fallback: string) => {
   const message = error instanceof Error ? error.message : typeof error === "object" && error && "message" in error ? String((error as { message: unknown }).message) : "";
-  if (/store_products|store_orders|store_order_items|store_wishlist|place_order|set_order_status|store-images/.test(message) && /does not exist|not find|schema cache/i.test(message)) {
+  if (/store_categories|store_products|store_orders|store_order_items|store_wishlist|place_order|set_order_status|store-images/.test(message) && /does not exist|not find|schema cache/i.test(message)) {
     return "Fitur toko butuh update database. Jalankan supabase/store.sql di Supabase SQL Editor, lalu refresh.";
   }
+  if (/store_products_category_check/.test(message)) return "Jenis produk baru butuh update database. Jalankan supabase/store-categories.sql di Supabase SQL Editor, lalu refresh.";
+  if (/store_products_category_fkey/.test(message)) return "Jenis produk ini masih dipakai produk (atau sudah dihapus). Pindahkan produknya dulu.";
+  if (/store_categories_label_key|store_categories_pkey/.test(message)) return "Nama jenis produk itu sudah ada.";
   return message || fallback;
 };
 

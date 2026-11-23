@@ -5,13 +5,13 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { useConfirm } from "@/components/ConfirmDialog";
 import PhotoCropper from "@/components/PhotoCropper";
 import {
-  CATEGORIES, LOW_STOCK, ORDER_COLUMNS, ORDER_STATUS, PRODUCT_COLUMNS, type Order, type OrderStatus, type Product, type StoreCategory,
-  buyerWhatsappUrl, categoryLabel, formatIDR, statusLabel, storeError, uploadStoreBlob,
+  DEFAULT_CATEGORIES, LOW_STOCK, ORDER_COLUMNS, ORDER_STATUS, PRODUCT_COLUMNS, type Category, type Order, type OrderStatus, type Product, type StoreCategory,
+  buyerWhatsappUrl, categoryLabel, categorySlug, fetchCategories, formatIDR, statusLabel, storeError, uploadStoreBlob,
 } from "@/lib/store";
 
 type Status = { tone: "ok" | "error"; text: string } | null;
 type Wish = { id: number; note: string; created_at: string; product_id: number | null; product_name: string | null; buyer_name: string | null; buyer_phone: string | null };
-type Tab = "orders" | "products" | "wishlist";
+type Tab = "orders" | "products" | "categories" | "wishlist";
 type Crop = { source: Blob; title: string };
 type Draft = { id: number | null; name: string; category: StoreCategory; card_info: string; price: string; stock: string; description: string; is_active: boolean; image_url: string | null };
 const EMPTY: Draft = { id: null, name: "", category: "boardgame", card_info: "", price: "", stock: "1", description: "", is_active: true, image_url: null };
@@ -21,6 +21,10 @@ const when = (iso: string) => new Date(iso).toLocaleString("id-ID", { timeZone: 
 export default function AdminStore({ userId }: { userId: string }) {
   const [tab, setTab] = useState<Tab>("orders");
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
+  const [catsMissing, setCatsMissing] = useState(false);
+  const [newCat, setNewCat] = useState("");
+  const [editingCat, setEditingCat] = useState<{ id: string; label: string } | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [wishes, setWishes] = useState<Wish[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,11 +39,14 @@ export default function AdminStore({ userId }: { userId: string }) {
 
   const load = useCallback(async () => {
     const supabase = getSupabaseClient();
-    const [p, o, w] = await Promise.all([
+    const [p, o, w, c] = await Promise.all([
       supabase.from("store_products").select(PRODUCT_COLUMNS).order("created_at", { ascending: false }),
       supabase.from("store_orders").select(ORDER_COLUMNS).order("created_at", { ascending: false }).limit(200),
       supabase.rpc("list_store_wishlist"),
+      fetchCategories(supabase),
     ]);
+    setCategories(c.list);
+    setCatsMissing(c.missing);
     const err = p.error ?? o.error ?? w.error;
     if (err) setStatus({ tone: "error", text: storeError(err, "Data toko gagal dimuat.") });
     setProducts((p.data ?? []) as Product[]);
@@ -111,7 +118,7 @@ export default function AdminStore({ userId }: { userId: string }) {
     setBusy(false);
   }
 
-  const startEdit = (p: Product | null) => { setPhoto(null); setStatus(null); setDraft(p ? { id: p.id, name: p.name, category: p.category, card_info: p.card_info ?? "", price: String(p.price), stock: String(p.stock), description: p.description ?? "", is_active: p.is_active, image_url: p.image_url } : { ...EMPTY }); };
+  const startEdit = (p: Product | null) => { setPhoto(null); setStatus(null); setDraft(p ? { id: p.id, name: p.name, category: p.category, card_info: p.card_info ?? "", price: String(p.price), stock: String(p.stock), description: p.description ?? "", is_active: p.is_active, image_url: p.image_url } : { ...EMPTY, category: categories.find((c) => c.is_active)?.id ?? EMPTY.category }); };
   const adjustStock = (p: Product, delta: number) => run(() => getSupabaseClient().from("store_products").update({ stock: Math.max(0, p.stock + delta) }).eq("id", p.id), "", "Stok gagal diubah.");
   const toggleActive = (p: Product) => run(() => getSupabaseClient().from("store_products").update({ is_active: !p.is_active }).eq("id", p.id), "", "Status gagal diubah.");
   async function removeProduct(p: Product) {
@@ -119,6 +126,47 @@ export default function AdminStore({ userId }: { userId: string }) {
     if (yes) await run(() => getSupabaseClient().from("store_products").delete().eq("id", p.id), "Produk dihapus.", "Produk gagal dihapus.");
   }
   const removeWish = (w: Wish) => run(() => getSupabaseClient().from("store_wishlist").delete().eq("id", w.id), "", "Titipan gagal dihapus.");
+
+  async function addCategory(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const label = newCat.trim();
+    if (!label) return;
+    const id = categorySlug(label, categories.map((c) => c.id));
+    const sort_order = categories.reduce((max, c) => Math.max(max, c.sort_order), 0) + 1;
+    const ok = await run(() => getSupabaseClient().from("store_categories").insert({ id, label, sort_order }), `Jenis "${label}" ditambahkan.`, "Jenis produk gagal ditambahkan.");
+    if (ok) setNewCat("");
+  }
+  async function saveCategoryLabel() {
+    if (!editingCat) return;
+    const label = editingCat.label.trim();
+    if (!label) return;
+    const ok = await run(() => getSupabaseClient().from("store_categories").update({ label }).eq("id", editingCat.id), "Nama jenis produk diperbarui.", "Nama gagal diubah.");
+    if (ok) setEditingCat(null);
+  }
+  const toggleCategory = (c: Category) =>
+    run(() => getSupabaseClient().from("store_categories").update({ is_active: !c.is_active }).eq("id", c.id), c.is_active ? `"${c.label}" disembunyikan dari katalog (produknya ikut tersembunyi).` : `"${c.label}" tampil lagi di katalog.`, "Gagal mengubah jenis produk.");
+  async function moveCategory(c: Category, dir: -1 | 1) {
+    const i = categories.findIndex((x) => x.id === c.id);
+    const other = categories[i + dir];
+    if (!other) return;
+    const supabase = getSupabaseClient();
+    // Re-number the whole list so equal sort_order values can't block the swap.
+    const order = categories.map((x) => x.id);
+    [order[i], order[i + dir]] = [order[i + dir], order[i]];
+    await run(async () => {
+      for (const [n, id] of order.entries()) {
+        const { error } = await supabase.from("store_categories").update({ sort_order: n + 1 }).eq("id", id);
+        if (error) return { error };
+      }
+      return { error: null };
+    }, "", "Urutan gagal diubah.");
+  }
+  async function removeCategory(c: Category) {
+    const used = products.filter((p) => p.category === c.id).length;
+    if (used > 0) { setStatus({ tone: "error", text: `"${c.label}" masih dipakai ${used} produk. Pindahkan produknya ke jenis lain dulu, atau pakai Sembunyikan.` }); return; }
+    const yes = await confirm({ title: `Hapus jenis "${c.label}"?`, message: "Jenis ini belum dipakai produk apa pun.", confirmLabel: "YA, HAPUS", tone: "danger" });
+    if (yes) await run(() => getSupabaseClient().from("store_categories").delete().eq("id", c.id), "Jenis produk dihapus.", "Jenis produk gagal dihapus.");
+  }
 
   return (
     <div className="admin-panel card admin-storepanel">
@@ -130,7 +178,7 @@ export default function AdminStore({ userId }: { userId: string }) {
         <div><dt>Omzet bulan ini</dt><dd>{formatIDR(stats.revenue)}</dd></div>
       </dl>
       <div className="admin-store-tabs" role="tablist">
-        {([["orders", `Pesanan (${stats.open})`], ["products", `Produk (${products.length})`], ["wishlist", `Titipan (${wishes.length})`]] as [Tab, string][]).map(([id, label]) => (
+        {([["orders", `Pesanan (${stats.open})`], ["products", `Produk (${products.length})`], ["categories", `Jenis produk (${categories.length})`], ["wishlist", `Titipan (${wishes.length})`]] as [Tab, string][]).map(([id, label]) => (
           <button key={id} type="button" role="tab" aria-selected={tab === id} className={tab === id ? "is-active" : ""} onClick={() => setTab(id)}>{label}</button>
         ))}
       </div>
@@ -181,9 +229,9 @@ export default function AdminStore({ userId }: { userId: string }) {
           <form className="admin-product-form" onSubmit={saveProduct}>
             <h3>{draft.id ? "Edit produk" : "Produk baru"}</h3>
             <label className="field"><span>NAMA</span><input value={draft.name} maxLength={120} required onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="mis. Catan, atau Pikachu ex SV8" /></label>
-            <label className="field"><span>KATEGORI</span><select value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value as StoreCategory })}>{CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}</select></label>
+            <label className="field"><span>KATEGORI</span><select value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value as StoreCategory })}>{categories.filter((c) => c.is_active || c.id === draft.category).map((c) => <option key={c.id} value={c.id}>{c.label}{c.is_active ? "" : " (disembunyikan)"}</option>)}</select></label>
             <label className="field"><span>SET / NOMOR KARTU (OPSIONAL)</span><input value={draft.card_info} maxLength={80} onChange={(e) => setDraft({ ...draft, card_info: e.target.value })} placeholder="mis. SV8 · 057/106" /></label>
-            <label className="field"><span>HARGA (RP)</span><input type="number" min={0} step={1000} inputMode="numeric" required value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} /></label>
+            <label className="field"><span>HARGA (RP)</span><input type="number" min={0} step={1} inputMode="numeric" required value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} /></label>
             <label className="field"><span>STOK</span><input type="number" min={0} step={1} inputMode="numeric" required value={draft.stock} onChange={(e) => setDraft({ ...draft, stock: e.target.value })} /></label>
             <label className="field admin-product-wide"><span>DESKRIPSI (OPSIONAL)</span><textarea rows={3} maxLength={500} value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} /></label>
             <div className="field admin-product-wide">
@@ -204,7 +252,7 @@ export default function AdminStore({ userId }: { userId: string }) {
             {shownProducts.map((p) => (
               <li key={p.id} className={p.is_active ? "" : "is-off"}>
                 {p.image_url ? <img src={p.image_url} alt="" loading="lazy" /> : <span className="admin-product-noimg" aria-hidden="true" />}
-                <span className="admin-product-info"><strong>{p.name}{!p.is_active && <em>NONAKTIF</em>}</strong><small>{categoryLabel(p.category)}{p.card_info ? ` · ${p.card_info}` : ""} · {formatIDR(p.price)}</small></span>
+                <span className="admin-product-info"><strong>{p.name}{!p.is_active && <em>NONAKTIF</em>}</strong><small>{categoryLabel(p.category, categories)}{p.card_info ? ` · ${p.card_info}` : ""} · {formatIDR(p.price)}</small></span>
                 <span className={`admin-stock${p.stock <= LOW_STOCK ? " is-low" : ""}`}>
                   <button type="button" disabled={busy || p.stock === 0} onClick={() => adjustStock(p, -1)} aria-label={`Kurangi stok ${p.name}`}>−</button>
                   <b>{p.stock}</b>
@@ -220,6 +268,45 @@ export default function AdminStore({ userId }: { userId: string }) {
           </ul>
         ))}
       </>)}
+
+      {!loading && tab === "categories" && (catsMissing ? (
+        <p className="notice notice-error" role="alert">Jenis produk belum bisa diatur. Jalankan <code>supabase/store-categories.sql</code> di Supabase SQL Editor, lalu refresh.</p>
+      ) : (
+        <div className="admin-categories">
+          <form className="admin-categories-add" onSubmit={addCategory}>
+            <label className="field"><span className="sr-only">Nama jenis produk</span><input value={newCat} onChange={(e) => setNewCat(e.target.value)} required maxLength={40} placeholder="Tambah jenis, mis. One Piece Singles" /></label>
+            <button className="btn-primary" type="submit" disabled={busy}><span>TAMBAH</span><i className="arrow-icon" aria-hidden="true" /></button>
+          </form>
+          {categories.length === 0 ? <p className="admin-empty">Belum ada jenis produk. Tambahkan yang pertama.</p> : (
+            <ul className="admin-content-list">
+              {categories.map((c, i) => (
+                <li key={c.id} className={c.is_active ? "" : "is-off"}>
+                  <div className="admin-content-row">
+                    <div className="admin-content-info">
+                      {editingCat?.id === c.id
+                        ? <input className="admin-category-edit" value={editingCat.label} maxLength={40} autoFocus onChange={(e) => setEditingCat({ id: c.id, label: e.target.value })} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); saveCategoryLabel(); } if (e.key === "Escape") setEditingCat(null); }} aria-label="Nama jenis produk" />
+                        : <strong>{c.label}{!c.is_active && <em>DISEMBUNYIKAN</em>}</strong>}
+                      <span>{products.filter((p) => p.category === c.id).length} produk</span>
+                    </div>
+                    <div className="admin-content-actions">
+                      {editingCat?.id === c.id ? (<>
+                        <button type="button" className="admin-use-id" disabled={busy} onClick={saveCategoryLabel}>SIMPAN</button>
+                        <button type="button" className="admin-use-id" disabled={busy} onClick={() => setEditingCat(null)}>BATAL</button>
+                      </>) : (<>
+                        <button type="button" className="admin-use-id" disabled={busy || i === 0} onClick={() => moveCategory(c, -1)} aria-label={`Naikkan ${c.label}`}>↑</button>
+                        <button type="button" className="admin-use-id" disabled={busy || i === categories.length - 1} onClick={() => moveCategory(c, 1)} aria-label={`Turunkan ${c.label}`}>↓</button>
+                        <button type="button" className="admin-use-id" disabled={busy} onClick={() => setEditingCat({ id: c.id, label: c.label })}>UBAH NAMA</button>
+                        <button type="button" className="admin-use-id" disabled={busy} onClick={() => toggleCategory(c)}>{c.is_active ? "SEMBUNYIKAN" : "TAMPILKAN"}</button>
+                        <button type="button" className="admin-use-id admin-use-danger" disabled={busy} onClick={() => removeCategory(c)}>HAPUS</button>
+                      </>)}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
 
       {!loading && tab === "wishlist" && (wishes.length === 0 ? <p className="admin-empty">Belum ada titipan dari member.</p> : (
         <ul className="admin-order-list">

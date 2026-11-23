@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { getSupabaseClient } from "@/lib/supabase";
 import StoreHero from "@/components/store/StoreHero";
 import {
-  CATEGORIES, PRODUCT_COLUMNS, type CartLine, type Product, type StoreCategory,
-  categoryLabel, formatIDR, hasStoreWhatsapp, orderMessage, readCart, stockState, storeError, whatsappUrl, writeCart,
+  DEFAULT_CATEGORIES, PRODUCT_COLUMNS, type CartLine, type Category, type Product, type StoreCategory,
+  categoryLabel, fetchCategories, formatIDR, hasStoreWhatsapp, orderMessage, readCart, stockState, storeError, whatsappUrl, writeCart,
 } from "@/lib/store";
 
 type Sort = "new" | "price-asc" | "price-desc" | "name";
@@ -16,6 +16,7 @@ type Buyer = { id: string; name: string; approved: boolean; staff: boolean } | n
 /** Public catalogue (anyone can browse) + cart. Ordering needs a signed-in, approved member; place_order() re-checks price and stock on the server. */
 export default function StoreApp() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [category, setCategory] = useState<StoreCategory | "all">("all");
@@ -37,9 +38,18 @@ export default function StoreApp() {
 
   const load = useCallback(async () => {
     try {
-      const { data, error } = await getSupabaseClient().from("store_products").select(PRODUCT_COLUMNS).eq("is_active", true).order("created_at", { ascending: false });
+      const supabase = getSupabaseClient();
+      const [{ data, error }, cats] = await Promise.all([
+        supabase.from("store_products").select(PRODUCT_COLUMNS).eq("is_active", true).order("created_at", { ascending: false }),
+        fetchCategories(supabase),
+      ]);
       if (error) throw error;
-      setProducts((data ?? []) as Product[]);
+      // Staff also receive hidden categories through RLS; the public catalogue only shows active ones.
+      const shown = cats.list.filter((c) => c.is_active);
+      const shownIds = new Set(shown.map((c) => c.id));
+      setCategories(shown);
+      // Hiding a category in admin also hides its products from the catalogue.
+      setProducts(((data ?? []) as Product[]).filter((p) => cats.missing || shownIds.has(p.category)));
       setLoadError("");
     } catch (error) {
       setLoadError(storeError(error, "Katalog gagal dimuat."));
@@ -162,7 +172,7 @@ export default function StoreApp() {
         <button type="button" role="tab" aria-selected={category === "all"} className={category === "all" ? "is-active" : ""} onClick={() => setCategory("all")}>
           <span className="store-tab-no">00</span><span className="store-tab-copy"><strong>Semua</strong><small>SEMUA BARANG</small></span><span className="store-tab-count">{products.length}</span>
         </button>
-        {CATEGORIES.map((c, i) => (
+        {categories.map((c, i) => (
           <button key={c.id} type="button" role="tab" aria-selected={category === c.id} className={category === c.id ? "is-active" : ""} onClick={() => setCategory(c.id)}>
             <span className="store-tab-no">{String(i + 1).padStart(2, "0")}</span><span className="store-tab-copy"><strong>{c.label}</strong><small>KATEGORI</small></span><span className="store-tab-count">{counts.get(c.id) ?? 0}</span>
           </button>
@@ -194,7 +204,7 @@ export default function StoreApp() {
                     {p.image_url ? <img src={p.image_url} alt="" loading="lazy" /> : <img className="store-card-placeholder" src="/white-coffee-bean.png" alt="" />}
                     <span className={`store-badge is-${s.tone}`}>{s.label}</span>
                   </button>
-                  <small className="store-card-cat">{categoryLabel(p.category)}{p.card_info ? ` · ${p.card_info}` : ""}</small>
+                  <small className="store-card-cat">{categoryLabel(p.category, categories)}{p.card_info ? ` · ${p.card_info}` : ""}</small>
                   <strong>{p.name}</strong>
                   <span className="store-price">{formatIDR(p.price)}</span>
                   <button type="button" className="btn-red store-add" disabled={s.tone === "out"} onClick={() => add(p)}>{s.tone === "out" ? "HABIS" : qtyOf(p.id) > 0 ? `DI KERANJANG (${qtyOf(p.id)})` : "TAMBAH"}</button>
@@ -215,7 +225,7 @@ export default function StoreApp() {
           <div className="store-sheet">
             <button type="button" className="store-close" onClick={() => setDetail(null)} aria-label="Tutup">×</button>
             <div className="store-sheet-art">{detail.image_url ? <img src={detail.image_url} alt={detail.name} /> : <img className="store-card-placeholder" src="/white-coffee-bean.png" alt="" />}</div>
-            <small className="store-card-cat">{categoryLabel(detail.category)}{detail.card_info ? ` · ${detail.card_info}` : ""}</small>
+            <small className="store-card-cat">{categoryLabel(detail.category, categories)}{detail.card_info ? ` · ${detail.card_info}` : ""}</small>
             {noticeEl}
             <h2>{detail.name}</h2>
             <p className="store-price">{formatIDR(detail.price)} <span className={`store-badge is-${stockState(detail.stock).tone}`}>{stockState(detail.stock).label}</span></p>
