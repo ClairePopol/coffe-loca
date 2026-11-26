@@ -154,7 +154,7 @@ export default function SequenceScroll() {
               <span className="eyebrow"><i /> MEDAN SPECIALITY COFFEE</span>
               <h1><em><span className="hero-loca">LOCA</span>-tion</em><span className="hero-for-row"><em>for</em><span className="hero-for-list"><span>coffee</span><span>food</span><span>hangout</span></span></span></h1>
               <p className="hero-slogan">Medan, Jl. T. Amir Hamzah No. 11</p>
-              <a className="hero-direction" href={SITE.mapsUrl} target="_blank" rel="noreferrer">DIRECTION <span className="arrow-icon" aria-hidden="true" /></a>
+              <a className="hero-direction" href={SITE.mapsUrl} target="_blank" rel="noreferrer">DIRECTION</a>
               <div className="hero-hours">
                 <div className="hero-hours-copy"><span>JAM OPERASIONAL</span><strong>{SITE.hours.open} – {SITE.hours.close} <small>WIB</small></strong><em>Open daily</em></div>
               </div>
