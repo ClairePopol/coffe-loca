@@ -63,32 +63,39 @@
 .entry-hours b { color:#fff; font-family:"Eight Bit Dragon","Press Start 2P",monospace; font-size:16px; font-weight:400; letter-spacing:.04em; line-height:1.1; text-shadow:0 0 3px #fff,0 0 9px rgba(255,70,70,.95),0 0 18px rgba(255,70,70,.6); }
 @media (max-width:760px) { .entry-hours { gap:7px; padding:4px 10px; } .entry-hours b { font-size:13px; } .entry-hours .tick-clock { width:15px; height:15px; } .tick-dots { gap:3px; } .tick-dots u { width:4px; height:4px; } }
 
-/* Sky decor: stars at night, drifting clouds + sun by day */
+/* Sky decor: stars at night, drifting clouds + sun by day. Every period change cross-fades. */
+@property --bg1 { syntax:"<color>"; inherits:true; initial-value:#ff857e; }
+@property --bg2 { syntax:"<color>"; inherits:true; initial-value:#f03d44; }
+@property --bg3 { syntax:"<color>"; inherits:true; initial-value:#cf2028; }
+@property --bg4 { syntax:"<color>"; inherits:true; initial-value:#a8141a; }
+@property --bg5 { syntax:"<color>"; inherits:true; initial-value:#6e0a10; }
+.entry-choice { transition:--bg1 2.2s ease,--bg2 2.2s ease,--bg3 2.2s ease,--bg4 2.2s ease,--bg5 2.2s ease; }
 .entry-choice-sky { position:fixed; z-index:-1; inset:0; overflow:hidden; pointer-events:none; }
-.sky-stars, .sky-sun { display:none; }
-.sky-cloud { position:absolute; left:0; width:230px; height:60px; border-radius:60px; background:rgba(255,255,255,.17); scale:var(--s); animation:sky-drift linear infinite; }
+
+.sky-cloud { position:absolute; left:0; width:230px; height:60px; border-radius:60px; background:rgba(255,255,255,.17); opacity:1; scale:var(--s); animation:sky-drift linear infinite; transition:background-color 2.2s ease,opacity 2.2s ease; }
 .sky-cloud::before, .sky-cloud::after { position:absolute; content:""; border-radius:50%; background:inherit; }
 .sky-cloud::before { width:90px; height:90px; left:34px; bottom:18px; }
 .sky-cloud::after { width:66px; height:66px; left:110px; bottom:22px; }
 @keyframes sky-drift { from { translate:-300px 0; } to { translate:calc(100vw + 300px) 0; } }
-.sky-sun { position:absolute; border-radius:50%; animation:sky-sun-breathe 8s ease-in-out infinite alternate; }
-@keyframes sky-sun-breathe { from { scale:1; } to { scale:1.05; } }
 
-/* pagi: low sun rising behind the horizon, pale clouds */
-.entry-choice[data-time="pagi"] .sky-sun { display:block; left:50%; bottom:-190px; width:420px; height:420px; margin-left:-210px; background:#ffe2a6; opacity:.5; }
+/* one sun that travels: rises (pagi) -> high corner (siang) -> sinks (sore) -> gone (malam) */
+.sky-sun { position:absolute; display:block; left:50%; top:130%; width:420px; height:420px; border-radius:50%; background:#ffe2a6; opacity:0; translate:-50% -50%; transition:left 2.6s ease,top 2.6s ease,width 2.6s ease,height 2.6s ease,background-color 2.2s ease,opacity 2.2s ease; }
+.entry-choice[data-time="pagi"] .sky-sun { left:50%; top:106%; width:420px; height:420px; background:#ffe2a6; opacity:.5; }
+.entry-choice[data-time="siang"] .sky-sun { left:90%; top:18%; width:104px; height:104px; background:#fff1c9; opacity:.55; }
+.entry-choice[data-time="sore"] .sky-sun { left:50%; top:108%; width:460px; height:460px; background:#ff9a4d; opacity:.5; }
+.entry-choice[data-time="malam"] .sky-sun { left:50%; top:135%; width:460px; height:460px; background:#ff9a4d; opacity:0; }
+
 .entry-choice[data-time="pagi"] .sky-cloud { background:rgba(255,244,225,.22); }
-/* siang: small bright sun top-right, white clouds */
-.entry-choice[data-time="siang"] .sky-sun { display:block; right:9%; top:13%; width:104px; height:104px; background:#fff1c9; opacity:.55; }
 .entry-choice[data-time="siang"] .sky-cloud { background:rgba(255,255,255,.2); }
-/* sore: big orange sun sinking to the horizon, dusk clouds */
-.entry-choice[data-time="sore"] .sky-sun { display:block; left:50%; bottom:-170px; width:460px; height:460px; margin-left:-230px; background:#ff9a4d; opacity:.5; }
 .entry-choice[data-time="sore"] .sky-cloud { background:rgba(255,170,150,.2); }
-/* malam: no clouds, twinkling stars */
-.entry-choice[data-time="malam"] .sky-cloud { display:none; }
-.entry-choice[data-time="malam"] .sky-stars { display:block; position:absolute; inset:0; animation:sky-twinkle 4s ease-in-out infinite alternate; background-repeat:repeat; }
-.sky-stars-a { background-image:radial-gradient(1.6px 1.6px at 20px 30px,#fff,transparent 60%),radial-gradient(1.2px 1.2px at 90px 120px,#ffe9ef,transparent 60%),radial-gradient(1.8px 1.8px at 160px 60px,#fff,transparent 60%),radial-gradient(1.2px 1.2px at 230px 170px,#fff,transparent 60%); background-size:260px 210px; }
-.sky-stars-b { background-image:radial-gradient(1.4px 1.4px at 60px 80px,#fff,transparent 60%),radial-gradient(1px 1px at 140px 20px,#ffdbe4,transparent 60%),radial-gradient(1.6px 1.6px at 200px 140px,#fff,transparent 60%); background-size:310px 240px; animation-delay:-1.4s !important; animation-duration:5.5s !important; }
-.sky-stars-c { background-image:radial-gradient(2.2px 2.2px at 110px 70px,#fff,transparent 65%),radial-gradient(2px 2px at 250px 190px,#fff,transparent 65%); background-size:380px 300px; animation-delay:-2.6s !important; animation-duration:3.2s !important; }
+.entry-choice[data-time="malam"] .sky-cloud { opacity:0; }
+
+.sky-stars { position:absolute; inset:0; opacity:0; transition:opacity 2.4s ease; }
+.sky-stars::before { position:absolute; inset:0; content:""; background-repeat:repeat; animation:sky-twinkle 4s ease-in-out infinite alternate; }
+.entry-choice[data-time="malam"] .sky-stars { opacity:1; }
+.sky-stars-a::before { background-image:radial-gradient(1.6px 1.6px at 20px 30px,#fff,transparent 60%),radial-gradient(1.2px 1.2px at 90px 120px,#ffe9ef,transparent 60%),radial-gradient(1.8px 1.8px at 160px 60px,#fff,transparent 60%),radial-gradient(1.2px 1.2px at 230px 170px,#fff,transparent 60%); background-size:260px 210px; }
+.sky-stars-b::before { background-image:radial-gradient(1.4px 1.4px at 60px 80px,#fff,transparent 60%),radial-gradient(1px 1px at 140px 20px,#ffdbe4,transparent 60%),radial-gradient(1.6px 1.6px at 200px 140px,#fff,transparent 60%); background-size:310px 240px; animation-delay:-1.4s; animation-duration:5.5s; }
+.sky-stars-c::before { background-image:radial-gradient(2.2px 2.2px at 110px 70px,#fff,transparent 65%),radial-gradient(2px 2px at 250px 190px,#fff,transparent 65%); background-size:380px 300px; animation-delay:-2.6s; animation-duration:3.2s; }
 @keyframes sky-twinkle { from { opacity:.25; } to { opacity:1; } }
 
 /* Developer mode panel (?dev) */
