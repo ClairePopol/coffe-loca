@@ -14,6 +14,19 @@ function imageUrl(index: number) {
   return `${FRAME_PATH}${String(index + 1).padStart(3, "0")}.jpg`;
 }
 
+// Static map of Coffee Loca, Jl. T. Amir Hamzah No. 11, Medan (OpenStreetMap, saved locally): no embed UI, no buttons, no third-party requests.
+function HeroMapTiles() {
+  return (
+    <>
+      <img className="hero-map-img" src="/hero-map.webp" alt="" width={600} height={400} loading="lazy" decoding="async" draggable={false} />
+      <span className="hero-map-pin" aria-hidden="true">
+        <svg viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.2 0 11.7 0 20.5 12 32 12 32s12-11.5 12-20.3C24 5.2 18.6 0 12 0z" fill="#d4232a" /><circle cx="12" cy="11.5" r="4.6" fill="#fff" /></svg>
+      </span>
+      <span className="hero-map-credit">© OpenStreetMap contributors</span>
+    </>
+  );
+}
+
 function drawFrame(canvas: HTMLCanvasElement, image: HTMLImageElement) {
   if (!image.complete || !image.naturalWidth) return;
   const rect = canvas.getBoundingClientRect();
@@ -167,7 +180,7 @@ export default function SequenceScroll() {
                   <i aria-hidden="true">★★★★★</i>
                   <span><b>Suka Coffee Loca?</b><small>Tulis ulasanmu di Google</small></span>
                 </a>
-                <a className="hero-map-frame" href={SITE.mapsUrl} target="_blank" rel="noreferrer" aria-label="Buka peta di Google Maps" tabIndex={-1}><iframe src={SITE.mapsEmbedUrl} title={`Peta ${SITE.placeName}`} loading="lazy" tabIndex={-1} referrerPolicy="no-referrer-when-downgrade" /></a>
+                <a className="hero-map-frame" href={SITE.mapsUrl} target="_blank" rel="noreferrer" aria-label="Buka peta di Google Maps" tabIndex={-1}><HeroMapTiles /></a>
                 <a className="hero-map-label" href={SITE.mapsUrl} target="_blank" rel="noreferrer"><b>COFFEE LOCA / MEDAN</b><i className="arrow-icon" aria-hidden="true" /></a>
               </div>
             </motion.div>
