@@ -188,8 +188,8 @@ export default function SequenceScroll() {
               <h2>COFFEE</h2>
               <p className="story-beans">SPECIALITY COFFEE BLENDED 100% ARABICA<br />YOUR BEANS OPTIONS :</p>
               <div className="story-bean-row">
-                <figure><img src="/beans/bold-berry.webp" alt="Bold Berry" width={600} height={600} loading="lazy" decoding="async" /><figcaption>BOLD BERRY</figcaption></figure>
-                <figure><img src="/beans/back-to-black.webp" alt="Back to Black" width={600} height={600} loading="lazy" decoding="async" /><figcaption>BACK TO BLACK</figcaption></figure>
+                <figure><img src="/beans/bold-berry.webp" alt="Bold Berry" width={600} height={600} loading="lazy" decoding="async" /><figcaption><b>BOLD BERRY</b><small>SWEET, JUICY, WELL BALANCE</small></figcaption></figure>
+                <figure><img src="/beans/back-to-black.webp" alt="Back to Black" width={600} height={600} loading="lazy" decoding="async" /><figcaption><b>BACK TO BLACK</b><small>BOLD, SWEET, ROUNDED</small></figcaption></figure>
               </div>
               <p className="story-beans story-beans-mix">OR MIX BETWEEN <b>BOLD BERRY</b> &amp; <b>BACK TO BLACK</b></p>
             </motion.div>
