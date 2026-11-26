@@ -1,11 +1,11 @@
 @font-face { font-family:"Eight Bit Dragon"; src:url("/fonts/eight-bit-dragon.otf") format("opentype"); font-display:swap; }
 /* First-visit destination choice (Loca Coffee / Loca Store) — red poster screen */
 /* First-visit destination choice (Coffee Loca / Locamart) — red poster screen */
-.entry-choice { --bg1:#ff857e; --bg2:#f03d44; --bg3:#cf2028; --bg4:#a8141a; --bg5:#6e0a10; --ray:.5; --glow:255,225,220; background:var(--bg4); }
-.entry-choice[data-time="pagi"] { --bg1:#ffd7a0; --bg2:#ff8a63; --bg3:#e0453a; --bg4:#b02424; --bg5:#7a1519; --ray:.55; --glow:255,236,200; }
-.entry-choice[data-time="sore"] { --bg1:#ffa552; --bg2:#f2593c; --bg3:#c91f35; --bg4:#8c1438; --bg5:#4d0b26; --ray:.5; --glow:255,200,150; }
-.entry-choice[data-time="malam"] { --bg1:#b92b44; --bg2:#7a1630; --bg3:#4a0e24; --bg4:#2a0816; --bg5:#12040b; --ray:.22; --glow:255,150,170; }
-.entry-choice { position:fixed; z-index:250; inset:0; display:flex; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; touch-action:pan-y; color:#fff; background:#a8141a; }
+.entry-choice { --bg1:#9bdcff; --bg2:#54b0f4; --bg3:#2f86dc; --bg4:#1f5eb4; --bg5:#133f82; --ray:.5; --glow:255,255,255; background:var(--bg4); }
+.entry-choice[data-time="pagi"] { --bg1:#ffdca6; --bg2:#f9ad8c; --bg3:#c27ca0; --bg4:#6a5e98; --bg5:#33396a; --ray:.5; --glow:255,236,200; }
+.entry-choice[data-time="sore"] { --bg1:#ffb56b; --bg2:#f27a4c; --bg3:#b8486c; --bg4:#702c70; --bg5:#2e1848; --ray:.5; --glow:255,200,150; }
+.entry-choice[data-time="malam"] { --bg1:#2d3478; --bg2:#1c2154; --bg3:#111538; --bg4:#080b24; --bg5:#03040f; --ray:.2; --glow:170,180,255; }
+.entry-choice { position:fixed; z-index:250; inset:0; display:flex; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; touch-action:pan-y; color:#fff; background:#1f5eb4; }
 .entry-choice:focus { outline:none; }
 .entry-choice::before { position:fixed; z-index:-2; inset:0; content:""; background:radial-gradient(ellipse 80% 90% at 50% 38%,var(--bg1) 0%,var(--bg2) 24%,var(--bg3) 48%,var(--bg4) 74%,var(--bg5) 100%); }
 .entry-choice-pins { position:fixed; z-index:-1; inset:0; overflow:hidden; pointer-events:none; }
@@ -52,23 +52,23 @@
   .entry-choice *,.entry-choice *::before,.entry-choice *::after { animation:none !important; }
 }
 
-.entry-hours { display:inline-flex; align-items:center; gap:10px; padding:5px 13px; border:2px solid #fff; border-radius:10px; background:rgba(110,6,12,.35); box-shadow:0 0 8px rgba(255,255,255,.55),0 0 22px rgba(255,70,70,.8),inset 0 0 14px rgba(255,70,70,.55); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
-.entry-hours .tick-clock { width:18px; height:18px; color:#fff; filter:drop-shadow(0 0 5px rgba(255,70,70,.9)); overflow:visible; }
+.entry-hours { display:inline-flex; align-items:center; gap:10px; padding:5px 13px; border:2px solid #fff; border-radius:10px; background:rgba(8,14,40,.35); box-shadow:0 0 8px rgba(255,255,255,.55),0 0 22px rgba(255,255,255,.8),inset 0 0 14px rgba(255,255,255,.55); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+.entry-hours .tick-clock { width:18px; height:18px; color:#fff; filter:drop-shadow(0 0 5px rgba(255,255,255,.9)); overflow:visible; }
 .tick-second { animation:entry-tick 60s steps(60) infinite; }
 @keyframes entry-tick { to { transform:rotate(360deg); } }
 .tick-dots { display:inline-flex; align-items:center; gap:4px; }
-.tick-dots u { width:5px; height:5px; border-radius:50%; background:#fff; box-shadow:0 0 8px rgba(255,70,70,.95); animation:entry-tick-dot 1.2s steps(1) infinite; opacity:.25; }
+.tick-dots u { width:5px; height:5px; border-radius:50%; background:#fff; box-shadow:0 0 8px rgba(255,255,255,.95); animation:entry-tick-dot 1.2s steps(1) infinite; opacity:.25; }
 .tick-dots u:nth-child(2) { animation-delay:.4s; } .tick-dots u:nth-child(3) { animation-delay:.8s; }
 @keyframes entry-tick-dot { 0% { opacity:1; } 33% { opacity:.25; } 100% { opacity:.25; } }
-.entry-hours b { color:#fff; font-family:"Eight Bit Dragon","Press Start 2P",monospace; font-size:16px; font-weight:400; letter-spacing:.04em; line-height:1.1; text-shadow:0 0 3px #fff,0 0 9px rgba(255,70,70,.95),0 0 18px rgba(255,70,70,.6); }
+.entry-hours b { color:#fff; font-family:"Eight Bit Dragon","Press Start 2P",monospace; font-size:16px; font-weight:400; letter-spacing:.04em; line-height:1.1; text-shadow:0 0 3px #fff,0 0 9px rgba(255,255,255,.95),0 0 18px rgba(255,255,255,.6); }
 @media (max-width:760px) { .entry-hours { gap:7px; padding:4px 10px; } .entry-hours b { font-size:13px; } .entry-hours .tick-clock { width:15px; height:15px; } .tick-dots { gap:3px; } .tick-dots u { width:4px; height:4px; } }
 
 /* Sky decor: stars at night, drifting clouds + sun by day. Every period change cross-fades. */
-@property --bg1 { syntax:"<color>"; inherits:true; initial-value:#ff857e; }
-@property --bg2 { syntax:"<color>"; inherits:true; initial-value:#f03d44; }
-@property --bg3 { syntax:"<color>"; inherits:true; initial-value:#cf2028; }
-@property --bg4 { syntax:"<color>"; inherits:true; initial-value:#a8141a; }
-@property --bg5 { syntax:"<color>"; inherits:true; initial-value:#6e0a10; }
+@property --bg1 { syntax:"<color>"; inherits:true; initial-value:#9bdcff; }
+@property --bg2 { syntax:"<color>"; inherits:true; initial-value:#54b0f4; }
+@property --bg3 { syntax:"<color>"; inherits:true; initial-value:#2f86dc; }
+@property --bg4 { syntax:"<color>"; inherits:true; initial-value:#1f5eb4; }
+@property --bg5 { syntax:"<color>"; inherits:true; initial-value:#133f82; }
 .entry-choice { transition:--bg1 2.2s ease,--bg2 2.2s ease,--bg3 2.2s ease,--bg4 2.2s ease,--bg5 2.2s ease; }
 .entry-choice-sky { position:fixed; z-index:-1; inset:0; overflow:hidden; pointer-events:none; }
 
