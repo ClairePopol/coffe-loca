@@ -124,7 +124,7 @@ export default function LoginPage() {
         </div>
 
         <div className="auth-card card">
-          <div className="card-topline"><span>MEMBER ACCESS</span><span>MEDAN / 2026</span></div>
+          <div className="card-topline"><span>MEMBER ACCESS</span></div>
           {(<>
           <div className="auth-tabs" role="tablist" aria-label="Akses akun">
             <button id="auth-tab-login" type="button" className={mode === "login" ? "is-active" : ""} role="tab" aria-selected={mode === "login"} aria-controls="auth-panel" onClick={() => switchMode("login")}>LOGIN</button>
