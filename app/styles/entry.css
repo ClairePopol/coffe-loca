@@ -90,3 +90,9 @@
 .sky-stars-b { background-image:radial-gradient(1.4px 1.4px at 60px 80px,#fff,transparent 60%),radial-gradient(1px 1px at 140px 20px,#ffdbe4,transparent 60%),radial-gradient(1.6px 1.6px at 200px 140px,#fff,transparent 60%); background-size:310px 240px; animation-delay:-1.4s !important; animation-duration:5.5s !important; }
 .sky-stars-c { background-image:radial-gradient(2.2px 2.2px at 110px 70px,#fff,transparent 65%),radial-gradient(2px 2px at 250px 190px,#fff,transparent 65%); background-size:380px 300px; animation-delay:-2.6s !important; animation-duration:3.2s !important; }
 @keyframes sky-twinkle { from { opacity:.25; } to { opacity:1; } }
+
+/* Developer mode panel (?dev) */
+.entry-dev { position:fixed; z-index:5; left:50%; bottom:14px; translate:-50% 0; display:flex; align-items:center; gap:6px; padding:7px 10px; border-radius:12px; background:rgba(0,0,0,.65); backdrop-filter:blur(6px); color:#fff; font-size:11px; font-weight:700; letter-spacing:.08em; }
+.entry-dev span { margin-right:4px; opacity:.7; }
+.entry-dev button { padding:6px 10px; border:1px solid rgba(255,255,255,.35); border-radius:8px; background:transparent; color:#fff; font:inherit; cursor:pointer; }
+.entry-dev button.is-active { background:#fff; color:#111; }

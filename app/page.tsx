@@ -197,6 +197,16 @@ function TickingClock() {
 function EntryChoice() {
   const [visible, setVisible] = useState(false);
   const [period, setPeriod] = useState<DayPeriod>("siang");
+  // Developer mode: open the site with ?dev (or ?time=pagi|siang|sore|malam) to preview each time-of-day theme.
+  const [devMode, setDevMode] = useState(false);
+  const [forced, setForced] = useState<DayPeriod | null>(null);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const time = params.get("time");
+    const isPeriod = (v: string | null): v is DayPeriod => v === "pagi" || v === "siang" || v === "sore" || v === "malam";
+    if (params.has("dev") || isPeriod(time)) setDevMode(true);
+    if (isPeriod(time)) setForced(time);
+  }, []);
   useEffect(() => {
     const update = () => {
       const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jakarta", hour: "2-digit", hourCycle: "h23" }).format(new Date()));
@@ -227,7 +237,7 @@ function EntryChoice() {
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div ref={dialogRef} tabIndex={-1} data-time={period} data-lenis-prevent data-scroll-lock-allow className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
+        <motion.div ref={dialogRef} tabIndex={-1} data-time={forced ?? period} data-lenis-prevent data-scroll-lock-allow className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
           <div className="entry-choice-pins" aria-hidden="true">
             <i style={{ left: "6%", top: "12%", width: 54, height: 54, animationDelay: "-0s", animationDuration: "9s", "--tilt": "-14deg" } as React.CSSProperties} />
             <i style={{ left: "88%", top: "8%", width: 40, height: 40, animationDelay: "-2s", animationDuration: "7s", "--tilt": "10deg" } as React.CSSProperties} />
@@ -248,6 +258,15 @@ function EntryChoice() {
             <i className="sky-cloud" style={{ top: "70%", animationDuration: "80s", animationDelay: "-30s", "--s": 1.2 } as React.CSSProperties} />
             <i className="sky-cloud" style={{ top: "26%", animationDuration: "110s", animationDelay: "-85s", "--s": .8 } as React.CSSProperties} />
           </div>
+          {devMode && (
+            <div className="entry-dev" role="group" aria-label="Developer mode: pilih waktu">
+              <span>DEV · TEMA WAKTU</span>
+              {(["pagi", "siang", "sore", "malam"] as DayPeriod[]).map((value) => (
+                <button key={value} type="button" className={(forced ?? period) === value ? "is-active" : ""} onClick={() => setForced(value)}>{value.toUpperCase()}</button>
+              ))}
+              <button type="button" onClick={() => setForced(null)}>AUTO</button>
+            </div>
+          )}
           <div className="entry-choice-grain" aria-hidden="true" />
           <div className="entry-choice-top"><NeonSign /><span className="entry-hours" aria-label={`Buka ${SITE.hours.open} sampai ${SITE.hours.close}`}>
               <TickingClock />
