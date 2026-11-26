@@ -320,9 +320,3 @@
   .footer-bottom>span:nth-child(2) { display:none; }
 }
 
-.location-detail:nth-child(2) { position:relative; padding-right:44%; }
-.location-minimap { position:absolute; top:0; right:0; bottom:0; width:38%; overflow:hidden; border-radius:0 var(--radius) var(--radius) 0; }
-.location-minimap svg { display:block; width:100%; height:100%; transition:transform .5s var(--ease-out); }
-.location-minimap:hover svg { transform:scale(1.08); }
-.location-detail>a.location-minimap { display:block; }
-@media (max-width:760px) { .location-detail:nth-child(2) { padding-right:42%; } }

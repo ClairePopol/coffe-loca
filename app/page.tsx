@@ -191,7 +191,6 @@ function EntryChoice() {
         <motion.div ref={dialogRef} tabIndex={-1} data-lenis-prevent data-scroll-lock-allow className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
           <div className="entry-choice-glow" aria-hidden="true" />
           <div className="entry-choice-pattern entry-choice-pattern-a" aria-hidden="true" />
-          <div className="entry-choice-pattern entry-choice-pattern-b" aria-hidden="true" />
           <div className="entry-choice-grain" aria-hidden="true" />
           <div className="entry-choice-top"><span>OPEN DAILY</span><span>{SITE.hours.open} - {SITE.hours.close}</span></div>
           <div className="entry-choice-content">
@@ -607,16 +606,6 @@ function LocationSection() {
               <span className="location-detail-label"><i>02</i> JAM OPERASIONAL</span>
               <p className="location-hours"><strong>{SITE.hours.open} – {SITE.hours.close}</strong><span>WIB</span></p>
               <OpenStatus />
-              <a className="location-minimap" href={SITE.mapsUrl} target="_blank" rel="noreferrer" aria-label="Buka peta di Google Maps">
-                <svg viewBox="0 0 120 120" aria-hidden="true" preserveAspectRatio="xMidYMid slice">
-                  <rect width="120" height="120" fill="#ececea" />
-                  <path d="M-10 30 L130 18 M-10 78 L130 92 M30 -10 L44 130 M84 -10 L72 130" stroke="#fff" strokeWidth="7" />
-                  <path d="M-10 54 L130 50 M58 -10 L62 130" stroke="#fff" strokeWidth="3" />
-                  <rect x="94" y="62" width="30" height="24" rx="3" fill="#dfe9dc" />
-                  <path d="M60 28 c-9 0-15 6-15 14 0 11 15 26 15 26 s15-15 15-26 c0-8-6-14-15-14z" fill="#d4232a" />
-                  <circle cx="60" cy="42" r="5.5" fill="#fff" />
-                </svg>
-              </a>
             </article>
           </div>
           <a className="location-cta" href={SITE.mapsUrl} target="_blank" rel="noreferrer"><span>PETUNJUK ARAH</span><i className="arrow-icon" aria-hidden="true" /></a>
