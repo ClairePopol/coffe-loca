@@ -190,6 +190,8 @@ function EntryChoice() {
       {visible && (
         <motion.div ref={dialogRef} tabIndex={-1} data-lenis-prevent data-scroll-lock-allow className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
           <div className="entry-choice-glow" aria-hidden="true" />
+          <div className="entry-choice-pattern entry-choice-pattern-a" aria-hidden="true" />
+          <div className="entry-choice-pattern entry-choice-pattern-b" aria-hidden="true" />
           <div className="entry-choice-grain" aria-hidden="true" />
           <div className="entry-choice-top"><span>OPEN DAILY</span><span>{SITE.hours.open} - {SITE.hours.close}</span></div>
           <div className="entry-choice-content">
