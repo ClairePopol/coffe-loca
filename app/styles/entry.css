@@ -106,7 +106,7 @@
 
 /* Loki, the Loca bird mascot: one bird, a different outfit + action per time of day */
 /* perched on top of the Coffee Loca card (it is a child of .entry-choice-actions) */
-.loki { position:absolute; z-index:3; left:7%; top:0; translate:0 -80%; width:clamp(96px,10vw,140px); pointer-events:none; }
+.loki { position:absolute; z-index:3; left:7%; top:0; translate:0 -93%; width:clamp(96px,10vw,140px); pointer-events:none; }
 .loki-svg { display:block; width:100%; height:auto; overflow:visible; }
 .loki-hop { position:relative; transform-origin:50% 100%; }
 .loki-hop.is-hop { animation:loki-pop .9s cubic-bezier(.3,1.5,.5,1); }
@@ -164,17 +164,17 @@
 .loki-bubble span.is-on { opacity:1; }
 @media (max-width:640px) { .loki { width:88px; left:5%; } .loki-bubble { display:none; } }
 
-/* sitting on the card edge: legs dangle over the card, arms bend at the elbow */
-.loki .loki-body { transform-box:view-box; transform-origin:70px 150px; }
+/* standing on the card: feet rest on its top edge, arms bend at the elbow */
+.loki .loki-body { transform-box:view-box; transform-origin:70px 178px; }
 .loki-arm, .loki-fore, .loki-leg { transform-box:view-box; }
 .loki-arm-l { transform-origin:19px 84px; } .loki-fore-l { transform-origin:8px 99px; }
 .loki-arm-r { transform-origin:121px 84px; } .loki-fore-r { transform-origin:132px 99px; }
-.loki-leg-l { transform-origin:58px 138px; } .loki-leg-r { transform-origin:82px 138px; }
+.loki-leg-l { transform-origin:60px 142px; } .loki-leg-r { transform-origin:80px 142px; }
 .loki { --leg:2.8s; }
 .loki-leg-l { animation:loki-leg-a var(--leg) ease-in-out infinite alternate; }
 .loki-leg-r { animation:loki-leg-b var(--leg) ease-in-out infinite alternate; }
-@keyframes loki-leg-a { from { transform:rotate(14deg); } to { transform:rotate(-9deg); } }
-@keyframes loki-leg-b { from { transform:rotate(-9deg); } to { transform:rotate(14deg); } }
+@keyframes loki-leg-a { from { transform:rotate(3deg); } to { transform:rotate(-2deg); } }
+@keyframes loki-leg-b { from { transform:rotate(-2deg); } to { transform:rotate(3deg); } }
 .loki-arm-l { animation:loki-arm-l 3.1s ease-in-out infinite alternate; }
 .loki-arm-r { animation:loki-arm-r 3.5s ease-in-out infinite alternate; }
 .loki-fore-l { animation:loki-fore-l 2.3s ease-in-out infinite alternate; }

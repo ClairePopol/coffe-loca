@@ -49,8 +49,8 @@ export default function LocaMascot({ period }: { period: DayPeriod }) {
         <span className="loki-zzz z1">z</span><span className="loki-zzz z2">Z</span>
         <svg className="loki-svg" viewBox="-14 -14 168 208">
           <g className="loki-body">
-            <g className="loki-leg loki-leg-l"><Limb d="M58 138L55 172" /><ellipse cx="52" cy="176" rx="10" ry="5" fill="#fff" stroke="#d4232a" strokeWidth="2.4" /></g>
-            <g className="loki-leg loki-leg-r"><Limb d="M82 138L85 172" /><ellipse cx="88" cy="176" rx="10" ry="5" fill="#fff" stroke="#d4232a" strokeWidth="2.4" /></g>
+            <g className="loki-leg loki-leg-l"><Limb d="M60 142L59 171" /><ellipse cx="55" cy="176" rx="10" ry="5" fill="#fff" stroke="#d4232a" strokeWidth="2.4" /></g>
+            <g className="loki-leg loki-leg-r"><Limb d="M80 142L81 171" /><ellipse cx="85" cy="176" rx="10" ry="5" fill="#fff" stroke="#d4232a" strokeWidth="2.4" /></g>
             <g className="loki-arm loki-arm-l"><Limb d="M19 84L8 99" />
               <g className="loki-fore loki-fore-l"><Limb d="M8 99L10 115" /><circle cx="10" cy="116" r="4.6" fill="#fff" stroke="#d4232a" strokeWidth="2" /></g>
             </g>
