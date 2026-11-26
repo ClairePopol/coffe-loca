@@ -11,7 +11,7 @@ const SAYS: Record<DayPeriod, string> = {
 };
 
 /**
- * Loki, the Loca pin mascot (the logo pin with a coffee-bean face). One character all day long: same pin, a different outfit and action per time of day
+ * Loki, the Loca pin mascot (the logo pin: white outline + coffee bean, with plain eyes). One character all day long: same pin, a different outfit and action per time of day
  * (morning coffee, noon sunglasses, evening scarf, night cap + sleep). Accessories cross-fade and the bird
  * hops whenever the period changes.
  */
@@ -45,26 +45,23 @@ export default function LocaMascot({ period }: { period: DayPeriod }) {
         <svg className="loki-svg" viewBox="0 -14 140 176">
           <ellipse cx="70" cy="153" rx="24" ry="5" fill="#fff" opacity=".92" />
           <g className="loki-body">
-            <ellipse className="loki-wing-l" cx="19" cy="90" rx="8" ry="15" fill="#fff" transform="rotate(24 19 90)" />
-            <path d="M70 151C70 151 17 99 17 66 17 36 40 13 70 13s53 23 53 53c0 33-53 85-53 85z" fill="#e8353b" stroke="#fff" strokeWidth="7" strokeLinejoin="round" />
-            <ellipse cx="70" cy="62" rx="31" ry="38" fill="#fff1e8" />
-            <path d="M70 26Q60 42 70 54" fill="none" stroke="#e8353b" strokeWidth="3.2" strokeLinecap="round" />
-            <g fill="#ff8f8f" opacity=".65"><circle cx="46" cy="76" r="6.5" /><circle cx="94" cy="76" r="6.5" /></g>
-            <g className="loki-eyes">
-              <circle cx="55" cy="62" r="9.5" fill="#fff" stroke="#e9d3c2" strokeWidth="1.2" /><circle cx="85" cy="62" r="9.5" fill="#fff" stroke="#e9d3c2" strokeWidth="1.2" />
-              <circle cx="56" cy="63" r="5.6" fill="#2a1a14" /><circle cx="86" cy="63" r="5.6" fill="#2a1a14" />
-              <circle cx="58" cy="60.8" r="1.9" fill="#fff" /><circle cx="88" cy="60.8" r="1.9" fill="#fff" />
+            <path d="M70 151C70 151 17 99 17 66 17 36 40 13 70 13s53 23 53 53c0 33-53 85-53 85z" fill="#d4232a" stroke="#fff" strokeWidth="7" strokeLinejoin="round" />
+            <g transform="rotate(35 70 56)">
+              <ellipse cx="70" cy="56" rx="27" ry="36" fill="#fff" />
+              <path d="M70 22Q61 40 70 56Q79 72 70 90" fill="none" stroke="#d4232a" strokeWidth="3" strokeLinecap="round" opacity=".7" />
+              <g className="loki-eyes">
+                <ellipse cx="58" cy="58" rx="4.6" ry="6" fill="#2a1a14" /><ellipse cx="82" cy="58" rx="4.6" ry="6" fill="#2a1a14" />
+                <circle cx="59.4" cy="55.6" r="1.4" fill="#fff" /><circle cx="83.4" cy="55.6" r="1.4" fill="#fff" />
+              </g>
+              <g className="loki-lids" fill="#fff"><ellipse cx="58" cy="58" rx="6.4" ry="7.6" /><ellipse cx="82" cy="58" rx="6.4" ry="7.6" /></g>
+              <g className="loki-sleepy" fill="none" stroke="#2a1a14" strokeWidth="2.4" strokeLinecap="round"><path d="M52 58Q58 63 64 58" /><path d="M76 58Q82 63 88 58" /></g>
+              <g className="loki-glasses"><rect x="48" y="50" width="20" height="16" rx="6" fill="#1d1d2c" opacity=".94" /><rect x="72" y="50" width="20" height="16" rx="6" fill="#1d1d2c" opacity=".94" /><path d="M68 56H72" stroke="#1d1d2c" strokeWidth="3" /><path d="M52 55l6-1.5M76 55l6-1.5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" opacity=".6" /></g>
             </g>
-            <g className="loki-lids" fill="#fff1e8"><ellipse cx="55" cy="62" rx="11" ry="11" /><ellipse cx="85" cy="62" rx="11" ry="11" /></g>
-            <g className="loki-sleepy" fill="none" stroke="#2a1a14" strokeWidth="2.4" strokeLinecap="round"><path d="M46 63Q55 71 64 63" /><path d="M76 63Q85 71 94 63" /></g>
-            <path className="loki-smile" d="M62 82Q70 90 78 82" fill="none" stroke="#c4541c" strokeWidth="2.2" strokeLinecap="round" />
-            <g className="loki-glasses"><rect x="42" y="52" width="26" height="19" rx="8" fill="#1d1d2c" opacity=".94" /><rect x="72" y="52" width="26" height="19" rx="8" fill="#1d1d2c" opacity=".94" /><path d="M68 59H72" stroke="#1d1d2c" strokeWidth="3" /><path d="M47 57l8-2M77 57l8-2" stroke="#fff" strokeWidth="2" strokeLinecap="round" opacity=".6" /></g>
             <g className="loki-scarf"><path d="M33 99Q70 123 107 99L100 114Q70 137 40 114Z" fill="#ff9a3d" /><path d="M88 125l11 25H83z" fill="#ff7a2b" /><path d="M50 115l-1 7M62 120l-1 7M76 121l1 7" stroke="#fff" strokeWidth="2" strokeLinecap="round" opacity=".55" /></g>
             <g className="loki-cap"><path d="M33 34Q40 -10 80 -10Q108 -9 124 24Q104 12 102 40Q70 26 35 42Z" fill="#3b4a9c" /><ellipse cx="68" cy="34" rx="38" ry="7" fill="#f4f6ff" /><circle cx="124" cy="25" r="8" fill="#f4f6ff" /></g>
             <g className="loki-arm">
-              <ellipse cx="121" cy="90" rx="8" ry="15" fill="#fff" transform="rotate(-24 121 90)" />
-              <g className="loki-cup"><rect x="114" y="92" width="24" height="21" rx="5" fill="#fff" stroke="#e9d3c2" strokeWidth="1.2" /><path d="M138 97q9 0 9 8t-9 7" fill="none" stroke="#fff" strokeWidth="3" /><ellipse cx="126" cy="93" rx="11" ry="3" fill="#6b3a1d" />
-                <g className="loki-steam" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round"><path d="M120 86q-4-5 0-9t0-9" /><path d="M130 86q-4-5 0-9t0-9" /></g></g>
+              <g className="loki-cup"><rect x="116" y="92" width="24" height="21" rx="5" fill="#fff" stroke="#e9d3c2" strokeWidth="1.2" /><path d="M140 97q9 0 9 8t-9 7" fill="none" stroke="#fff" strokeWidth="3" /><ellipse cx="128" cy="93" rx="11" ry="3" fill="#6b3a1d" />
+                <g className="loki-steam" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round"><path d="M122 86q-4-5 0-9t0-9" /><path d="M132 86q-4-5 0-9t0-9" /></g></g>
             </g>
           </g>
         </svg>
