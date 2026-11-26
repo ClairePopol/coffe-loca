@@ -167,8 +167,8 @@ export default function SequenceScroll() {
                   <i aria-hidden="true">★★★★★</i>
                   <span><b>Suka Coffee Loca?</b><small>Tulis ulasanmu di Google</small></span>
                 </a>
-                <a className="hero-map-open" href={SITE.mapsUrl} target="_blank" rel="noreferrer">OPEN MAPS <i className="arrow-icon" aria-hidden="true" /></a>
                 <a className="hero-map-frame" href={SITE.mapsUrl} target="_blank" rel="noreferrer" aria-label="Buka peta di Google Maps" tabIndex={-1}><iframe src={SITE.mapsEmbedUrl} title={`Peta ${SITE.placeName}`} loading="lazy" tabIndex={-1} referrerPolicy="no-referrer-when-downgrade" /></a>
+                <a className="hero-map-label" href={SITE.mapsUrl} target="_blank" rel="noreferrer"><b>COFFEE LOCA / MEDAN</b><i className="arrow-icon" aria-hidden="true" /></a>
               </div>
             </motion.div>
             <motion.div className="story-copy story-left" style={{ opacity: firstOpacity, x: firstX }}>
