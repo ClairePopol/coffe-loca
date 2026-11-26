@@ -21,7 +21,6 @@ export default function NeonSign({ className = "" }: { className?: string }) {
   return (
     <span className={`neon-sign ${isOpen ? "is-open" : "is-closed"}${known ? "" : " is-pending"} ${className}`} role="status" aria-label={isOpen ? "Sedang buka" : "Sudah tutup"}>
       <span className="neon-word">{isOpen ? "OPEN" : "CLOSED"}</span>
-      <small>{isOpen ? "DAILY" : `OPEN ${SITE.hours.open}`}</small>
     </span>
   );
 }

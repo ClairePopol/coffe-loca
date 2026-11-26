@@ -81,13 +81,13 @@
 }
 
 /* Retro neon OPEN / CLOSED sign */
-.neon-sign { --neon:#5dffa0; --neon-glow:rgba(40,255,130,.9); display:inline-flex; align-items:center; gap:12px; }
-.neon-sign.is-closed { --neon:#ffd9b0; --neon-glow:rgba(255,150,60,.85); }
+.neon-sign { --neon:#fff; --neon-glow:rgba(255,70,70,.95); display:inline-flex; align-items:center; gap:12px; }
+.neon-sign.is-closed { --neon:rgba(255,255,255,.55); --neon-glow:rgba(255,110,90,.4); }
+.neon-sign.is-closed .neon-word { color:rgba(255,255,255,.7); }
 .neon-sign.is-pending { visibility:hidden; }
 .neon-word { padding:6px 16px 6px 18px; border:2px solid var(--neon); border-radius:12px; color:#fff; font-size:20px; font-style:italic; font-weight:800; letter-spacing:.16em; line-height:1.15; text-shadow:0 0 3px #fff,0 0 8px var(--neon),0 0 18px var(--neon-glow),0 0 34px var(--neon-glow); box-shadow:0 0 6px var(--neon),0 0 18px var(--neon-glow),inset 0 0 10px var(--neon-glow); animation:neon-flicker 5.5s linear infinite; }
-.neon-sign small { color:var(--neon); font-size:11px; font-weight:700; letter-spacing:.18em; text-shadow:0 0 8px var(--neon-glow); }
 .neon-sign.is-closed .neon-word { animation-duration:3.2s; }
 @keyframes neon-flicker { 0%,17%,19%,22%,62%,64%,100% { opacity:1; } 18%,21%,63% { opacity:.45; } 20% { opacity:.8; } }
-.neon-in-box { flex:none; padding:0 16px; flex-direction:column; justify-content:center; gap:6px; }
+.neon-in-box { flex:none; padding:0 16px; justify-content:center; }
 .neon-in-box .neon-word { font-size:15px; padding:4px 12px; }
 @media (prefers-reduced-motion:reduce) { .neon-word { animation:none; } }
