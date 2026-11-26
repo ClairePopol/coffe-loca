@@ -91,3 +91,24 @@
 .neon-in-box { flex:none; padding:0 16px; justify-content:center; }
 .neon-in-box .neon-word { font-size:15px; padding:4px 12px; }
 @media (prefers-reduced-motion:reduce) { .neon-word { animation:none; } }
+
+/* Time-of-day icons beside OPEN / CLOSED */
+.period-icon { flex:none; width:18px; height:18px; overflow:visible; vertical-align:-3px; margin-right:8px; }
+.neon-word .period-icon { filter:drop-shadow(0 0 5px rgba(255,70,70,.95)); }
+.period-icon .rays { transform-origin:12px 12px; }
+.period-siang .rays { animation:period-spin 14s linear infinite; }
+.period-siang .orb,.period-sore .orb { animation:period-pulse 3s ease-in-out infinite; transform-origin:12px 12px; }
+.period-pagi .orb { animation:period-rise 3.2s ease-in-out infinite alternate; }
+.period-pagi .rays { animation:period-pulse 2.4s ease-in-out infinite; }
+.period-sore .orb { animation:period-set 4s ease-in-out infinite alternate; }
+.period-sore { color:#ffc27a; }
+.period-pagi { color:#ffe3a3; }
+.period-malam .moon { animation:period-pulse 4s ease-in-out infinite; transform-origin:12px 12px; }
+.period-malam .star { animation:period-twinkle 1.8s ease-in-out infinite; transform-origin:center; transform-box:fill-box; }
+.period-malam .s2 { animation-delay:.9s; }
+@keyframes period-spin { to { transform:rotate(360deg); } }
+@keyframes period-pulse { 50% { opacity:.7; transform:scale(.92); } }
+@keyframes period-rise { from { transform:translateY(5px); } to { transform:translateY(-1px); } }
+@keyframes period-set { from { transform:translateY(-1px); } to { transform:translateY(5px); } }
+@keyframes period-twinkle { 50% { opacity:.2; transform:scale(.6); } }
+@media (prefers-reduced-motion:reduce) { .period-icon * { animation:none !important; } }
