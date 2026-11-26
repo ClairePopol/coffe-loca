@@ -117,7 +117,8 @@
 .loki-blink > g:last-child { animation-delay:0s; }
 @keyframes loki-blink { 0%,90%,100% { transform:scaleY(0); } 93.5% { transform:scaleY(1); } 96% { transform:scaleY(0); } }
 .loki[data-mood="malam"] .loki-blink { display:none; }
-.loki-cupfix { transform-box:fill-box; transform-origin:50% 50%; }
+/* the cup pivots around the hand that grips its handle, so hand and cup never drift apart */
+.loki-cupfix { transform-box:view-box; transform-origin:131px 125px; }
 /* lids slide down to make the bird sleepy */
 .loki-lids ellipse { transform-origin:50% 0; transform:scaleY(0); transition:transform .9s ease; }
 .loki-sleepy, .loki-glasses, .loki-scarf, .loki-cap, .loki-cup { opacity:0; transition:opacity .7s ease,transform .7s cubic-bezier(.3,1.4,.5,1); }
@@ -190,11 +191,13 @@
 .loki[data-mood="pagi"] { --leg:3.6s; }
 .loki[data-mood="pagi"] .loki-arm-r { animation:loki-sip-up 4.2s ease-in-out infinite; }
 .loki[data-mood="pagi"] .loki-fore-r { animation:loki-sip-fore 4.2s ease-in-out infinite; }
-@keyframes loki-sip-up { 0%,35%,100% { transform:rotate(0deg); } 50%,72% { transform:rotate(74deg); } }
-@keyframes loki-sip-fore { 0%,35%,100% { transform:rotate(0deg); } 50%,72% { transform:rotate(61deg); } }
+@keyframes loki-sip-up { 0%,30%,92%,100% { transform:rotate(0deg); } 48%,74% { transform:rotate(74deg); } }
+@keyframes loki-sip-fore { 0%,30%,92%,100% { transform:rotate(0deg); } 48%,74% { transform:rotate(76deg); } }
 .loki[data-mood="pagi"] .loki-cupfix { animation:loki-cup-level 4.2s ease-in-out infinite; }
-/* the arm turns 134deg in total: turn the cup back 159deg so it ends up tilted 25deg toward the mouth (a sip), never upside down */
-@keyframes loki-cup-level { 0%,35%,100% { transform:rotate(0deg); } 50%,72% { transform:rotate(-159deg); } }
+/* the forearm turns 150deg in total: the cup turns back 175deg so it ends tilted 25deg toward the mouth, never upside down */
+@keyframes loki-cup-level { 0%,30%,92%,100% { transform:rotate(0deg); } 48%,74% { transform:rotate(-175deg); } }
+.loki[data-mood="pagi"] .loki-steam { animation:loki-steam-hide 4.2s ease-in-out infinite; }
+@keyframes loki-steam-hide { 0%,28%,94%,100% { opacity:1; } 40%,84% { opacity:0; } }
 
 .loki[data-mood="siang"] { --leg:1.5s; }
 .loki[data-mood="siang"] .loki-arm-r { animation:loki-wave-up 2.6s ease-in-out infinite; }
@@ -215,6 +218,6 @@
 .loki-mouth-o { opacity:0; transform-box:fill-box; transform-origin:50% 50%; }
 .loki[data-mood="pagi"] .loki-mouth-o { animation:loki-mouth 4.2s ease-in-out infinite; }
 .loki[data-mood="pagi"] .loki-smile { animation:loki-smile-hide 4.2s ease-in-out infinite; }
-@keyframes loki-mouth { 0%,48%,74%,100% { opacity:0; transform:scale(.4); } 54%,70% { opacity:1; transform:scale(1); } }
-@keyframes loki-smile-hide { 0%,48%,74%,100% { opacity:1; } 54%,70% { opacity:0; } }
+@keyframes loki-mouth { 0%,42%,80%,100% { opacity:0; transform:scale(.4); } 50%,72% { opacity:1; transform:scale(1); } }
+@keyframes loki-smile-hide { 0%,42%,80%,100% { opacity:1; } 50%,72% { opacity:0; } }
 .loki[data-mood="malam"] .loki-smile { opacity:.8; }

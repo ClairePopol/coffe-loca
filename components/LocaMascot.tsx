@@ -72,9 +72,14 @@ export default function LocaMascot({ period }: { period: DayPeriod }) {
             <g className="loki-scarf"><path d="M33 99Q70 123 107 99L100 114Q70 137 40 114Z" fill="#ff9a3d" /><path d="M88 125l11 25H83z" fill="#ff7a2b" /><path d="M50 115l-1 7M62 120l-1 7M76 121l1 7" stroke="#fff" strokeWidth="2" strokeLinecap="round" opacity=".55" /></g>
             <g className="loki-cap"><path d="M33 34Q40 -10 80 -10Q108 -9 124 24Q104 12 102 40Q70 26 35 42Z" fill="#3b4a9c" /><ellipse cx="68" cy="34" rx="38" ry="7" fill="#f4f6ff" /><circle cx="124" cy="25" r="8" fill="#f4f6ff" /></g>
             <g className="loki-arm loki-arm-r"><Limb d="M121 84L134 102" />
-              <g className="loki-fore loki-fore-r"><Limb d="M134 102L131 124" /><circle cx="131" cy="125" r="4.6" fill="#fff" stroke="#d4232a" strokeWidth="2" />
-                <g className="loki-cup"><g className="loki-cupfix"><rect x="128" y="115" width="22" height="19" rx="5" fill="#fff" stroke="#d4232a" strokeWidth="1.6" /><path d="M150 119q8 0 8 7t-8 6" fill="none" stroke="#fff" strokeWidth="3" /><ellipse cx="139" cy="116" rx="10" ry="3" fill="#6b3a1d" />
-                  <g className="loki-steam" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round"><path d="M134 109q-4-5 0-9t0-9" /><path d="M144 109q-4-5 0-9t0-9" /></g></g></g>
+              <g className="loki-fore loki-fore-r"><Limb d="M134 102L131 124" />
+                <g className="loki-cup"><g className="loki-cupfix">
+                  <path d="M126 119.5q8 0 8 6t-8 6" fill="none" stroke="#d4232a" strokeWidth="5.6" /><path d="M126 119.5q8 0 8 6t-8 6" fill="none" stroke="#fff" strokeWidth="3" />
+                  <rect x="107" y="115" width="20" height="20" rx="4.5" fill="#fff" stroke="#d4232a" strokeWidth="1.6" />
+                  <ellipse cx="117" cy="116.6" rx="8.4" ry="2.5" fill="#6b3a1d" />
+                  <g className="loki-steam" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round"><path d="M113 109q-4-5 0-9t0-9" /><path d="M122 109q-4-5 0-9t0-9" /></g>
+                </g></g>
+                <circle cx="131" cy="125" r="4.6" fill="#fff" stroke="#d4232a" strokeWidth="2" />
               </g>
             </g>
           </g>
