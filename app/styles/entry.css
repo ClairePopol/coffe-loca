@@ -1,40 +1,35 @@
+@font-face { font-family:"Eight Bit Dragon"; src:url("/fonts/eight-bit-dragon.otf") format("opentype"); font-display:swap; }
 /* First-visit destination choice (Loca Coffee / Loca Store) — red poster screen */
-.entry-choice { position:fixed; z-index:250; inset:0; display:flex; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; touch-action:pan-y; color:#fff; background:var(--red); }
+/* First-visit destination choice (Coffee Loca / Locamart) — red poster screen */
+.entry-choice { position:fixed; z-index:250; inset:0; display:flex; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; touch-action:pan-y; color:#fff; background:#a8141a; }
 .entry-choice:focus { outline:none; }
-.entry-choice::before { position:fixed; z-index:-1; inset:0; content:""; background:linear-gradient(115deg,var(--red) 0%,var(--red) 58%,var(--red-deep) 100%); }
-.entry-choice-orbit { position:fixed; z-index:-1; right:-10px; bottom:-10px; width:160px; height:160px; border:0; border-radius:0; box-shadow:none; animation:none; pointer-events:none; background:conic-gradient(#fff 25%,transparent 0 50%,#fff 0 75%,transparent 0) 0 0/50% 50%; opacity:.92; }
-.entry-choice-top,.entry-choice-bottom { display:flex; justify-content:space-between; gap:16px; padding:26px 7vw; color:rgba(255,255,255,.85); font-size:var(--fs-label); font-weight:700; letter-spacing:var(--track-label); }
-.entry-choice-content { width:min(780px,86vw); margin:auto; padding:12px 0; text-align:center; }
-.entry-choice-mark { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:30px; color:#fff; font-family:var(--font); font-size:22px; font-style:italic; font-weight:800; letter-spacing:-.02em; }
-.entry-choice-mark b { font-weight:800; }
-.entry-choice-mark b::after { content:"/"; margin-left:2px; color:#fff; }
-.entry-choice-mark img { width:34px; height:34px; object-fit:contain; }
-.entry-choice .eyebrow { color:#fff; }
-.entry-choice h1 { margin:22px 0 14px; color:#fff; font-size:clamp(52px,8vw,112px); font-weight:800; letter-spacing:-.04em; line-height:.9; text-transform:uppercase; }
-.entry-choice h1 em { color:#fff; }
-.entry-choice-content>p { margin:0; color:rgba(255,255,255,.9); font-size:var(--fs-body); font-weight:500; letter-spacing:.06em; }
-.entry-choice-actions { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:42px; text-align:left; }
-.entry-choice-actions button { position:relative; display:flex; min-height:150px; align-items:flex-end; justify-content:space-between; gap:16px; padding:22px; overflow:hidden; border:0; border-radius:var(--radius-lg); color:var(--ink); background:#fff; text-align:left; cursor:pointer; box-shadow:0 20px 50px rgba(0,0,0,.18); transition:transform .4s var(--ease-out),background .3s,color .3s; }
+.entry-choice::before { position:fixed; z-index:-2; inset:0; content:""; background:
+  radial-gradient(ellipse 60% 55% at 50% 38%,#e0313a 0%,rgba(224,49,58,0) 70%),
+  radial-gradient(ellipse 120% 90% at 50% 50%,#c4181f 0%,#a8141a 55%,#6e0a10 100%); }
+.entry-choice-glow { position:fixed; z-index:-1; left:50%; top:36%; width:min(720px,90vw); aspect-ratio:1; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle,rgba(255,170,150,.32) 0%,rgba(255,120,110,.12) 38%,transparent 68%); filter:blur(10px); pointer-events:none; animation:entry-breathe 7s ease-in-out infinite; }
+.entry-choice-grain { position:fixed; z-index:-1; inset:0; pointer-events:none; opacity:.16; mix-blend-mode:overlay; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.entry-choice-grain::after { position:absolute; inset:0; content:""; background:radial-gradient(ellipse at center,transparent 55%,rgba(40,0,4,.55) 100%); mix-blend-mode:multiply; }
+@keyframes entry-breathe { 50% { opacity:.7; transform:translate(-50%,-50%) scale(1.06); } }
+.entry-choice-top { display:flex; justify-content:space-between; gap:16px; padding:26px 7vw; color:#fff; font-size:15px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; }
+.entry-choice-content { display:flex; width:min(840px,90vw); flex-direction:column; align-items:center; margin:auto; padding:0 0 32px; }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.loca-sign { width:min(440px,70vw); height:auto; margin-bottom:34px; overflow:visible; filter:drop-shadow(0 22px 28px rgba(60,0,6,.45)); }
+.entry-choice-actions { display:grid; width:100%; grid-template-columns:1fr 1fr; gap:16px; text-align:left; }
+.entry-choice-actions button { position:relative; display:flex; min-height:164px; flex-direction:column; justify-content:flex-start; gap:10px; padding:22px 26px 24px; overflow:hidden; border:0; border-radius:var(--radius-lg); color:var(--ink); background:#fff; text-align:left; cursor:pointer; box-shadow:0 20px 44px rgba(50,0,6,.32); transition:transform .4s var(--ease-out),background .3s,color .3s; }
 .entry-choice-actions button:hover,.entry-choice-actions button:focus-visible { transform:translateY(-6px); background:var(--ink); color:#fff; }
 .entry-choice-actions button:focus-visible { outline:2px solid #fff; outline-offset:4px; }
-.entry-choice-actions button>span { display:flex; flex-direction:column; gap:8px; }
-.entry-choice-actions button small { color:var(--red); font-size:var(--fs-label); font-weight:700; letter-spacing:var(--track-label); }
-.entry-choice-actions button strong { font-family:var(--font); font-size:32px; font-weight:800; letter-spacing:-.03em; line-height:1; }
-.entry-choice-actions button em { color:inherit; opacity:.7; font-size:14px; font-style:normal; }
-.entry-choice-actions button .arrow-icon { align-self:flex-start; width:18px; height:18px; color:var(--red); }
+.entry-card-tag { color:var(--red); font-size:var(--fs-label); font-weight:700; letter-spacing:var(--track-label); }
+.entry-card-tag b { font-weight:800; }
+.entry-choice-actions button strong { margin-top:2px; font-family:"Eight Bit Dragon","Press Start 2P",monospace; font-size:30px; font-weight:400; letter-spacing:.01em; line-height:1.1; }
+.entry-choice-actions button em { max-width:92%; color:inherit; opacity:.72; font-size:13px; font-style:normal; line-height:1.5; }
+.entry-choice-actions button .arrow-icon { position:absolute; top:22px; right:24px; width:16px; height:16px; color:var(--red); }
 .entry-choice-actions button:hover .arrow-icon { transform:translate(3px,-3px); }
 
 @media (max-width:760px) {
-  .entry-choice-top,.entry-choice-bottom { padding:16px 6vw; font-size:10px; }
-  .entry-choice-bottom>span:last-child { display:none; }
-  .entry-choice-content { width:88vw; }
-  .entry-choice-mark { margin-bottom:18px; font-size:18px; }
-  .entry-choice-mark img { width:28px; height:28px; }
-  .entry-choice h1 { margin:14px 0 10px; font-size:clamp(44px,13vw,76px); }
-  .entry-choice-content>p { font-size:13px; }
-  .entry-choice-actions { grid-template-columns:1fr; gap:10px; margin-top:24px; }
-  .entry-choice-actions button { min-height:96px; padding:16px 18px; border-radius:var(--radius); }
-  .entry-choice-actions button strong { font-size:26px; }
-  .entry-choice-actions button em { font-size:13px; }
-  .entry-choice-orbit { width:110px; height:110px; }
+  .entry-choice-top { padding:18px 6vw; font-size:13px; }
+  .entry-choice-content { width:88vw; padding-bottom:24px; }
+  .loca-sign { width:min(300px,76vw); margin-bottom:22px; }
+  .entry-choice-actions { grid-template-columns:1fr; gap:10px; }
+  .entry-choice-actions button { min-height:0; padding:18px 20px; border-radius:var(--radius); }
+  .entry-choice-actions button strong { font-size:25px; }
 }

@@ -161,6 +161,34 @@ function Navigation() {
   );
 }
 
+function LocaSign() {
+  const arrows = [{ t: "DESTINATION FOR", y: 62 }, { t: "COFFEE", y: 132 }, { t: "FOOD", y: 202 }, { t: "HANGOUT", y: 272 }];
+  return (
+    <svg className="loca-sign" viewBox="0 0 560 470" role="img" aria-label="Coffee Loca - destination for coffee, food, hangout">
+      <rect x="196" y="250" width="16" height="220" fill="#0d0d0d" />
+      <rect x="318" y="170" width="12" height="300" fill="#0d0d0d" />
+      {arrows.map((a) => (
+        <g key={a.t} transform={`translate(330 ${a.y}) skewY(-7)`}>
+          <path d="M6 8 L190 0 V54 L6 60Z" fill="#7d0c10" />
+          <path d="M0 0 L184 -8 V46 L0 52Z" fill="#e0262c" />
+          <text x="92" y="30" textAnchor="middle" fill="#fff" fontFamily="Poppins,sans-serif" fontWeight="800" fontStyle="italic" fontSize={a.t.length > 8 ? 17 : 22}>{a.t}</text>
+        </g>
+      ))}
+      <path d="M118 28 C118 -8 214 -8 214 38 C214 74 176 112 166 150 C156 112 118 74 118 28Z" fill="#c8c8c8" transform="translate(10 6)" />
+      <path d="M112 30 C112 -8 204 -8 204 36 C204 72 168 108 158 146 C148 108 112 72 112 30Z" fill="#fff" stroke="#1a1a1a" strokeWidth="2" />
+      <path d="M122 32 C122 2 194 2 194 36 C194 66 166 96 158 126 C150 96 122 66 122 32Z" fill="#e8281f" />
+      <image href="/white-coffee-bean.png" x="136" y="14" width="46" height="46" transform="rotate(18 159 37)" />
+      <ellipse cx="158" cy="150" rx="26" ry="8" fill="#9a9a9a" />
+      <path d="M52 218 L330 190 L316 300 L40 330Z" fill="#b9b9b9" transform="translate(8 10)" />
+      <path d="M52 218 L330 190 L316 300 L40 330Z" fill="#fff" stroke="#1a1a1a" strokeWidth="2" />
+      <g transform="skewY(-5.5)" fill="#d4232a" fontFamily="Poppins,sans-serif" fontStyle="italic" fontWeight="800">
+        <text x="90" y="270" fontSize="25" letterSpacing="5" transform="rotate(-1 90 270)">COFFEE</text>
+        <text x="62" y="338" fontSize="68" letterSpacing="6">LOCA</text>
+      </g>
+    </svg>
+  );
+}
+
 function EntryChoice() {
   const [visible, setVisible] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -185,19 +213,17 @@ function EntryChoice() {
     <AnimatePresence>
       {visible && (
         <motion.div ref={dialogRef} tabIndex={-1} data-lenis-prevent data-scroll-lock-allow className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
-          <div className="entry-choice-orbit" aria-hidden="true" />
-          <div className="entry-choice-top"><span>LOCA / EST. WITH CARE</span><span>MEDAN · 2026</span></div>
+          <div className="entry-choice-glow" aria-hidden="true" />
+          <div className="entry-choice-grain" aria-hidden="true" />
+          <div className="entry-choice-top"><span>OPEN DAILY</span><span>{SITE.hours.open} - {SITE.hours.close}</span></div>
           <div className="entry-choice-content">
-            <div className="entry-choice-mark"><img src="/white-coffee-bean.png" alt="" /><span>COFFE <b>LOCA</b></span></div>
-            <span className="eyebrow"><i /> WHERE DO YOU WANT TO GO?</span>
-            <h1 id="entry-title">Pilih ruang<br /><em>untuk jedamu.</em></h1>
-            <p>Satu rumah, dua cara menikmati Loca.</p>
+            <h1 id="entry-title" className="sr-only">Coffee Loca</h1>
+            <LocaSign />
             <div className="entry-choice-actions">
-              <button type="button" onClick={() => choose("coffee")}><span><small>01 / COFFEE HOUSE</small><strong>Loca Coffee</strong><em>Good coffee, good company.</em></span><i className="arrow-icon" aria-hidden="true" /></button>
-              <button type="button" onClick={() => choose("store")}><span><small>02 / ONLINE STORE</small><strong>Loca Store</strong><em>Boardgame &amp; Pokémon, pesan lewat WhatsApp.</em></span><i className="arrow-icon" aria-hidden="true" /></button>
+              <button type="button" onClick={() => choose("coffee")}><span className="entry-card-tag"><b>01</b> / CAFE</span><strong>COFFEE LOCA</strong><em>Good Coffee, Comfort food, Reading, Mahjong, TCG &amp; Boardgame.</em><i className="arrow-icon" aria-hidden="true" /></button>
+              <button type="button" onClick={() => choose("store")}><span className="entry-card-tag"><b>02</b> / TCG STORE</span><strong>LOCAMART</strong><em>BUY SELL TRADE Pokemon &amp; Riftbound TCG. Official retailer - Weekly event.</em><i className="arrow-icon" aria-hidden="true" /></button>
             </div>
           </div>
-          <div className="entry-choice-bottom"><span>TAKE YOUR TIME</span><span>COFFEE · STORE · COMMUNITY</span></div>
         </motion.div>
       )}
     </AnimatePresence>
