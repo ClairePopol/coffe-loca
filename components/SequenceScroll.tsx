@@ -185,9 +185,8 @@ export default function SequenceScroll() {
               </div>
             </motion.div>
             <motion.div className="story-copy story-left" style={{ opacity: firstOpacity, x: firstX }}>
-              <span className="eyebrow"><i /> MADE FOR SLOW MORNINGS</span>
-              <h2>Mulai hari<br /><em>tanpa buru-buru.</em></h2>
-              <p>Ambil napas. Pilih kopi favorit. Biarkan pagi menyusul.</p>
+              <h2>COFFEE</h2>
+              <p className="story-beans">SPECIALITY COFFEE BLENDED 100% ARABICA<br />YOUR BEANS OPTIONS :<br /><b>BOLD BERRY</b>, <b>BACK TO BLACK</b><br />OR MIX BETWEEN <b>BOLD BERRY</b> &amp; <b>BACK TO BLACK</b></p>
             </motion.div>
             <motion.div className="story-copy story-right" style={{ opacity: secondOpacity, x: secondX }}>
               <span className="eyebrow"><i /> GOOD COFFEE, GOOD COMPANY</span>
