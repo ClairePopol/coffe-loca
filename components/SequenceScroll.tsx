@@ -153,7 +153,7 @@ export default function SequenceScroll() {
           <div className="sequence-copy">
             <motion.div className="hero-copy" style={{ opacity: titleOpacity, y: titleY }}>
               <span className="eyebrow"><i /> MEDAN SPECIALITY COFFEE</span>
-              <h1><em><span className="hero-loca">LOCA</span>-tion</em><span className="hero-for-row"><em>for</em><span className="hero-for-list"><span>coffee</span><span>food</span><span>hangout</span></span></span></h1>
+              <h1><em><span className="hero-loca">LOCA</span><span className="hero-tion">-tion</span></em><span className="hero-for-row"><em>for</em><span className="hero-for-list"><span>coffee</span><span>food</span><span>hangout</span></span></span></h1>
               <p className="hero-slogan">Medan, Jl. T. Amir Hamzah No. 11</p>
               <a className="hero-direction" href={SITE.mapsUrl} target="_blank" rel="noreferrer">DIRECTION</a>
               <div className="hero-hours">
