@@ -166,8 +166,28 @@ function LocaSign() {
   return <span className="loca-sign-wrap"><img className="loca-sign" src="/loca-sign.webp" alt="Coffee Loca - destination for coffee, food, hangout" width={900} height={676} /></span>;
 }
 
+type DayPeriod = "pagi" | "siang" | "sore" | "malam";
+
+/** Background theme by Medan time (WIB): pagi 05–10, siang 10–15, sore 15–18, malam 18–05. */
+function periodForHour(hour: number): DayPeriod {
+  if (hour >= 5 && hour < 10) return "pagi";
+  if (hour >= 10 && hour < 15) return "siang";
+  if (hour >= 15 && hour < 18) return "sore";
+  return "malam";
+}
+
 function EntryChoice() {
   const [visible, setVisible] = useState(false);
+  const [period, setPeriod] = useState<DayPeriod>("siang");
+  useEffect(() => {
+    const update = () => {
+      const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jakarta", hour: "2-digit", hourCycle: "h23" }).format(new Date()));
+      setPeriod(periodForHour(hour));
+    };
+    update();
+    const timer = window.setInterval(update, 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
   const dialogRef = useRef<HTMLDivElement>(null);
   useScrollLock(visible);
 
@@ -189,7 +209,7 @@ function EntryChoice() {
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div ref={dialogRef} tabIndex={-1} data-lenis-prevent data-scroll-lock-allow className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
+        <motion.div ref={dialogRef} tabIndex={-1} data-time={period} data-lenis-prevent data-scroll-lock-allow className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
           <div className="entry-choice-rays" aria-hidden="true" />
           <div className="entry-choice-glow" aria-hidden="true" />
           <div className="entry-choice-pins" aria-hidden="true">

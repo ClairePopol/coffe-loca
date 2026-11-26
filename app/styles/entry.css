@@ -1,12 +1,16 @@
 @font-face { font-family:"Eight Bit Dragon"; src:url("/fonts/eight-bit-dragon.otf") format("opentype"); font-display:swap; }
 /* First-visit destination choice (Loca Coffee / Loca Store) — red poster screen */
 /* First-visit destination choice (Coffee Loca / Locamart) — red poster screen */
+.entry-choice { --bg1:#ff857e; --bg2:#f03d44; --bg3:#cf2028; --bg4:#a8141a; --bg5:#6e0a10; --ray:.5; --glow:255,225,220; background:var(--bg4); }
+.entry-choice[data-time="pagi"] { --bg1:#ffd7a0; --bg2:#ff8a63; --bg3:#e0453a; --bg4:#b02424; --bg5:#7a1519; --ray:.55; --glow:255,236,200; }
+.entry-choice[data-time="sore"] { --bg1:#ffa552; --bg2:#f2593c; --bg3:#c91f35; --bg4:#8c1438; --bg5:#4d0b26; --ray:.5; --glow:255,200,150; }
+.entry-choice[data-time="malam"] { --bg1:#b92b44; --bg2:#7a1630; --bg3:#4a0e24; --bg4:#2a0816; --bg5:#12040b; --ray:.22; --glow:255,150,170; }
 .entry-choice { position:fixed; z-index:250; inset:0; display:flex; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; touch-action:pan-y; color:#fff; background:#a8141a; }
 .entry-choice:focus { outline:none; }
-.entry-choice::before { position:fixed; z-index:-2; inset:0; content:""; background:radial-gradient(ellipse 80% 90% at 50% 38%,#ff857e 0%,#f03d44 24%,#cf2028 48%,#a8141a 74%,#6e0a10 100%); }
-.entry-choice-rays { position:fixed; z-index:-1; left:50%; top:38%; width:190vmax; aspect-ratio:1; translate:-50% -50%; pointer-events:none; opacity:.5; background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.2) 0deg 6deg,rgba(255,255,255,0) 6deg 18deg); -webkit-mask-image:radial-gradient(circle,#000 0%,rgba(0,0,0,.55) 8%,transparent 30%); mask-image:radial-gradient(circle,#000 0%,rgba(0,0,0,.55) 8%,transparent 30%); animation:entry-rays 120s linear infinite; }
+.entry-choice::before { position:fixed; z-index:-2; inset:0; content:""; background:radial-gradient(ellipse 80% 90% at 50% 38%,var(--bg1) 0%,var(--bg2) 24%,var(--bg3) 48%,var(--bg4) 74%,var(--bg5) 100%); }
+.entry-choice-rays { position:fixed; z-index:-1; left:50%; top:38%; width:190vmax; aspect-ratio:1; translate:-50% -50%; pointer-events:none; opacity:var(--ray); background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.2) 0deg 6deg,rgba(255,255,255,0) 6deg 18deg); -webkit-mask-image:radial-gradient(circle,#000 0%,rgba(0,0,0,.55) 8%,transparent 30%); mask-image:radial-gradient(circle,#000 0%,rgba(0,0,0,.55) 8%,transparent 30%); animation:entry-rays 120s linear infinite; }
 @keyframes entry-rays { to { rotate:360deg; } }
-.entry-choice-glow { position:fixed; z-index:-1; left:50%; top:38%; width:min(900px,110vw); aspect-ratio:1; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle,rgba(255,225,220,.38) 0%,rgba(255,200,195,.12) 38%,transparent 68%); pointer-events:none; animation:entry-breathe 7s ease-in-out infinite; }
+.entry-choice-glow { position:fixed; z-index:-1; left:50%; top:38%; width:min(900px,110vw); aspect-ratio:1; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle,rgba(var(--glow),.38) 0%,rgba(var(--glow),.12) 38%,transparent 68%); pointer-events:none; animation:entry-breathe 7s ease-in-out infinite; }
 .entry-choice-pins { position:fixed; z-index:-1; inset:0; overflow:hidden; pointer-events:none; }
 .entry-choice-pins i { position:absolute; opacity:.14; background:url("/loca-pin.webp") center/contain no-repeat; animation:entry-pin-float 9s ease-in-out infinite alternate; }
 @keyframes entry-pin-float { from { translate:0 14px; rotate:calc(var(--tilt) * -1); } to { translate:10px -34px; rotate:var(--tilt); } }
@@ -23,10 +27,6 @@
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 .loca-sign-wrap { position:relative; z-index:0; display:block; transform:translateX(5.5%); margin-top:-110px; margin-bottom:-52px; filter:drop-shadow(0 22px 28px rgba(60,0,6,.45)); animation:entry-sign-in 1s var(--ease-out) .15s backwards,entry-sign-float 6s ease-in-out 1.2s infinite; }
 .loca-sign { display:block; width:auto; height:min(56vh,560px); max-width:90vw; object-fit:contain; }
-/* Poles continue down to the bottom of the screen */
-.loca-sign-wrap::before,.loca-sign-wrap::after { position:absolute; content:""; background:#0e0e0e; }
-.loca-sign-wrap::before { left:29.8%; width:4.8%; top:97%; height:100vh; }
-.loca-sign-wrap::after { left:54.6%; width:1.4%; top:85.5%; height:calc(100vh + 15%); }
 .entry-choice-actions { position:relative; z-index:1; display:grid; width:100%; grid-template-columns:1fr 1fr; gap:16px; text-align:left; }
 .entry-choice-actions button { position:relative; display:flex; min-height:164px; flex-direction:column; justify-content:flex-start; gap:10px; padding:22px 26px 24px; overflow:hidden; border:0; border-radius:var(--radius-lg); color:var(--ink); background:#fff; text-align:left; cursor:pointer; box-shadow:0 20px 44px rgba(50,0,6,.32); transition:transform .4s var(--ease-out),background .3s,color .3s; }
 .entry-choice-actions button { animation:entry-card-in .8s var(--ease-out) .55s backwards; }
