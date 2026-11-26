@@ -157,10 +157,13 @@ export default function SequenceScroll() {
               <a className="hero-direction" href={SITE.mapsUrl} target="_blank" rel="noreferrer">DIRECTION <span className="arrow-icon" aria-hidden="true" /></a>
               <div className="hero-hours">
                 <div className="hero-hours-copy"><span>JAM OPERASIONAL</span><strong>{SITE.hours.open} – {SITE.hours.close} <small>WIB</small></strong><em>Open daily</em></div>
-                <a className="hero-hours-map" href={SITE.mapsUrl} target="_blank" rel="noreferrer" aria-label="Buka peta di Google Maps">
-                  <iframe src={SITE.mapsEmbedUrl} title={`Peta ${SITE.placeName}`} loading="lazy" tabIndex={-1} referrerPolicy="no-referrer-when-downgrade" />
-                </a>
               </div>
+            </motion.div>
+            <motion.div className="hero-map-card" style={{ opacity: titleOpacity, y: titleY }}>
+              <a href={SITE.mapsUrl} target="_blank" rel="noreferrer" aria-label="Buka peta di Google Maps">
+                <iframe src={SITE.mapsEmbedUrl} title={`Peta ${SITE.placeName}`} loading="lazy" tabIndex={-1} referrerPolicy="no-referrer-when-downgrade" />
+                <span className="hero-map-label"><b>COFFEE LOCA / MEDAN</b><i className="arrow-icon" aria-hidden="true" /></span>
+              </a>
             </motion.div>
             <motion.div className="story-copy story-left" style={{ opacity: firstOpacity, x: firstX }}>
               <span className="eyebrow"><i /> MADE FOR SLOW MORNINGS</span>
