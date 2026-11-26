@@ -112,7 +112,7 @@
 .loki-hop.is-hop { animation:loki-pop .9s cubic-bezier(.3,1.5,.5,1); }
 @keyframes loki-pop { 0% { scale:1 1; translate:0 0; } 20% { scale:1.12 .85; } 45% { scale:.93 1.1; translate:0 -34px; } 70% { scale:1.06 .94; translate:0 0; } 100% { scale:1 1; } }
 .loki-body, .loki-lids ellipse, .loki-arm, .loki-eyes, .loki-glasses, .loki-scarf, .loki-cap, .loki-cup, .loki-sleepy, .loki-smile, .loki-wing-l, .loki-steam { transform-box:fill-box; }
-.loki-body { transform-origin:50% 100%; animation:loki-breathe 3.4s ease-in-out infinite alternate; }
+.loki-body { transform-origin:50% 96%; animation:loki-breathe 3.4s ease-in-out infinite alternate; }
 @keyframes loki-breathe { from { scale:1 1; } to { scale:1.025 .975; } }
 .loki-eyes { transform-origin:50% 50%; animation:loki-blink 5s infinite; }
 @keyframes loki-blink { 0%,92%,100% { transform:scaleY(1); } 95% { transform:scaleY(.1); } }
