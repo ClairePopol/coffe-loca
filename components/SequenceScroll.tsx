@@ -194,9 +194,12 @@ export default function SequenceScroll() {
               <p className="story-beans story-beans-mix">OR MIX BETWEEN <b>BOLD BERRY</b> &amp; <b>BACK TO BLACK</b></p>
             </motion.div>
             <motion.div className="story-copy story-right" style={{ opacity: secondOpacity, x: secondX }}>
-              <span className="eyebrow"><i /> GOOD COFFEE, GOOD COMPANY</span>
-              <h2>Rasa yang baik<br /><em>lebih enak dibagi.</em></h2>
-              <p>Datang sendiri atau bawa cerita. Selalu ada tempat.</p>
+              <h2>COMFORT <span className="story-red">FOOD</span></h2>
+              <p className="story-hashtag">#YOURDAILYCOMFORTFOOD</p>
+              <figure className="story-dish">
+                <img src="/tongseng.webp" alt="Tongseng sapi" width={900} height={773} loading="lazy" decoding="async" />
+                <figcaption>TONGSENG<br />AYAM/SAPI</figcaption>
+              </figure>
             </motion.div>
             <motion.div className="hero-cta-copy" style={{ opacity: ctaOpacity, y: ctaY }}>
               <span className="eyebrow"><i /> THE LOCA WAY</span>
