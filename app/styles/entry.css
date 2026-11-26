@@ -53,10 +53,12 @@
 }
 
 .entry-hours { display:inline-flex; align-items:center; gap:14px; padding:8px 20px; border:3px solid #fff; border-radius:14px; background:rgba(110,6,12,.35); box-shadow:0 0 8px rgba(255,255,255,.55),0 0 22px rgba(255,70,70,.8),inset 0 0 14px rgba(255,70,70,.55); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
-.entry-hours svg { width:22px; height:22px; color:#fff; filter:drop-shadow(0 0 5px rgba(255,70,70,.9)); }
-.entry-hours svg circle,.entry-hours svg path { stroke-width:2.6; }
+.entry-hours .tick-clock { width:26px; height:26px; color:#fff; filter:drop-shadow(0 0 5px rgba(255,70,70,.9)); overflow:visible; }
+.tick-second { animation:entry-tick 60s steps(60) infinite; }
+@keyframes entry-tick { to { transform:rotate(360deg); } }
+.tick-dots { display:inline-flex; align-items:center; gap:6px; }
+.tick-dots u { width:7px; height:7px; border-radius:50%; background:#fff; box-shadow:0 0 8px rgba(255,70,70,.95); animation:entry-tick-dot 1.2s steps(1) infinite; opacity:.25; }
+.tick-dots u:nth-child(2) { animation-delay:.4s; } .tick-dots u:nth-child(3) { animation-delay:.8s; }
+@keyframes entry-tick-dot { 0% { opacity:1; } 33% { opacity:.25; } 100% { opacity:.25; } }
 .entry-hours b { color:#fff; font-family:"Eight Bit Dragon","Press Start 2P",monospace; font-size:28px; font-weight:400; letter-spacing:.04em; line-height:1.1; text-shadow:0 0 4px #fff,0 0 12px rgba(255,70,70,.95),0 0 26px rgba(255,70,70,.7); }
-.entry-hours i { position:relative; width:30px; height:4px; background:#fff; border-radius:3px; box-shadow:0 0 8px rgba(255,70,70,.9); }
-.entry-hours i::before,.entry-hours i::after { position:absolute; top:50%; width:8px; height:8px; content:""; border-radius:50%; background:#fff; transform:translateY(-50%); box-shadow:0 0 8px rgba(255,70,70,.9); }
-.entry-hours i::before { left:-4px; } .entry-hours i::after { right:-4px; }
-@media (max-width:760px) { .entry-hours { gap:9px; padding:5px 12px; border-width:2px; } .entry-hours b { font-size:17px; } .entry-hours svg { width:15px; height:15px; } .entry-hours i { width:18px; height:3px; } }
+@media (max-width:760px) { .entry-hours { gap:9px; padding:5px 12px; border-width:2px; } .entry-hours b { font-size:17px; } .entry-hours .tick-clock { width:18px; height:18px; } .tick-dots { gap:4px; } .tick-dots u { width:5px; height:5px; } }

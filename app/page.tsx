@@ -166,6 +166,33 @@ function LocaSign() {
   return <span className="loca-sign-wrap"><img className="loca-sign" src="/loca-sign.webp" alt="Coffee Loca - destination for coffee, food, hangout" width={900} height={676} /></span>;
 }
 
+/** Small analog clock showing Medan time, with a ticking second hand. */
+function TickingClock() {
+  const [t, setT] = useState<{ h: number; m: number; s: number } | null>(null);
+  useEffect(() => {
+    const read = () => {
+      const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jakarta", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).formatToParts(new Date());
+      const get = (type: string) => Number(parts.find((part) => part.type === type)?.value ?? 0);
+      setT({ h: get("hour"), m: get("minute"), s: get("second") });
+    };
+    read();
+    const timer = window.setInterval(read, 20_000); // re-sync hands; the second hand ticks on its own via CSS
+    return () => window.clearInterval(timer);
+  }, []);
+  const hourDeg = t ? ((t.h % 12) + t.m / 60) * 30 : 0;
+  const minuteDeg = t ? t.m * 6 : 0;
+  return (
+    <svg className="tick-clock" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2.2" />
+      <path d="M12 3v1.6M21 12h-1.6M12 21v-1.6M3 12h1.6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M12 12V7.6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" style={{ transformOrigin: "12px 12px", transform: `rotate(${hourDeg}deg)` }} />
+      <path d="M12 12V5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" style={{ transformOrigin: "12px 12px", transform: `rotate(${minuteDeg}deg)` }} />
+      {t && <path className="tick-second" d="M12 13.5V4.6" stroke="#ff5a5a" strokeWidth="1.2" strokeLinecap="round" style={{ transformOrigin: "12px 12px", animationDelay: `-${t.s}s` }} />}
+      <circle cx="12" cy="12" r="1.5" fill="#fff" />
+    </svg>
+  );
+}
+
 type DayPeriod = "pagi" | "siang" | "sore" | "malam";
 
 /** Background theme by Medan time (WIB): pagi 05–10, siang 10–15, sore 15–18, malam 18–05. */
@@ -222,8 +249,8 @@ function EntryChoice() {
           </div>
           <div className="entry-choice-grain" aria-hidden="true" />
           <div className="entry-choice-top"><NeonSign /><span className="entry-hours" aria-label={`Buka ${SITE.hours.open} sampai ${SITE.hours.close}`}>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" /><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-              <b>{SITE.hours.open}</b><i aria-hidden="true" /><b>{SITE.hours.close}</b>
+              <TickingClock />
+              <b>{SITE.hours.open}</b><span className="tick-dots" aria-hidden="true"><u /><u /><u /></span><b>{SITE.hours.close}</b>
             </span></div>
           <div className="entry-choice-content">
             <h1 id="entry-title" className="sr-only">Coffee Loca</h1>
