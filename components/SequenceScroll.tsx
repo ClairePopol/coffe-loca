@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring, useTransform } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import RedeemStamps from "@/components/RedeemStamps";
+import { SITE } from "@/lib/site";
 
 const FRAME_COUNT = 161;
 const FRAME_PATH = "/image-sequence/ezgif-frame-";
@@ -150,10 +151,10 @@ export default function SequenceScroll() {
           <motion.div className="sequence-exit-wash" style={{ opacity: exitWashOpacity }} aria-hidden="true" />
           <div className="sequence-copy">
             <motion.div className="hero-copy" style={{ opacity: titleOpacity, y: titleY }}>
-              <span className="eyebrow"><i /> SLOW MADE · FRESH POURED</span>
-              <h1>Coffee<br /><em><span className="hero-loca">LOCA</span>-tion for</em></h1>
-              <p className="hero-slogan"><b>coffee · food · hangout</b><br />now get TCG, boardgame &amp; mahjong</p>
-              <a className="text-link hero-link" href="#cerita">MASUK KE CERITA <span className="arrow-icon arrow-down-right" aria-hidden="true" /></a>
+              <span className="eyebrow"><i /> MEDAN SPECIALITY COFFEE</span>
+              <h1><em><span className="hero-loca">LOCA</span>-tion<br />for</em></h1>
+              <p className="hero-slogan"><b>coffee · food · hangout</b><br />Medan, Jl. T. Amir Hamzah No. 11</p>
+              <a className="hero-direction" href={SITE.mapsUrl} target="_blank" rel="noreferrer">DIRECTION <span className="arrow-icon" aria-hidden="true" /></a>
             </motion.div>
             <motion.div className="story-copy story-left" style={{ opacity: firstOpacity, x: firstX }}>
               <span className="eyebrow"><i /> MADE FOR SLOW MORNINGS</span>

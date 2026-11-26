@@ -81,3 +81,7 @@
 
 .hero-copy p.hero-slogan { max-width:440px; font-size:14px; line-height:1.9; color:rgba(255,255,255,.85); }
 .hero-slogan b { color:#fff; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+
+.hero-direction { display:inline-flex; align-items:center; gap:14px; margin-top:30px; padding:15px 26px; border-radius:var(--radius-btn); color:var(--red); background:#fff; font-size:12px; font-weight:800; letter-spacing:.14em; box-shadow:0 14px 30px rgba(0,0,0,.28); transition:transform .3s var(--ease-out),background .25s,color .25s; }
+.hero-direction .arrow-icon { width:14px; height:14px; }
+.hero-direction:hover { transform:translateY(-3px); color:#fff; background:var(--red); }
