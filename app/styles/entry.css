@@ -3,13 +3,8 @@
 /* First-visit destination choice (Coffee Loca / Locamart) — red poster screen */
 .entry-choice { position:fixed; z-index:250; inset:0; display:flex; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; touch-action:pan-y; color:#fff; background:#a8141a; }
 .entry-choice:focus { outline:none; }
-.entry-choice::before { position:fixed; z-index:-2; inset:0; content:""; background:
-  radial-gradient(ellipse 55% 50% at 50% 34%,rgba(255,110,95,.85) 0%,rgba(236,52,56,.55) 35%,rgba(236,52,56,0) 72%),
-  radial-gradient(ellipse 45% 60% at 0% 100%,rgba(70,0,6,.85) 0%,rgba(70,0,6,0) 70%),
-  radial-gradient(ellipse 45% 60% at 100% 100%,rgba(70,0,6,.75) 0%,rgba(70,0,6,0) 70%),
-  radial-gradient(ellipse 40% 40% at 100% 0%,rgba(255,90,80,.35) 0%,rgba(255,90,80,0) 70%),
-  linear-gradient(160deg,#c9242b 0%,#a3121a 45%,#5c070d 100%); }
-.entry-choice-glow { position:fixed; z-index:-1; left:50%; top:36%; width:min(720px,90vw); aspect-ratio:1; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle,rgba(255,170,150,.32) 0%,rgba(255,120,110,.12) 38%,transparent 68%); filter:blur(10px); pointer-events:none; animation:entry-breathe 7s ease-in-out infinite; }
+.entry-choice::before { position:fixed; z-index:-2; inset:0; content:""; background:radial-gradient(ellipse 75% 85% at 50% 38%,#fff 0%,#ffe4de 12%,#ff8f86 30%,#e63038 50%,#b5161d 72%,#6a0a10 100%); }
+.entry-choice-glow { position:fixed; z-index:-1; left:50%; top:38%; width:min(900px,110vw); aspect-ratio:1; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle,rgba(255,255,255,.75) 0%,rgba(255,255,255,.25) 35%,transparent 68%); pointer-events:none; animation:entry-breathe 7s ease-in-out infinite; }
 .entry-choice-pins { position:fixed; z-index:-1; inset:0; overflow:hidden; pointer-events:none; }
 .entry-choice-pins i { position:absolute; opacity:.1; background:url("/loca-pin.webp") center/contain no-repeat; animation:entry-pin-float 9s ease-in-out infinite alternate; }
 @keyframes entry-pin-float { from { translate:0 14px; rotate:calc(var(--tilt) * -1); } to { translate:10px -34px; rotate:var(--tilt); } }
