@@ -74,3 +74,5 @@
 .auth-modal-note { font-size:13px; }
 .auth-modal-close { position:absolute; top:10px; right:14px; border:0; background:none; font-size:26px; line-height:1; cursor:pointer; color:inherit; }
 .field-optional { margin-left:8px; padding:2px 8px; border-radius:99px; color:var(--green); background:var(--green-soft); font-size:10px; font-style:normal; font-weight:800; letter-spacing:.12em; }
+
+.auth-inline-link { color: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }

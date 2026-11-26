@@ -161,12 +161,9 @@ export default function LoginPage() {
           <div className="auth-modal-card" onClick={(event) => event.stopPropagation()}>
             <button className="auth-modal-close" type="button" onClick={closeWaiting} aria-label="Tutup">×</button>
             <span className="auth-kicker">{waiting === "register" ? "AKUN BERHASIL DIDAFTARKAN" : "AKUN BELUM AKTIF"}</span>
-            <h2 id="verify-title">Verify your account.</h2>
-            <p>{waiting === "register"
-              ? "Please verify your account — click the link below to chat the owner on WhatsApp. Your account can only be used after the owner approves it."
-              : "Your account hasn't been approved yet, so you can't log in. Click the link below to chat the owner on WhatsApp and ask for approval."}</p>
-            <p className="auth-modal-note">Sebutkan nama dan nomor HP yang kamu daftarkan. Akun diaktifkan oleh Owner / Admin Coffe Loca.</p>
-            <a className="btn-primary" href={OWNER_WHATSAPP_URL} target="_blank" rel="noopener noreferrer"><span>CHAT OWNER DI WHATSAPP</span><span className="arrow-icon" aria-hidden="true" /></a>
+            <h2 id="verify-title">Verifikasi akun kamu.</h2>
+            <p>Silahkan verifikasi akun kamu - click link di bawah untuk chat ke admin di whatsapp. Akun kamu akan aktif kurang lebih 15 menit dari verifikasi, jika lebih lama silahkan chat <a className="auth-inline-link" href="https://wa.link/anrdhi" target="_blank" rel="noopener noreferrer">disini</a>.</p>
+            <a className="btn-primary" href={OWNER_WHATSAPP_URL} target="_blank" rel="noopener noreferrer"><span>KONFIRMASI ADMIN DI WHATSAPP</span><span className="arrow-icon" aria-hidden="true" /></a>
             <button type="button" className="auth-link" onClick={closeWaiting}>KEMBALI KE LOGIN</button>
           </div>
         </div>

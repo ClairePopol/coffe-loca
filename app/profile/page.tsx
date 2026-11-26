@@ -225,7 +225,7 @@ export default function ProfilePage() {
               <span className="profile-kicker">MENUNGGU VERIFIKASI</span>
               <h2>Akunmu belum diverifikasi.</h2>
               <p>Halo {displayName}! Supaya akunmu aktif, chat Owner Coffe Loca lewat WhatsApp dan minta akunmu diverifikasi. Setelah disetujui, kartu member dan voucher akan terbuka.</p>
-              <a className="btn-primary" href={OWNER_WHATSAPP_URL} target="_blank" rel="noopener noreferrer"><span>CHAT OWNER DI WHATSAPP</span><span className="arrow-icon" aria-hidden="true" /></a>
+              <a className="btn-primary" href={OWNER_WHATSAPP_URL} target="_blank" rel="noopener noreferrer"><span>KONFIRMASI ADMIN DI WHATSAPP</span><span className="arrow-icon" aria-hidden="true" /></a>
               <p>Sebutkan nama dan nomor HP yang kamu pakai untuk daftar: <b>{displayName}{contact ? ` · ${contact}` : ""}</b></p>
               <button type="button" className="profile-pending-check" onClick={() => window.location.reload()}>Sudah diverifikasi? Cek status</button>
             </div>
