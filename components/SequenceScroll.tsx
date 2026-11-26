@@ -158,7 +158,7 @@ export default function SequenceScroll() {
               <a className="hero-direction" href={SITE.mapsUrl} target="_blank" rel="noreferrer">DIRECTION</a>
               <div className="hero-hours">
                 <div className="hero-hours-copy"><span>JAM OPERASIONAL</span><strong>{SITE.hours.open} – {SITE.hours.close} <small>WIB</small></strong></div>
-                <NeonSign className="neon-in-box" />
+                <NeonSign variant="badge" className="status-in-box" />
               </div>
             </motion.div>
             <motion.div className="hero-map-card" style={{ opacity: titleOpacity, y: titleY }}>
