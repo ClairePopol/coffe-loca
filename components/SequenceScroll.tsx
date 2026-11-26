@@ -44,59 +44,76 @@ export default function SequenceScroll() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const progressRef = useRef(0);
-  const [loaded, setLoaded] = useState(0);
   const [ready, setReady] = useState(false);
   const [preloaderProgress, setPreloaderProgress] = useState(0);
   const { scrollYProgress } = useScroll({ target: stageRef, offset: ["start start", "end end"] });
   const easedProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 28, mass: 0.35 });
 
   useEffect(() => {
-    const target = ready ? 100 : Math.min(92, (loaded / FRAME_COUNT) * 100);
+    const target = ready ? 100 : 70;
     const timer = window.setInterval(() => {
       setPreloaderProgress((value) => {
         if (value >= target) return value;
-        return Math.min(target, value + (ready ? 2.5 : 1.2));
+        return Math.min(target, value + (ready ? 5 : 1.2));
       });
     }, 24);
     return () => window.clearInterval(timer);
-  }, [loaded, ready]);
+  }, [ready]);
 
   const draw = useCallback((progress: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const index = Math.min(FRAME_COUNT - 1, Math.max(0, Math.round(progress * (FRAME_COUNT - 1))));
-    const image = imagesRef.current[index];
+    // Frames stream in gradually: fall back to the nearest frame that is already loaded.
+    const frames = imagesRef.current;
+    const usable = (image?: HTMLImageElement) => !!image && image.complete && image.naturalWidth > 0;
+    let image: HTMLImageElement | undefined;
+    for (let i = index; i >= 0 && !image; i--) if (usable(frames[i])) image = frames[i];
+    for (let i = index + 1; i < FRAME_COUNT && !image; i++) if (usable(frames[i])) image = frames[i];
     if (image) drawFrame(canvas, image);
   }, []);
 
   useEffect(() => {
     let cancelled = false;
-    let firstFrameReady = false;
-    const revealWhenUsable = () => {
-      if (cancelled || firstFrameReady) return;
-      firstFrameReady = true;
+    let revealed = false;
+    const frames: HTMLImageElement[] = new Array(FRAME_COUNT);
+    imagesRef.current = frames;
+    const reveal = () => {
+      if (cancelled || revealed) return;
+      revealed = true;
       setReady(true);
       requestAnimationFrame(() => draw(progressRef.current));
     };
-    const frames = Array.from({ length: FRAME_COUNT }, (_, index) => {
-      const image = new Image();
-      image.decoding = "async";
-      image.onload = () => {
-        if (cancelled) return;
-        setLoaded((value) => value + 1);
-        if (index === 0) revealWhenUsable();
-      };
-      image.onerror = () => {
-        if (cancelled) return;
-        setLoaded((value) => value + 1);
-        if (index === 0) revealWhenUsable();
-      };
-      image.src = imageUrl(index);
-      return image;
+    const loadFrame = (index: number) =>
+      new Promise<void>((resolve) => {
+        const image = new Image();
+        image.decoding = "async";
+        frames[index] = image;
+        const done = () => {
+          if (index === 0) reveal();
+          resolve();
+        };
+        image.onload = () => { image.decode().catch(() => undefined).finally(done); };
+        image.onerror = done;
+        image.src = imageUrl(index);
+      });
+
+    // Only the first frame blocks the page. The rest stream in quietly, a few at a time, after it is shown.
+    const CONCURRENCY = 3;
+    let next = 1;
+    const worker = async () => {
+      while (!cancelled && next < FRAME_COUNT) {
+        await loadFrame(next++);
+        if (!cancelled && Math.round(progressRef.current * (FRAME_COUNT - 1)) === next - 1) draw(progressRef.current);
+      }
+    };
+    const fallbackTimer = window.setTimeout(reveal, 3000);
+    loadFrame(0).then(() => {
+      if (cancelled) return;
+      const start = () => { for (let i = 0; i < CONCURRENCY; i++) void worker(); };
+      const idle = (window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number }).requestIdleCallback;
+      if (idle) idle(start, { timeout: 1500 }); else window.setTimeout(start, 300);
     });
-    imagesRef.current = frames;
-    const fallbackTimer = window.setTimeout(revealWhenUsable, 5000);
-    Promise.all(frames.map((image) => image.decode().catch(() => undefined))).then(() => revealWhenUsable());
     return () => {
       cancelled = true;
       window.clearTimeout(fallbackTimer);
