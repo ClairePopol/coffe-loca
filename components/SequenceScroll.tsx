@@ -162,14 +162,14 @@ export default function SequenceScroll() {
               </div>
             </motion.div>
             <motion.div className="hero-map-card" style={{ opacity: titleOpacity, y: titleY }}>
-              <a href={SITE.mapsUrl} target="_blank" rel="noreferrer" aria-label={`Rating ${SITE.rating} dari 5, ${SITE.reviews} ulasan di Google. Buka peta di Google Maps`}>
-                <span className="hero-map-rating">
-                  <b>{SITE.rating}</b>
-                  <span><i aria-hidden="true">★★★★★</i><small>{SITE.reviews} ulasan di Google</small></span>
-                </span>
-                <span className="hero-map-frame"><iframe src={SITE.mapsEmbedUrl} title={`Peta ${SITE.placeName}`} loading="lazy" tabIndex={-1} referrerPolicy="no-referrer-when-downgrade" /></span>
-                <span className="hero-map-label"><b>COFFEE LOCA / MEDAN</b><i className="arrow-icon" aria-hidden="true" /></span>
-              </a>
+              <div className="hero-map-box">
+                <a className="hero-map-review" href={SITE.mapsUrl} target="_blank" rel="noreferrer">
+                  <i aria-hidden="true">★★★★★</i>
+                  <span><b>Suka Coffee Loca?</b><small>Tulis ulasanmu di Google</small></span>
+                </a>
+                <a className="hero-map-open" href={SITE.mapsUrl} target="_blank" rel="noreferrer">OPEN MAPS <i className="arrow-icon" aria-hidden="true" /></a>
+                <a className="hero-map-frame" href={SITE.mapsUrl} target="_blank" rel="noreferrer" aria-label="Buka peta di Google Maps" tabIndex={-1}><iframe src={SITE.mapsEmbedUrl} title={`Peta ${SITE.placeName}`} loading="lazy" tabIndex={-1} referrerPolicy="no-referrer-when-downgrade" /></a>
+              </div>
             </motion.div>
             <motion.div className="story-copy story-left" style={{ opacity: firstOpacity, x: firstX }}>
               <span className="eyebrow"><i /> MADE FOR SLOW MORNINGS</span>
