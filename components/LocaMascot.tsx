@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { DayPeriod } from "@/lib/dayPeriod";
 
 const SAYS: Record<DayPeriod, string> = {
@@ -18,19 +18,25 @@ const SAYS: Record<DayPeriod, string> = {
 export default function LocaMascot({ period }: { period: DayPeriod }) {
   const ref = useRef<HTMLDivElement>(null);
   const first = useRef(true);
+  // The bubble only pops up briefly (on load and whenever the period changes) so it never sits on top of the sign.
+  const [talking, setTalking] = useState(false);
 
   useEffect(() => {
-    if (first.current) { first.current = false; return; }
     const el = ref.current;
-    if (!el) return;
-    el.classList.remove("is-hop");
-    void el.offsetWidth;
-    el.classList.add("is-hop");
+    if (el && !first.current) {
+      el.classList.remove("is-hop");
+      void el.offsetWidth;
+      el.classList.add("is-hop");
+    }
+    first.current = false;
+    setTalking(true);
+    const timer = window.setTimeout(() => setTalking(false), 4200);
+    return () => window.clearTimeout(timer);
   }, [period]);
 
   return (
     <div className="loki" data-mood={period} aria-hidden="true">
-      <div className="loki-bubble">
+      <div className={`loki-bubble${talking ? " is-show" : ""}`}>
         {(Object.keys(SAYS) as DayPeriod[]).map((key) => <span key={key} className={key === period ? "is-on" : ""}>{SAYS[key]}</span>)}
       </div>
       <div className="loki-hop" ref={ref}>

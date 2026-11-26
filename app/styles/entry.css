@@ -163,7 +163,8 @@
 @keyframes loki-z { 0% { opacity:0; translate:0 8px; } 25% { opacity:.95; } 100% { opacity:0; translate:14px -34px; } }
 
 /* speech bubble that changes with the time of day */
-.loki-bubble { position:absolute; left:58%; bottom:104%; display:grid; padding:7px 12px; border-radius:14px; background:#fff; color:#7a1519; font-size:12px; font-weight:800; line-height:1.25; white-space:nowrap; box-shadow:0 6px 16px rgba(0,0,0,.22); }
+.loki-bubble { position:absolute; left:50%; bottom:100%; display:grid; opacity:0; scale:.85; transform-origin:20% 100%; transition:opacity .5s ease,scale .5s cubic-bezier(.3,1.4,.5,1); padding:7px 12px; border-radius:14px; background:#fff; color:#7a1519; font-size:12px; font-weight:800; line-height:1.25; white-space:nowrap; box-shadow:0 6px 16px rgba(0,0,0,.22); }
+.loki-bubble.is-show { opacity:1; scale:1; }
 .loki-bubble::after { position:absolute; left:20px; bottom:-6px; width:12px; height:12px; content:""; background:#fff; rotate:45deg; border-radius:2px; }
 .loki-bubble span { grid-area:1 / 1; opacity:0; transition:opacity .6s ease; }
 .loki-bubble span.is-on { opacity:1; }
