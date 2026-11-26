@@ -202,7 +202,10 @@ function EntryChoice() {
             <i style={{ left: "94%", top: "36%", width: 34, height: 34, animationDelay: "-0.5s", animationDuration: "8s", "--tilt": "-12deg" } as React.CSSProperties} />
           </div>
           <div className="entry-choice-grain" aria-hidden="true" />
-          <div className="entry-choice-top"><NeonSign /><span>{SITE.hours.open} - {SITE.hours.close}</span></div>
+          <div className="entry-choice-top"><NeonSign /><span className="entry-hours" aria-label={`Buka ${SITE.hours.open} sampai ${SITE.hours.close}`}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" /><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+              <b>{SITE.hours.open}</b><i aria-hidden="true" /><b>{SITE.hours.close}</b>
+            </span></div>
           <div className="entry-choice-content">
             <h1 id="entry-title" className="sr-only">Coffee Loca</h1>
             <LocaSign />
