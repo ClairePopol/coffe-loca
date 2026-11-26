@@ -1,11 +1,11 @@
 @font-face { font-family:"Eight Bit Dragon"; src:url("/fonts/eight-bit-dragon.otf") format("opentype"); font-display:swap; }
 /* First-visit destination choice (Loca Coffee / Loca Store) — red poster screen */
 /* First-visit destination choice (Coffee Loca / Locamart) — red poster screen */
-.entry-choice { --bg1:#9bdcff; --bg2:#54b0f4; --bg3:#2f86dc; --bg4:#1f5eb4; --bg5:#133f82; --ray:.5; --glow:255,255,255; background:var(--bg4); }
-.entry-choice[data-time="pagi"] { --bg1:#ffdca6; --bg2:#f9ad8c; --bg3:#c27ca0; --bg4:#6a5e98; --bg5:#33396a; --ray:.5; --glow:255,236,200; }
+.entry-choice { --bg1:#c4f1ff; --bg2:#79d3f7; --bg3:#3fb0ee; --bg4:#2384d2; --bg5:#1858a6; --ray:.5; --glow:255,255,255; background:var(--bg4); }
+.entry-choice[data-time="pagi"] { --bg1:#fff0bf; --bg2:#ffcf86; --bg3:#fba575; --bg4:#e1768a; --bg5:#9c5493; --ray:.5; --glow:255,236,200; }
 .entry-choice[data-time="sore"] { --bg1:#ffb56b; --bg2:#f27a4c; --bg3:#b8486c; --bg4:#702c70; --bg5:#2e1848; --ray:.5; --glow:255,200,150; }
 .entry-choice[data-time="malam"] { --bg1:#2d3478; --bg2:#1c2154; --bg3:#111538; --bg4:#080b24; --bg5:#03040f; --ray:.2; --glow:170,180,255; }
-.entry-choice { position:fixed; z-index:250; inset:0; display:flex; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; touch-action:pan-y; color:#fff; background:#1f5eb4; }
+.entry-choice { position:fixed; z-index:250; inset:0; display:flex; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; touch-action:pan-y; color:#fff; background:#2384d2; }
 .entry-choice:focus { outline:none; }
 .entry-choice::before { position:fixed; z-index:-2; inset:0; content:""; background:radial-gradient(ellipse 80% 90% at 50% 38%,var(--bg1) 0%,var(--bg2) 24%,var(--bg3) 48%,var(--bg4) 74%,var(--bg5) 100%); }
 .entry-choice-pins { position:fixed; z-index:-1; inset:0; overflow:hidden; pointer-events:none; }
@@ -64,11 +64,11 @@
 @media (max-width:760px) { .entry-hours { gap:7px; padding:4px 10px; } .entry-hours b { font-size:13px; } .entry-hours .tick-clock { width:15px; height:15px; } .tick-dots { gap:3px; } .tick-dots u { width:4px; height:4px; } }
 
 /* Sky decor: stars at night, drifting clouds + sun by day. Every period change cross-fades. */
-@property --bg1 { syntax:"<color>"; inherits:true; initial-value:#9bdcff; }
-@property --bg2 { syntax:"<color>"; inherits:true; initial-value:#54b0f4; }
-@property --bg3 { syntax:"<color>"; inherits:true; initial-value:#2f86dc; }
-@property --bg4 { syntax:"<color>"; inherits:true; initial-value:#1f5eb4; }
-@property --bg5 { syntax:"<color>"; inherits:true; initial-value:#133f82; }
+@property --bg1 { syntax:"<color>"; inherits:true; initial-value:#c4f1ff; }
+@property --bg2 { syntax:"<color>"; inherits:true; initial-value:#79d3f7; }
+@property --bg3 { syntax:"<color>"; inherits:true; initial-value:#3fb0ee; }
+@property --bg4 { syntax:"<color>"; inherits:true; initial-value:#2384d2; }
+@property --bg5 { syntax:"<color>"; inherits:true; initial-value:#1858a6; }
 .entry-choice { transition:--bg1 2.2s ease,--bg2 2.2s ease,--bg3 2.2s ease,--bg4 2.2s ease,--bg5 2.2s ease; }
 .entry-choice-sky { position:fixed; z-index:-1; inset:0; overflow:hidden; pointer-events:none; }
 
@@ -80,13 +80,13 @@
 
 /* one sun that travels: rises (pagi) -> high corner (siang) -> sinks (sore) -> gone (malam) */
 .sky-sun { position:absolute; display:block; left:50%; top:130%; width:420px; height:420px; border-radius:50%; background:#ffe2a6; opacity:0; translate:-50% -50%; transition:left 2.6s ease,top 2.6s ease,width 2.6s ease,height 2.6s ease,background-color 2.2s ease,opacity 2.2s ease; }
-.entry-choice[data-time="pagi"] .sky-sun { left:50%; top:106%; width:420px; height:420px; background:#ffe2a6; opacity:.5; }
-.entry-choice[data-time="siang"] .sky-sun { left:90%; top:18%; width:104px; height:104px; background:#fff1c9; opacity:.55; }
+.entry-choice[data-time="pagi"] .sky-sun { left:50%; top:104%; width:480px; height:480px; background:#fff0b0; opacity:.75; }
+.entry-choice[data-time="siang"] .sky-sun { left:88%; top:17%; width:130px; height:130px; background:#fff3b8; opacity:.9; }
 .entry-choice[data-time="sore"] .sky-sun { left:50%; top:108%; width:460px; height:460px; background:#ff9a4d; opacity:.5; }
 .entry-choice[data-time="malam"] .sky-sun { left:50%; top:135%; width:460px; height:460px; background:#ff9a4d; opacity:0; }
 
-.entry-choice[data-time="pagi"] .sky-cloud { background:rgba(255,244,225,.22); }
-.entry-choice[data-time="siang"] .sky-cloud { background:rgba(255,255,255,.2); }
+.entry-choice[data-time="pagi"] .sky-cloud { background:rgba(255,248,235,.38); }
+.entry-choice[data-time="siang"] .sky-cloud { background:rgba(255,255,255,.55); }
 .entry-choice[data-time="sore"] .sky-cloud { background:rgba(255,170,150,.2); }
 .entry-choice[data-time="malam"] .sky-cloud { opacity:0; }
 
