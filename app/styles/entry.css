@@ -105,7 +105,8 @@
 .entry-dev button.is-active { background:#fff; color:#111; }
 
 /* Loki, the Loca bird mascot: one bird, a different outfit + action per time of day */
-.loki { position:fixed; z-index:-1; left:3%; bottom:5%; width:clamp(112px,11.5vw,168px); pointer-events:none; }
+/* perched on top of the Coffee Loca card (it is a child of .entry-choice-actions) */
+.loki { position:absolute; z-index:3; left:7%; top:0; translate:0 -96%; width:clamp(96px,10vw,140px); pointer-events:none; }
 .loki-svg { display:block; width:100%; height:auto; overflow:visible; }
 .loki-hop { position:relative; transform-origin:50% 100%; }
 .loki-hop.is-hop { animation:loki-pop .9s cubic-bezier(.3,1.5,.5,1); }
@@ -166,4 +167,4 @@
 .loki-bubble::after { position:absolute; left:20px; bottom:-6px; width:12px; height:12px; content:""; background:#fff; rotate:45deg; border-radius:2px; }
 .loki-bubble span { grid-area:1 / 1; opacity:0; transition:opacity .6s ease; }
 .loki-bubble span.is-on { opacity:1; }
-@media (max-width:640px) { .loki { bottom:2%; } .loki-bubble { display:none; } }
+@media (max-width:640px) { .loki { width:88px; left:5%; } .loki-bubble { display:none; } }

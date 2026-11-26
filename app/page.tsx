@@ -268,7 +268,6 @@ function EntryChoice() {
               <button type="button" onClick={() => setForced(null)}>AUTO</button>
             </div>
           )}
-          <LocaMascot period={forced ?? period} />
           <div className="entry-choice-grain" aria-hidden="true" />
           <div className="entry-choice-top"><NeonSign /><span className="entry-hours" aria-label={`Buka ${SITE.hours.open} sampai ${SITE.hours.close}`}>
               <TickingClock />
@@ -280,6 +279,7 @@ function EntryChoice() {
             <div className="entry-choice-actions">
               <button type="button" onClick={() => choose("coffee")}><span className="entry-card-tag"><b>01</b> / CAFE</span><strong>COFFEE LOCA</strong><em>Good Coffee, Comfort food, Reading, Mahjong, TCG &amp; Boardgame.</em><i className="arrow-icon" aria-hidden="true" /></button>
               <button type="button" onClick={() => choose("store")}><span className="entry-card-tag"><b>02</b> / TCG STORE</span><strong>LOCAMART</strong><em>BUY SELL TRADE Pokemon &amp; Riftbound TCG. Official retailer - Weekly event.</em><i className="arrow-icon" aria-hidden="true" /></button>
+              <LocaMascot period={forced ?? period} />
             </div>
           </div>
         </motion.div>
