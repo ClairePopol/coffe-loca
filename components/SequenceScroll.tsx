@@ -162,8 +162,12 @@ export default function SequenceScroll() {
               </div>
             </motion.div>
             <motion.div className="hero-map-card" style={{ opacity: titleOpacity, y: titleY }}>
-              <a href={SITE.mapsUrl} target="_blank" rel="noreferrer" aria-label="Buka peta di Google Maps">
-                <iframe src={SITE.mapsEmbedUrl} title={`Peta ${SITE.placeName}`} loading="lazy" tabIndex={-1} referrerPolicy="no-referrer-when-downgrade" />
+              <a href={SITE.mapsUrl} target="_blank" rel="noreferrer" aria-label={`Rating ${SITE.rating} dari 5, ${SITE.reviews} ulasan di Google. Buka peta di Google Maps`}>
+                <span className="hero-map-rating">
+                  <b>{SITE.rating}</b>
+                  <span><i aria-hidden="true">★★★★★</i><small>{SITE.reviews} ulasan di Google</small></span>
+                </span>
+                <span className="hero-map-frame"><iframe src={SITE.mapsEmbedUrl} title={`Peta ${SITE.placeName}`} loading="lazy" tabIndex={-1} referrerPolicy="no-referrer-when-downgrade" /></span>
                 <span className="hero-map-label"><b>COFFEE LOCA / MEDAN</b><i className="arrow-icon" aria-hidden="true" /></span>
               </a>
             </motion.div>
