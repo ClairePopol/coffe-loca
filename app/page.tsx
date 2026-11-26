@@ -238,6 +238,16 @@ function EntryChoice() {
             <i style={{ left: "30%", top: "34%", width: 30, height: 30, animationDelay: "-2.5s", animationDuration: "7s", "--tilt": "14deg" } as React.CSSProperties} />
             <i style={{ left: "94%", top: "36%", width: 34, height: 34, animationDelay: "-0.5s", animationDuration: "8s", "--tilt": "-12deg" } as React.CSSProperties} />
           </div>
+          <div className="entry-choice-sky" aria-hidden="true">
+            <span className="sky-stars sky-stars-a" />
+            <span className="sky-stars sky-stars-b" />
+            <span className="sky-stars sky-stars-c" />
+            <s className="sky-sun" />
+            <i className="sky-cloud" style={{ top: "14%", animationDuration: "70s", animationDelay: "-12s", "--s": 1 } as React.CSSProperties} />
+            <i className="sky-cloud" style={{ top: "40%", animationDuration: "95s", animationDelay: "-60s", "--s": 1.5 } as React.CSSProperties} />
+            <i className="sky-cloud" style={{ top: "70%", animationDuration: "80s", animationDelay: "-30s", "--s": 1.2 } as React.CSSProperties} />
+            <i className="sky-cloud" style={{ top: "26%", animationDuration: "110s", animationDelay: "-85s", "--s": .8 } as React.CSSProperties} />
+          </div>
           <div className="entry-choice-grain" aria-hidden="true" />
           <div className="entry-choice-top"><NeonSign /><span className="entry-hours" aria-label={`Buka ${SITE.hours.open} sampai ${SITE.hours.close}`}>
               <TickingClock />
