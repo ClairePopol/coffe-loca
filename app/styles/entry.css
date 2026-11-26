@@ -19,9 +19,14 @@
 @keyframes entry-card-in { from { opacity:0; translate:0 36px; } }
 .entry-choice-top { animation:entry-fade-down .8s var(--ease-out) .1s backwards; }
 .entry-choice-top { display:flex; width:min(840px,90vw); align-items:center; justify-content:space-between; gap:16px; margin:0 auto; padding:26px 0; color:#fff; font-size:15px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; }
-.entry-choice-content { display:flex; width:min(840px,90vw); flex-direction:column; align-items:center; margin:auto; padding:0 0 32px; }
+.entry-choice-content { display:flex; flex:1 0 auto; width:min(840px,90vw); flex-direction:column; align-items:center; justify-content:center; margin:0 auto; padding:0 0 70px; overflow-x:visible; overflow-y:clip; }
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
-.loca-sign { position:relative; z-index:0; transform:translateX(5.5%); width:auto; height:min(56vh,560px); max-width:90vw; object-fit:contain; margin-top:-78px; margin-bottom:-52px; filter:drop-shadow(0 22px 28px rgba(60,0,6,.45)); animation:entry-sign-in 1s var(--ease-out) .15s backwards,entry-sign-float 6s ease-in-out 1.2s infinite; }
+.loca-sign-wrap { position:relative; z-index:0; display:block; transform:translateX(5.5%); margin-top:-110px; margin-bottom:-52px; filter:drop-shadow(0 22px 28px rgba(60,0,6,.45)); animation:entry-sign-in 1s var(--ease-out) .15s backwards,entry-sign-float 6s ease-in-out 1.2s infinite; }
+.loca-sign { display:block; width:auto; height:min(56vh,560px); max-width:90vw; object-fit:contain; }
+/* Poles continue down to the bottom of the screen */
+.loca-sign-wrap::before,.loca-sign-wrap::after { position:absolute; content:""; background:#0e0e0e; }
+.loca-sign-wrap::before { left:29.8%; width:4.8%; top:97%; height:100vh; }
+.loca-sign-wrap::after { left:54.6%; width:1.4%; top:85.5%; height:calc(100vh + 15%); }
 .entry-choice-actions { position:relative; z-index:1; display:grid; width:100%; grid-template-columns:1fr 1fr; gap:16px; text-align:left; }
 .entry-choice-actions button { position:relative; display:flex; min-height:164px; flex-direction:column; justify-content:flex-start; gap:10px; padding:22px 26px 24px; overflow:hidden; border:0; border-radius:var(--radius-lg); color:var(--ink); background:#fff; text-align:left; cursor:pointer; box-shadow:0 20px 44px rgba(50,0,6,.32); transition:transform .4s var(--ease-out),background .3s,color .3s; }
 .entry-choice-actions button { animation:entry-card-in .8s var(--ease-out) .55s backwards; }
@@ -38,8 +43,9 @@
 
 @media (max-width:760px) {
   .entry-choice-top { width:88vw; padding:18px 0; font-size:13px; }
-  .entry-choice-content { width:88vw; padding-bottom:24px; }
-  .loca-sign { height:min(38vh,340px); margin-top:-44px; margin-bottom:-30px; }
+  .entry-choice-content { width:88vw; padding-bottom:40px; }
+  .loca-sign-wrap { margin-top:-64px; margin-bottom:-30px; }
+  .loca-sign { height:min(38vh,340px); }
   .entry-choice-actions { grid-template-columns:1fr; gap:10px; }
   .entry-choice-actions button { min-height:0; padding:18px 20px; border-radius:var(--radius); }
   .entry-choice-actions button strong { font-size:25px; }
