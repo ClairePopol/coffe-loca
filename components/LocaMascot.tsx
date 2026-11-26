@@ -8,8 +8,8 @@ function Limb({ d }: { d: string }) {
   return <><path d={d} fill="none" stroke="#d4232a" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" /><path d={d} fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" /></>;
 }
 
-/** Card-game style card faces (domain-coloured art windows) for the night fan of cards. */
-const RIFT = ["#d4232a", "#2f9e5b", "#2b6fd6", "#8a3fc7"];
+/** The night fan of cards: Loki holds them facing himself, so the viewer sees the card backs. */
+const RIFT = [0, 1, 2, 3];
 
 const SAYS: Record<DayPeriod, string> = {
   pagi: "Pagi! Ngopi dulu yuk ☕",
@@ -56,7 +56,7 @@ export default function LocaMascot({ period }: { period: DayPeriod }) {
         <span className="loki-note">♪</span>
         <span className="loki-zzz z1">z</span><span className="loki-zzz z2">Z</span>
         <svg className="loki-svg" viewBox="-14 -14 168 208">
-          <defs><linearGradient id="loki-bf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#3a2f8f" /><stop offset=".55" stopColor="#2b6fd6" /><stop offset="1" stopColor="#d9b45a" /></linearGradient></defs>
+          <defs><radialGradient id="loki-back"><stop offset="0" stopColor="#1f4f8f" /><stop offset="1" stopColor="#0d1830" /></radialGradient><linearGradient id="loki-bf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#3a2f8f" /><stop offset=".55" stopColor="#2b6fd6" /><stop offset="1" stopColor="#d9b45a" /></linearGradient></defs>
           <g className="loki-squat-legs">
             <Limb d="M60 156L42 162L48 172" /><Limb d="M80 156L98 162L92 172" />
             <g fill="#fff" stroke="#d4232a" strokeWidth="2.4"><ellipse cx="46" cy="176" rx="10" ry="5" /><ellipse cx="94" cy="176" rx="10" ry="5" /></g>
@@ -84,13 +84,12 @@ export default function LocaMascot({ period }: { period: DayPeriod }) {
                   <rect x="-1" y="111" width="20" height="3" rx="1.5" fill="#fff" stroke="#d4232a" strokeWidth="1.2" />
                 </g></g>
                 <g className="loki-fan"><g className="loki-fanfix">
-                  {RIFT.map((c, i) => (
+                  {RIFT.map((_, i) => (
                     <g key={i} className={i === 2 ? "loki-fan-pick" : undefined}><g transform={`rotate(${[-36, -12, 12, 36][i]} 9 132) translate(9 132) scale(1.3) translate(-9 -132)`}>
-                      <rect x="2.5" y="106" width="13" height="19" rx="1.8" fill="#14121c" stroke="#d9b45a" strokeWidth=".9" />
-                      <rect x="4" y="108.6" width="10" height="8.4" rx=".8" fill={c} />
-                      <path d="M4 114.6l3-3 2.4 2.2 1.6-1.4 3 2.6V117H4z" fill="#000" opacity=".28" />
-                      <rect x="4" y="118" width="10" height="5.4" rx=".6" fill="#efe6d2" />
-                      <circle cx="4.6" cy="107.6" r="2" fill="#d9b45a" stroke="#14121c" strokeWidth=".5" />
+                      <rect x="2.5" y="106" width="13" height="19" rx="1.8" fill="#0d1830" stroke="#d9b45a" strokeWidth=".9" />
+                      <rect x="4" y="107.6" width="10" height="15.8" rx="1" fill="url(#loki-back)" stroke="#d9b45a" strokeWidth=".4" />
+                      <path d="M9 110.6l3.6 4.9L9 120.4l-3.6-4.9z" fill="none" stroke="#d9b45a" strokeWidth=".7" />
+                      <circle cx="9" cy="115.5" r="1.5" fill="#d9b45a" />
                     </g></g>
                   ))}
                 </g></g>
