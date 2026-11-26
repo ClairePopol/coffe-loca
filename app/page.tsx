@@ -190,6 +190,7 @@ function EntryChoice() {
     <AnimatePresence>
       {visible && (
         <motion.div ref={dialogRef} tabIndex={-1} data-lenis-prevent data-scroll-lock-allow className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
+          <div className="entry-choice-rays" aria-hidden="true" />
           <div className="entry-choice-glow" aria-hidden="true" />
           <div className="entry-choice-pins" aria-hidden="true">
             <i style={{ left: "6%", top: "12%", width: 54, height: 54, animationDelay: "-0s", animationDuration: "9s", "--tilt": "-14deg" } as React.CSSProperties} />
