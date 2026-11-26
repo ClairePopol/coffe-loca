@@ -133,8 +133,8 @@ export default function LoginPage() {
           <div id="auth-panel" role="tabpanel" aria-labelledby={`auth-tab-${mode}`}>
             <div className="auth-card-heading" key={mode}>
               <span className="auth-kicker">{isRegister ? "AYO" : "SELAMAT DATANG KEMBALI"}</span>
-              <h2>{isRegister ? "Buat akun untuk tau lebih lanjut." : "Kita ngopi di Loca."}</h2>
-              <p>{isRegister ? "Buat akun untuk ikut dalam cerita Loca." : "Claim rewards dan hadiahnya."}</p>
+              <h2>{isRegister ? "Mulai dari sini." : "Kita ngopi di Loca."}</h2>
+              <p>{isRegister ? "Buat akun untuk tau lebih lanjut." : "Claim rewards dan hadiahnya."}</p>
             </div>
 
             <form className="auth-form" onSubmit={handleSubmit}>
