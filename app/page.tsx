@@ -13,7 +13,7 @@ import { lenisRef } from "@/lib/lenis";
 import { useScrollLock } from "@/lib/useScrollLock";
 import SequenceScroll from "@/components/SequenceScroll";
 import Wordmark from "@/components/Wordmark";
-import EntryBirds from "@/components/EntryBirds";
+import LocaMascot from "@/components/LocaMascot";
 import NeonSign from "@/components/NeonSign";
 import { periodForHour, type DayPeriod } from "@/lib/dayPeriod";
 
@@ -254,7 +254,6 @@ function EntryChoice() {
             <span className="sky-stars sky-stars-b" />
             <span className="sky-stars sky-stars-c" />
             <s className="sky-sun" />
-            <EntryBirds />
             <i className="sky-cloud" style={{ top: "14%", animationDuration: "70s", animationDelay: "-12s", "--s": 1 } as React.CSSProperties} />
             <i className="sky-cloud" style={{ top: "40%", animationDuration: "95s", animationDelay: "-60s", "--s": 1.5 } as React.CSSProperties} />
             <i className="sky-cloud" style={{ top: "70%", animationDuration: "80s", animationDelay: "-30s", "--s": 1.2 } as React.CSSProperties} />
@@ -269,6 +268,7 @@ function EntryChoice() {
               <button type="button" onClick={() => setForced(null)}>AUTO</button>
             </div>
           )}
+          <LocaMascot period={forced ?? period} />
           <div className="entry-choice-grain" aria-hidden="true" />
           <div className="entry-choice-top"><NeonSign /><span className="entry-hours" aria-label={`Buka ${SITE.hours.open} sampai ${SITE.hours.close}`}>
               <TickingClock />

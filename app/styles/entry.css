@@ -104,54 +104,66 @@
 .entry-dev button { padding:6px 10px; border:1px solid rgba(255,255,255,.35); border-radius:8px; background:transparent; color:#fff; font:inherit; cursor:pointer; }
 .entry-dev button.is-active { background:#fff; color:#111; }
 
-/* Cute birds: each time of day has its own bird and action */
-.bird-spot { position:absolute; opacity:0; transition:opacity 1.8s ease; }
-.entry-choice[data-time="pagi"] .bird-pagi, .entry-choice[data-time="siang"] .bird-siang, .entry-choice[data-time="sore"] .bird-sore, .entry-choice[data-time="malam"] .bird-malam { opacity:1; }
-.pb, .owl { display:block; width:100%; height:auto; overflow:visible; }
-.pb-body, .pb-head, .pb-wing, .ow-head, .ow-eye, .ow-all, .fl-wing { transform-box:fill-box; }
+/* Loki, the Loca bird mascot: one bird, a different outfit + action per time of day */
+.loki { position:fixed; z-index:-1; left:3%; bottom:5%; width:clamp(112px,11.5vw,168px); pointer-events:none; }
+.loki-svg { display:block; width:100%; height:auto; overflow:visible; }
+.loki-hop { position:relative; transform-origin:50% 100%; }
+.loki-hop.is-hop { animation:loki-pop .9s cubic-bezier(.3,1.5,.5,1); }
+@keyframes loki-pop { 0% { scale:1 1; translate:0 0; } 20% { scale:1.12 .85; } 45% { scale:.93 1.1; translate:0 -34px; } 70% { scale:1.06 .94; translate:0 0; } 100% { scale:1 1; } }
+.loki-body, .loki-lids ellipse, .loki-arm, .loki-eyes, .loki-glasses, .loki-scarf, .loki-cap, .loki-cup, .loki-sleepy, .loki-smile, .loki-wing-l, .loki-steam { transform-box:fill-box; }
+.loki-body { transform-origin:50% 100%; animation:loki-breathe 3.4s ease-in-out infinite alternate; }
+@keyframes loki-breathe { from { scale:1 1; } to { scale:1.025 .975; } }
+.loki-eyes { transform-origin:50% 50%; animation:loki-blink 5s infinite; }
+@keyframes loki-blink { 0%,92%,100% { transform:scaleY(1); } 95% { transform:scaleY(.1); } }
+/* lids slide down to make the bird sleepy */
+.loki-lids ellipse { transform-origin:50% 0; transform:scaleY(0); transition:transform .9s ease; }
+.loki-sleepy, .loki-glasses, .loki-scarf, .loki-cap, .loki-cup { opacity:0; transition:opacity .7s ease,transform .7s cubic-bezier(.3,1.4,.5,1); }
+.loki-glasses, .loki-scarf, .loki-cap, .loki-cup { transform:scale(.4); }
+.loki-glasses, .loki-cap, .loki-scarf { transform-origin:50% 50%; }
+.loki-cup { transform-origin:30% 60%; }
+.loki-arm { transform-origin:30% 20%; transition:transform .8s ease; }
+.loki-smile { opacity:1; transition:opacity .5s; }
 
-/* pagi: a chick on a branch, hopping and chirping */
-.bird-pagi { left:4%; bottom:11%; width:clamp(78px,8vw,112px); }
-.bird-pagi .pb { animation:bird-hop 3.6s ease-in-out infinite; transform-origin:50% 100%; }
-.bird-pagi .pb-head { transform-origin:30% 90%; animation:bird-chirp 3.6s ease-in-out infinite; }
-.bird-pagi .pb-wing { transform-origin:80% 30%; animation:bird-flutter 3.6s ease-in-out infinite; }
-.bird-pagi .branch { display:block; width:150%; margin:-6px 0 0 -25%; }
-.note { position:absolute; left:78%; top:6%; color:#fff; font-size:20px; font-weight:800; opacity:0; text-shadow:0 2px 6px rgba(0,0,0,.25); animation:bird-note 3.6s ease-out infinite; }
-.note.n2 { left:92%; top:14%; font-size:15px; animation-delay:.35s; }
-@keyframes bird-hop { 0%,55%,100% { translate:0 0; } 62% { translate:0 -16px; } 70% { translate:0 0; } 78% { translate:0 -9px; } 86% { translate:0 0; } }
-@keyframes bird-chirp { 0%,10% { rotate:0deg; } 20% { rotate:-14deg; } 30% { rotate:8deg; } 40%,100% { rotate:0deg; } }
-@keyframes bird-flutter { 0%,55%,100% { rotate:0deg; } 62%,78% { rotate:-26deg; } 70%,86% { rotate:4deg; } }
-@keyframes bird-note { 0%,12% { opacity:0; translate:0 6px; } 24% { opacity:1; } 60%,100% { opacity:0; translate:10px -34px; } }
+/* pagi: sleepy-eyed, sipping coffee with steam */
+.loki[data-mood="pagi"] .loki-lids ellipse { transform:scaleY(.45); }
+.loki[data-mood="pagi"] .loki-cup { opacity:1; transform:scale(1); }
+.loki[data-mood="pagi"] .loki-arm { animation:loki-sip 4s ease-in-out infinite; }
+.loki[data-mood="pagi"] .loki-steam path { animation:loki-steam 2.4s ease-in-out infinite; }
+.loki[data-mood="pagi"] .loki-steam path:nth-child(2) { animation-delay:-1.2s; }
+@keyframes loki-sip { 0%,40%,100% { transform:rotate(0deg); } 55%,75% { transform:rotate(-34deg); } }
+@keyframes loki-steam { 0% { opacity:0; translate:0 6px; } 40% { opacity:.9; } 100% { opacity:0; translate:0 -8px; } }
 
-/* siang: little birds flapping across the sky */
-.bird-siang { inset:0; }
-.flyer { position:absolute; left:0; display:block; opacity:.95; animation:bird-cross linear infinite; filter:drop-shadow(0 4px 6px rgba(20,60,120,.25)); }
-.flyer svg { display:block; width:100%; height:auto; overflow:visible; animation:bird-bob 1.4s ease-in-out infinite alternate; }
-.fl-wing { transform-origin:55% 85%; animation:bird-flap .42s ease-in-out infinite alternate; }
-@keyframes bird-cross { from { translate:-120px 0; } to { translate:calc(100vw + 120px) 0; } }
-@keyframes bird-bob { from { translate:0 -6px; } to { translate:0 8px; } }
-@keyframes bird-flap { from { transform:scaleY(1); } to { transform:scaleY(-.55); } }
+/* siang: sunglasses, waving */
+.loki[data-mood="siang"] .loki-glasses { opacity:1; transform:scale(1); }
+.loki[data-mood="siang"] .loki-arm { animation:loki-wave 1.1s ease-in-out infinite alternate; }
+.loki[data-mood="siang"] .loki-body { animation-duration:2.2s; }
+@keyframes loki-wave { from { transform:rotate(-8deg); } to { transform:rotate(-58deg); } }
 
-/* sore: two birds sitting on a wire, swaying and turning their heads */
-.bird-sore { right:3%; bottom:9%; width:clamp(190px,21vw,300px); height:72px; }
-.bird-sore .wire { position:absolute; left:-6%; right:-6%; bottom:0; height:2px; border-radius:2px; background:rgba(40,12,50,.55); }
-.bird-sore .perch { position:absolute; bottom:-1px; display:block; transform-origin:50% 100%; }
-.bird-sore .p1 { left:18%; width:26%; animation:bird-sway 4.2s ease-in-out infinite; }
-.bird-sore .p2 { left:60%; width:22%; scale:-1 1; animation:bird-sway 5s ease-in-out -1.6s infinite; }
-.bird-sore .pb-head { transform-origin:30% 90%; animation:bird-look 6s ease-in-out infinite; }
-.bird-sore .p2 .pb-head { animation-delay:-3s; }
-.bird-sore .pb-body { animation:bird-puff 3s ease-in-out infinite alternate; transform-origin:50% 100%; }
-@keyframes bird-sway { 0%,100% { rotate:-3deg; } 50% { rotate:3deg; } }
-@keyframes bird-look { 0%,35%,100% { rotate:0deg; } 45%,60% { rotate:-18deg; } 75%,90% { rotate:12deg; } }
-@keyframes bird-puff { from { scale:1 1; } to { scale:1.03 .97; } }
+/* sore: cosy scarf, relaxed eyes, swaying and humming */
+.loki[data-mood="sore"] .loki-scarf { opacity:1; transform:scale(1); }
+.loki[data-mood="sore"] .loki-lids ellipse { transform:scaleY(.3); }
+.loki[data-mood="sore"] .loki-body { animation:loki-sway 5s ease-in-out infinite; }
+@keyframes loki-sway { 0%,100% { rotate:-4deg; } 50% { rotate:4deg; } }
+.loki-note { position:absolute; left:84%; top:8%; color:#fff; font-size:20px; font-weight:800; opacity:0; }
+.loki[data-mood="sore"] .loki-note { animation:loki-hum 3.6s ease-out infinite; }
+@keyframes loki-hum { 0%,10% { opacity:0; translate:0 6px; } 25% { opacity:1; } 70%,100% { opacity:0; translate:12px -40px; } }
 
-/* malam: a sleepy owl that blinks and tilts its head */
-.bird-malam { left:5%; bottom:8%; width:clamp(78px,8vw,112px); }
-.ow-head { transform-origin:50% 90%; animation:owl-tilt 7s ease-in-out infinite; }
-.ow-eye { transform-origin:50% 50%; animation:owl-blink 5s infinite; }
-.ow-eye:last-of-type { animation-delay:0s; }
-.ow-all { transform-origin:50% 100%; animation:owl-breathe 3.4s ease-in-out infinite alternate; }
-@keyframes owl-tilt { 0%,30%,100% { rotate:0deg; } 38%,55% { rotate:-14deg; } 65%,80% { rotate:10deg; } }
-@keyframes owl-blink { 0%,90%,100% { transform:scaleY(1); } 94% { transform:scaleY(.08); } }
-@keyframes owl-breathe { from { scale:1 1; } to { scale:1.025 .975; } }
-@media (max-width:640px) { .bird-pagi,.bird-malam { bottom:3%; } .bird-sore { bottom:3%; } }
+/* malam: nightcap, eyes shut, little z's */
+.loki[data-mood="malam"] .loki-lids ellipse { transform:scaleY(1); }
+.loki[data-mood="malam"] .loki-sleepy { opacity:1; }
+.loki[data-mood="malam"] .loki-cap { opacity:1; transform:scale(1); }
+.loki[data-mood="malam"] .loki-smile { opacity:0; }
+.loki[data-mood="malam"] .loki-eyes { animation:none; }
+.loki[data-mood="malam"] .loki-body { animation-duration:5s; }
+.loki-zzz { position:absolute; left:82%; top:4%; color:#fff; font-weight:800; font-size:16px; opacity:0; }
+.loki-zzz.z2 { font-size:22px; left:92%; top:-6%; }
+.loki[data-mood="malam"] .loki-zzz { animation:loki-z 3.2s ease-out infinite; }
+.loki[data-mood="malam"] .loki-zzz.z2 { animation-delay:1.1s; }
+@keyframes loki-z { 0% { opacity:0; translate:0 8px; } 25% { opacity:.95; } 100% { opacity:0; translate:14px -34px; } }
+
+/* speech bubble that changes with the time of day */
+.loki-bubble { position:absolute; left:58%; bottom:104%; display:grid; padding:7px 12px; border-radius:14px; background:#fff; color:#7a1519; font-size:12px; font-weight:800; line-height:1.25; white-space:nowrap; box-shadow:0 6px 16px rgba(0,0,0,.22); }
+.loki-bubble::after { position:absolute; left:20px; bottom:-6px; width:12px; height:12px; content:""; background:#fff; rotate:45deg; border-radius:2px; }
+.loki-bubble span { grid-area:1 / 1; opacity:0; transition:opacity .6s ease; }
+.loki-bubble span.is-on { opacity:1; }
+@media (max-width:640px) { .loki { bottom:2%; } .loki-bubble { display:none; } }
