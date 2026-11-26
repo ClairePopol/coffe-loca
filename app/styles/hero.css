@@ -149,3 +149,5 @@
 .story-right h2 { font-size:clamp(40px,5.2vw,74px); }
 .story-copy p.story-hashtag { font-size:clamp(15px,1.5vw,20px); }
 .story-dish figcaption { font-size:clamp(18px,2vw,28px); }
+/* phones: keep "coffee food hangout" readable next to "for" */
+@media (max-width:640px) { .hero-for-list { font-size:max(.34em, 11px); gap:.7em; } }

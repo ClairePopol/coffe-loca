@@ -161,7 +161,7 @@
 .loki-bubble::after { position:absolute; left:20px; bottom:-6px; width:12px; height:12px; content:""; background:#fff; rotate:45deg; border-radius:2px; }
 .loki-bubble span { grid-area:1 / 1; opacity:0; transition:opacity .6s ease; }
 .loki-bubble span.is-on { opacity:1; }
-@media (max-width:640px) { .loki { width:88px; left:5%; } .loki-bubble { display:none; } }
+@media (max-width:640px) { .loki { width:104px; left:4%; } .loki-bubble { display:none; } }
 
 /* standing on the card: feet rest on its top edge, arms bend at the elbow */
 .loki .loki-body { transform-box:view-box; transform-origin:70px 178px; }
@@ -300,3 +300,8 @@
 @keyframes loki-mug-cup { 0%,40%,90%,100% { transform:rotate(-20.6deg); } 55%,74% { transform:rotate(-175deg); } }
 @keyframes loki-mug-mouth { 0%,52%,77%,100% { opacity:0; transform:scale(.4); } 57%,72% { opacity:1; transform:scale(1); } }
 @keyframes loki-mug-smile { 0%,52%,77%,100% { opacity:1; } 57%,72% { opacity:0; } }
+@media (max-width:640px) {
+  .entry-dev { left:8px; right:8px; translate:none; flex-wrap:wrap; justify-content:center; gap:5px; padding:6px; font-size:10px; }
+  .entry-dev span { width:100%; text-align:center; margin:0; }
+  .entry-dev button { padding:5px 8px; }
+}
