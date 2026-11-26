@@ -162,7 +162,7 @@ function Navigation() {
 }
 
 function LocaSign() {
-  return <img className="loca-sign" src="/loca-sign.png" alt="Coffee Loca - destination for coffee, food, hangout" width={1100} height={1065} />;
+  return <img className="loca-sign" src="/loca-sign.png" alt="Coffee Loca - destination for coffee, food, hangout" width={1100} height={826} />;
 }
 
 function EntryChoice() {
