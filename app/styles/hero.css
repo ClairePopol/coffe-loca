@@ -146,3 +146,6 @@
 .story-dish { position:relative; margin:18px 0 0 auto; width:clamp(220px,24vw,340px); }
 .story-dish img { display:block; width:100%; height:auto; filter:drop-shadow(0 18px 28px rgba(0,0,0,.5)); }
 .story-dish figcaption { position:absolute; left:2%; bottom:4%; text-align:left; color:#fff; font-size:clamp(15px,1.6vw,22px); font-weight:800; line-height:1.05; letter-spacing:.02em; text-shadow:0 2px 10px rgba(0,0,0,.7); }
+.story-right h2 { font-size:clamp(40px,5.2vw,74px); }
+.story-copy p.story-hashtag { font-size:clamp(15px,1.5vw,20px); }
+.story-dish figcaption { font-size:clamp(18px,2vw,28px); }
