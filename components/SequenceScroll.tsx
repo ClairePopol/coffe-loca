@@ -183,7 +183,7 @@ export default function SequenceScroll() {
               <RedeemStamps />
             </motion.div>
           </div>
-          <div className="sequence-footer"><span>01 — 04 <i /> THE LOCA STORY</span><span className="scroll-cue"><i /> SCROLL TO SLOW DOWN</span><span>GOOD COFFEE, GOOD COMPANY</span></div>
+          <div className="sequence-footer"><img className="sequence-kata" src="/kata.webp" alt="Coffee, food, hangout" width={700} height={270} /></div>
           <div className="sequence-progress" aria-hidden="true"><motion.span style={{ scaleX: easedProgress, transformOrigin: "0% 50%" }} /></div>
         </div>
       </section>

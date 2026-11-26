@@ -73,7 +73,6 @@
   .story-copy p { max-width:235px; font-size:11px; }
   .hero-cta-copy { width:88vw; }
   .sequence-footer { inset:auto 17px 19px; font-size:6px; }
-  .sequence-footer>span:last-child { display:none; }
   .scroll-cue { gap:8px; }
   .scroll-cue i { height:20px; }
   .pill-button .arrow-icon { width:11px; height:11px; }
@@ -106,3 +105,7 @@
 .hero-map-label { position:absolute; left:10px; right:10px; bottom:10px; display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-radius:10px; color:var(--ink); background:#fff; font-size:10px; letter-spacing:.14em; }
 .hero-map-label .arrow-icon { width:12px; height:12px; color:var(--red); }
 @media (max-width:1000px) { .hero-map-card { display:none; } }
+
+.sequence-footer { justify-content:flex-end; }
+.sequence-kata { display:block; width:min(230px,28vw); height:auto; filter:drop-shadow(0 8px 18px rgba(0,0,0,.5)); }
+@media (max-width:760px) { .sequence-kata { width:130px; } }
