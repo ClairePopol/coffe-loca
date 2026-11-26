@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useScroll, useSpring, use
 import { useCallback, useEffect, useRef, useState } from "react";
 import RedeemStamps from "@/components/RedeemStamps";
 import { SITE } from "@/lib/site";
+import NeonSign from "@/components/NeonSign";
 
 const FRAME_COUNT = 161;
 const FRAME_PATH = "/image-sequence/ezgif-frame-";
@@ -156,7 +157,8 @@ export default function SequenceScroll() {
               <p className="hero-slogan">Medan, Jl. T. Amir Hamzah No. 11</p>
               <a className="hero-direction" href={SITE.mapsUrl} target="_blank" rel="noreferrer">DIRECTION</a>
               <div className="hero-hours">
-                <div className="hero-hours-copy"><span>JAM OPERASIONAL</span><strong>{SITE.hours.open} – {SITE.hours.close} <small>WIB</small></strong><em>Open daily</em></div>
+                <div className="hero-hours-copy"><span>JAM OPERASIONAL</span><strong>{SITE.hours.open} – {SITE.hours.close} <small>WIB</small></strong></div>
+                <NeonSign className="neon-in-box" />
               </div>
             </motion.div>
             <motion.div className="hero-map-card" style={{ opacity: titleOpacity, y: titleY }}>

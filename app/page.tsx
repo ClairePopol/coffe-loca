@@ -13,6 +13,7 @@ import { lenisRef } from "@/lib/lenis";
 import { useScrollLock } from "@/lib/useScrollLock";
 import SequenceScroll from "@/components/SequenceScroll";
 import Wordmark from "@/components/Wordmark";
+import NeonSign from "@/components/NeonSign";
 
 const menuItems = [
   { title: "Awal cerita", href: "#cerita", number: "01", note: "KENALI CERITA KAMI" },
@@ -190,9 +191,18 @@ function EntryChoice() {
       {visible && (
         <motion.div ref={dialogRef} tabIndex={-1} data-lenis-prevent data-scroll-lock-allow className="entry-choice" role="dialog" aria-modal="true" aria-labelledby="entry-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
           <div className="entry-choice-glow" aria-hidden="true" />
-          <div className="entry-choice-pattern entry-choice-pattern-a" aria-hidden="true" />
+          <div className="entry-choice-pins" aria-hidden="true">
+            <i style={{ left: "6%", top: "12%", width: 54, height: 54, animationDelay: "-0s", animationDuration: "9s", "--tilt": "-14deg" } as React.CSSProperties} />
+            <i style={{ left: "88%", top: "8%", width: 40, height: 40, animationDelay: "-2s", animationDuration: "7s", "--tilt": "10deg" } as React.CSSProperties} />
+            <i style={{ left: "16%", top: "62%", width: 72, height: 72, animationDelay: "-1s", animationDuration: "11s", "--tilt": "8deg" } as React.CSSProperties} />
+            <i style={{ left: "80%", top: "58%", width: 60, height: 60, animationDelay: "-3s", animationDuration: "10s", "--tilt": "-10deg" } as React.CSSProperties} />
+            <i style={{ left: "46%", top: "6%", width: 34, height: 34, animationDelay: "-4s", animationDuration: "8s", "--tilt": "12deg" } as React.CSSProperties} />
+            <i style={{ left: "62%", top: "82%", width: 46, height: 46, animationDelay: "-1.5s", animationDuration: "9s", "--tilt": "-8deg" } as React.CSSProperties} />
+            <i style={{ left: "30%", top: "34%", width: 30, height: 30, animationDelay: "-2.5s", animationDuration: "7s", "--tilt": "14deg" } as React.CSSProperties} />
+            <i style={{ left: "94%", top: "36%", width: 34, height: 34, animationDelay: "-0.5s", animationDuration: "8s", "--tilt": "-12deg" } as React.CSSProperties} />
+          </div>
           <div className="entry-choice-grain" aria-hidden="true" />
-          <div className="entry-choice-top"><span>OPEN DAILY</span><span>{SITE.hours.open} - {SITE.hours.close}</span></div>
+          <div className="entry-choice-top"><NeonSign /><span>{SITE.hours.open} - {SITE.hours.close}</span></div>
           <div className="entry-choice-content">
             <h1 id="entry-title" className="sr-only">Coffee Loca</h1>
             <LocaSign />
