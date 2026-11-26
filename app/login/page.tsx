@@ -113,9 +113,9 @@ export default function LoginPage() {
 
       <section className="auth-layout" aria-labelledby="auth-title">
         <div className="auth-intro page-heading">
-          <span className="eyebrow"><i /> COFFE LOCA / AREA MEMBER</span>
-          <h1 id="auth-title">Simpan jeda<br /><em>favoritmu.</em></h1>
-          <p>Masuk untuk mengumpulkan stamp, menyimpan pilihanmu, dan tetap dekat dengan cerita baru dari Loca.</p>
+          <span className="eyebrow"><i /> COFFEE LOCA / AREA MEMBER</span>
+          <h1 id="auth-title"><em>Apa nih yg baru ?</em></h1>
+          <p>Masuk untuk claim promo, hadiah menarik & update aktifitas mingguan LOCA</p>
           <div className="auth-art" aria-hidden="true">
             <div className="auth-art-ring auth-art-ring-one" />
             <div className="auth-art-ring auth-art-ring-two" />
