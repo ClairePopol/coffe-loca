@@ -10,7 +10,7 @@ function Limb({ d }: { d: string }) {
 
 const SAYS: Record<DayPeriod, string> = {
   pagi: "Pagi! Ngopi dulu yuk ☕",
-  siang: "Siang~ mampir ke Loca!",
+  siang: "Wih enak nih kerja sambil ngopi di Loca",
   sore: "Sore santai di Loca ♪",
   malam: "Zzz… selamat malam",
 };
@@ -48,11 +48,15 @@ export default function LocaMascot({ period }: { period: DayPeriod }) {
         <span className="loki-note">♪</span>
         <span className="loki-zzz z1">z</span><span className="loki-zzz z2">Z</span>
         <svg className="loki-svg" viewBox="-14 -14 168 208">
+          <g className="loki-squat-legs">
+            <Limb d="M60 156L42 162L48 172" /><Limb d="M80 156L98 162L92 172" />
+            <g fill="#fff" stroke="#d4232a" strokeWidth="2.4"><ellipse cx="46" cy="176" rx="10" ry="5" /><ellipse cx="94" cy="176" rx="10" ry="5" /></g>
+          </g>
           <g className="loki-body">
+            <g className="loki-squat">
+            <g className="loki-stand-legs">
             <g className="loki-leg loki-leg-l"><Limb d="M60 142L59 171" /><ellipse cx="55" cy="176" rx="10" ry="5" fill="#fff" stroke="#d4232a" strokeWidth="2.4" /></g>
             <g className="loki-leg loki-leg-r"><Limb d="M80 142L81 171" /><ellipse cx="85" cy="176" rx="10" ry="5" fill="#fff" stroke="#d4232a" strokeWidth="2.4" /></g>
-            <g className="loki-arm loki-arm-l"><Limb d="M19 84L6 102" />
-              <g className="loki-fore loki-fore-l"><Limb d="M6 102L9 124" /><circle cx="9" cy="125" r="4.6" fill="#fff" stroke="#d4232a" strokeWidth="2" /></g>
             </g>
             <path d="M70 151C70 151 17 99 17 66 17 36 40 13 70 13s53 23 53 53c0 33-53 85-53 85z" fill="#d4232a" stroke="#fff" strokeWidth="7" strokeLinejoin="round" />
             <g transform="rotate(35 70 56)">
@@ -71,6 +75,18 @@ export default function LocaMascot({ period }: { period: DayPeriod }) {
             <g className="loki-glasses"><rect x="45" y="50" width="20" height="16" rx="6" fill="#1d1d2c" opacity=".94" /><rect x="75" y="50" width="20" height="16" rx="6" fill="#1d1d2c" opacity=".94" /><path d="M65 56H75" stroke="#1d1d2c" strokeWidth="3" /><path d="M49 55l6-1.5M79 55l6-1.5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" opacity=".6" /></g>
             <g className="loki-scarf"><path d="M33 99Q70 123 107 99L100 114Q70 137 40 114Z" fill="#ff9a3d" /><path d="M88 125l11 25H83z" fill="#ff7a2b" /><path d="M50 115l-1 7M62 120l-1 7M76 121l1 7" stroke="#fff" strokeWidth="2" strokeLinecap="round" opacity=".55" /></g>
             <g className="loki-cap"><path d="M33 34Q40 -10 80 -10Q108 -9 124 24Q104 12 102 40Q70 26 35 42Z" fill="#3b4a9c" /><ellipse cx="68" cy="34" rx="38" ry="7" fill="#f4f6ff" /><circle cx="124" cy="25" r="8" fill="#f4f6ff" /></g>
+            <g className="loki-arm loki-arm-l"><Limb d="M19 84L6 102" />
+              <g className="loki-fore loki-fore-l"><Limb d="M6 102L9 124" />
+                <g className="loki-ice"><g className="loki-icefix">
+                  <path d="M11 116L13 104Q14 100 18 98L23 96" fill="none" stroke="#d4232a" strokeWidth="2.6" strokeLinecap="round" />
+                  <path d="M0 113H18L16 137H2Z" fill="#eaf6ff" stroke="#d4232a" strokeWidth="1.4" strokeLinejoin="round" />
+                  <path d="M.8 122H17.2L16 137H2Z" fill="#9b6a43" />
+                  <rect x="3" y="115.5" width="5" height="5" rx="1" fill="#fff" opacity=".9" /><rect x="9.5" y="117" width="5" height="5" rx="1" fill="#fff" opacity=".9" />
+                  <rect x="-1" y="111" width="20" height="3" rx="1.5" fill="#fff" stroke="#d4232a" strokeWidth="1.2" />
+                </g></g>
+                <circle cx="9" cy="125" r="4.6" fill="#fff" stroke="#d4232a" strokeWidth="2" />
+              </g>
+            </g>
             <g className="loki-arm loki-arm-r"><Limb d="M121 84L134 102" />
               <g className="loki-fore loki-fore-r"><Limb d="M134 102L131 124" />
                 <g className="loki-cup"><g className="loki-cupfix">
@@ -82,6 +98,13 @@ export default function LocaMascot({ period }: { period: DayPeriod }) {
                 <circle cx="131" cy="125" r="4.6" fill="#fff" stroke="#d4232a" strokeWidth="2" />
               </g>
             </g>
+            </g>
+          </g>
+          <g className="loki-laptop">
+            <rect x="38" y="126" width="64" height="44" rx="5" fill="#d9dde5" stroke="#8a909c" strokeWidth="2" />
+            <path d="M70 140c-4 0-7 3-7 6.6 0 4.6 7 11.4 7 11.4s7-6.8 7-11.4c0-3.6-3-6.6-7-6.6z" fill="#d4232a" />
+            <circle cx="70" cy="146.6" r="2.4" fill="#fff" />
+            <path d="M28 169H112L106 177H34Z" fill="#6b707c" />
           </g>
         </svg>
       </div>
