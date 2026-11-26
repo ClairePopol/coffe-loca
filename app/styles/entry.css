@@ -190,11 +190,11 @@
 .loki[data-mood="pagi"] { --leg:3.6s; }
 .loki[data-mood="pagi"] .loki-arm-r { animation:loki-sip-up 4.2s ease-in-out infinite; }
 .loki[data-mood="pagi"] .loki-fore-r { animation:loki-sip-fore 4.2s ease-in-out infinite; }
-@keyframes loki-sip-up { 0%,35%,100% { transform:rotate(0deg); } 50%,72% { transform:rotate(-10deg); } }
-@keyframes loki-sip-fore { 0%,35%,100% { transform:rotate(0deg); } 50%,72% { transform:rotate(105deg); } }
+@keyframes loki-sip-up { 0%,35%,100% { transform:rotate(0deg); } 50%,72% { transform:rotate(10deg); } }
+@keyframes loki-sip-fore { 0%,35%,100% { transform:rotate(0deg); } 50%,72% { transform:rotate(125deg); } }
 .loki[data-mood="pagi"] .loki-cupfix { animation:loki-cup-level 4.2s ease-in-out infinite; }
-/* arm turns +95deg in total: turn the cup back so the coffee never ends up upside down */
-@keyframes loki-cup-level { 0%,35%,100% { transform:rotate(0deg); } 50%,72% { transform:rotate(-95deg); } }
+/* the arm turns 135deg in total: turn the cup back 105deg so it ends up tilted 30deg toward the body (a sip), never upside down */
+@keyframes loki-cup-level { 0%,35%,100% { transform:rotate(0deg); } 50%,72% { transform:rotate(-105deg); } }
 
 .loki[data-mood="siang"] { --leg:1.5s; }
 .loki[data-mood="siang"] .loki-arm-r { animation:loki-wave-up 2.6s ease-in-out infinite; }
