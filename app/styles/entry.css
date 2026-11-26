@@ -103,3 +103,55 @@
 .entry-dev span { margin-right:4px; opacity:.7; }
 .entry-dev button { padding:6px 10px; border:1px solid rgba(255,255,255,.35); border-radius:8px; background:transparent; color:#fff; font:inherit; cursor:pointer; }
 .entry-dev button.is-active { background:#fff; color:#111; }
+
+/* Cute birds: each time of day has its own bird and action */
+.bird-spot { position:absolute; opacity:0; transition:opacity 1.8s ease; }
+.entry-choice[data-time="pagi"] .bird-pagi, .entry-choice[data-time="siang"] .bird-siang, .entry-choice[data-time="sore"] .bird-sore, .entry-choice[data-time="malam"] .bird-malam { opacity:1; }
+.pb, .owl { display:block; width:100%; height:auto; overflow:visible; }
+.pb-body, .pb-head, .pb-wing, .ow-head, .ow-eye, .ow-all, .fl-wing { transform-box:fill-box; }
+
+/* pagi: a chick on a branch, hopping and chirping */
+.bird-pagi { left:4%; bottom:11%; width:clamp(78px,8vw,112px); }
+.bird-pagi .pb { animation:bird-hop 3.6s ease-in-out infinite; transform-origin:50% 100%; }
+.bird-pagi .pb-head { transform-origin:30% 90%; animation:bird-chirp 3.6s ease-in-out infinite; }
+.bird-pagi .pb-wing { transform-origin:80% 30%; animation:bird-flutter 3.6s ease-in-out infinite; }
+.bird-pagi .branch { display:block; width:150%; margin:-6px 0 0 -25%; }
+.note { position:absolute; left:78%; top:6%; color:#fff; font-size:20px; font-weight:800; opacity:0; text-shadow:0 2px 6px rgba(0,0,0,.25); animation:bird-note 3.6s ease-out infinite; }
+.note.n2 { left:92%; top:14%; font-size:15px; animation-delay:.35s; }
+@keyframes bird-hop { 0%,55%,100% { translate:0 0; } 62% { translate:0 -16px; } 70% { translate:0 0; } 78% { translate:0 -9px; } 86% { translate:0 0; } }
+@keyframes bird-chirp { 0%,10% { rotate:0deg; } 20% { rotate:-14deg; } 30% { rotate:8deg; } 40%,100% { rotate:0deg; } }
+@keyframes bird-flutter { 0%,55%,100% { rotate:0deg; } 62%,78% { rotate:-26deg; } 70%,86% { rotate:4deg; } }
+@keyframes bird-note { 0%,12% { opacity:0; translate:0 6px; } 24% { opacity:1; } 60%,100% { opacity:0; translate:10px -34px; } }
+
+/* siang: little birds flapping across the sky */
+.bird-siang { inset:0; }
+.flyer { position:absolute; left:0; display:block; opacity:.95; animation:bird-cross linear infinite; filter:drop-shadow(0 4px 6px rgba(20,60,120,.25)); }
+.flyer svg { display:block; width:100%; height:auto; overflow:visible; animation:bird-bob 1.4s ease-in-out infinite alternate; }
+.fl-wing { transform-origin:55% 85%; animation:bird-flap .42s ease-in-out infinite alternate; }
+@keyframes bird-cross { from { translate:-120px 0; } to { translate:calc(100vw + 120px) 0; } }
+@keyframes bird-bob { from { translate:0 -6px; } to { translate:0 8px; } }
+@keyframes bird-flap { from { transform:scaleY(1); } to { transform:scaleY(-.55); } }
+
+/* sore: two birds sitting on a wire, swaying and turning their heads */
+.bird-sore { right:3%; bottom:9%; width:clamp(190px,21vw,300px); height:72px; }
+.bird-sore .wire { position:absolute; left:-6%; right:-6%; bottom:0; height:2px; border-radius:2px; background:rgba(40,12,50,.55); }
+.bird-sore .perch { position:absolute; bottom:-1px; display:block; transform-origin:50% 100%; }
+.bird-sore .p1 { left:18%; width:26%; animation:bird-sway 4.2s ease-in-out infinite; }
+.bird-sore .p2 { left:60%; width:22%; scale:-1 1; animation:bird-sway 5s ease-in-out -1.6s infinite; }
+.bird-sore .pb-head { transform-origin:30% 90%; animation:bird-look 6s ease-in-out infinite; }
+.bird-sore .p2 .pb-head { animation-delay:-3s; }
+.bird-sore .pb-body { animation:bird-puff 3s ease-in-out infinite alternate; transform-origin:50% 100%; }
+@keyframes bird-sway { 0%,100% { rotate:-3deg; } 50% { rotate:3deg; } }
+@keyframes bird-look { 0%,35%,100% { rotate:0deg; } 45%,60% { rotate:-18deg; } 75%,90% { rotate:12deg; } }
+@keyframes bird-puff { from { scale:1 1; } to { scale:1.03 .97; } }
+
+/* malam: a sleepy owl that blinks and tilts its head */
+.bird-malam { left:5%; bottom:8%; width:clamp(78px,8vw,112px); }
+.ow-head { transform-origin:50% 90%; animation:owl-tilt 7s ease-in-out infinite; }
+.ow-eye { transform-origin:50% 50%; animation:owl-blink 5s infinite; }
+.ow-eye:last-of-type { animation-delay:0s; }
+.ow-all { transform-origin:50% 100%; animation:owl-breathe 3.4s ease-in-out infinite alternate; }
+@keyframes owl-tilt { 0%,30%,100% { rotate:0deg; } 38%,55% { rotate:-14deg; } 65%,80% { rotate:10deg; } }
+@keyframes owl-blink { 0%,90%,100% { transform:scaleY(1); } 94% { transform:scaleY(.08); } }
+@keyframes owl-breathe { from { scale:1 1; } to { scale:1.025 .975; } }
+@media (max-width:640px) { .bird-pagi,.bird-malam { bottom:3%; } .bird-sore { bottom:3%; } }
