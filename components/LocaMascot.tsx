@@ -8,16 +8,19 @@ function Limb({ d }: { d: string }) {
   return <><path d={d} fill="none" stroke="#d4232a" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" /><path d={d} fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" /></>;
 }
 
+/** Card-game style card faces (domain-coloured art windows) for the night fan of cards. */
+const RIFT = ["#d4232a", "#2f9e5b", "#2b6fd6", "#8a3fc7"];
+
 const SAYS: Record<DayPeriod, string> = {
   pagi: "Pagi! Ngopi dulu yuk ☕",
   siang: "Wih enak nih kerja sambil ngopi di Loca",
   sore: "Sore-sore main mahjong sambil ngopi di Loca",
-  malam: "Begadang main kartu, kopinya jangan lupa ☕",
+  malam: "Begadang main Riftbound, kopinya jangan lupa ☕",
 };
 
 /**
- * Loki, the Loca pin mascot (the logo pin: white outline + coffee bean, with plain eyes). One character all day long: same pin, a different outfit and action per time of day
- * (morning coffee, noon sunglasses, evening scarf, night cap + sleep). Accessories cross-fade and the bird
+ * Loki, the Loca pin mascot (the logo pin: white outline + coffee bean, no face). One character all day long: same pin, a different outfit and action per time of day
+ * (morning coffee, noon laptop, evening mahjong, night card game). Accessories cross-fade and the bird
  * hops whenever the period changes.
  */
 export default function LocaMascot({ period }: { period: DayPeriod }) {
@@ -53,6 +56,7 @@ export default function LocaMascot({ period }: { period: DayPeriod }) {
         <span className="loki-note">♪</span>
         <span className="loki-zzz z1">z</span><span className="loki-zzz z2">Z</span>
         <svg className="loki-svg" viewBox="-14 -14 168 208">
+          <defs><linearGradient id="loki-bf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#3a2f8f" /><stop offset=".55" stopColor="#2b6fd6" /><stop offset="1" stopColor="#d9b45a" /></linearGradient></defs>
           <g className="loki-squat-legs">
             <Limb d="M60 156L42 162L48 172" /><Limb d="M80 156L98 162L92 172" />
             <g fill="#fff" stroke="#d4232a" strokeWidth="2.4"><ellipse cx="46" cy="176" rx="10" ry="5" /><ellipse cx="94" cy="176" rx="10" ry="5" /></g>
@@ -68,16 +72,6 @@ export default function LocaMascot({ period }: { period: DayPeriod }) {
               <ellipse cx="70" cy="56" rx="27" ry="36" fill="#fff" />
               <path d="M70 22Q61 40 70 56Q79 72 70 90" fill="none" stroke="#d4232a" strokeWidth="3" strokeLinecap="round" opacity=".7" />
             </g>
-            <g className="loki-eyes">
-              <ellipse cx="56" cy="58" rx="4.6" ry="6" fill="#2a1a14" /><ellipse cx="84" cy="58" rx="4.6" ry="6" fill="#2a1a14" />
-              <circle cx="57.4" cy="55.6" r="1.4" fill="#fff" /><circle cx="85.4" cy="55.6" r="1.4" fill="#fff" />
-            </g>
-            <g className="loki-lids" fill="#fff"><ellipse cx="56" cy="58" rx="6.4" ry="7.6" /><ellipse cx="84" cy="58" rx="6.4" ry="7.6" /></g>
-            <path className="loki-smile" d="M66 79Q72 84 78 79" fill="none" stroke="#2a1a14" strokeWidth="2.2" strokeLinecap="round" />
-            <ellipse className="loki-mouth-o" cx="72" cy="81" rx="3.6" ry="4.2" fill="#4a1414" />
-            <g className="loki-blink" fill="#fff"><g><ellipse cx="56" cy="58" rx="6.6" ry="7.8" /><path d="M49.6 58Q56 64.5 62.4 58" fill="none" stroke="#2a1a14" strokeWidth="2.2" strokeLinecap="round" /></g><g><ellipse cx="84" cy="58" rx="6.6" ry="7.8" /><path d="M77.6 58Q84 64.5 90.4 58" fill="none" stroke="#2a1a14" strokeWidth="2.2" strokeLinecap="round" /></g></g>
-            <g className="loki-sleepy" fill="none" stroke="#2a1a14" strokeWidth="2.4" strokeLinecap="round"><path d="M50 58Q56 63 62 58" /><path d="M78 58Q84 63 90 58" /></g>
-            <g className="loki-glasses"><rect x="45" y="50" width="20" height="16" rx="6" fill="#1d1d2c" opacity=".94" /><rect x="75" y="50" width="20" height="16" rx="6" fill="#1d1d2c" opacity=".94" /><path d="M65 56H75" stroke="#1d1d2c" strokeWidth="3" /><path d="M49 55l6-1.5M79 55l6-1.5" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" opacity=".6" /></g>
             <g className="loki-scarf"><path d="M33 99Q70 123 107 99L100 114Q70 137 40 114Z" fill="#ff9a3d" /><path d="M88 125l11 25H83z" fill="#ff7a2b" /><path d="M50 115l-1 7M62 120l-1 7M76 121l1 7" stroke="#fff" strokeWidth="2" strokeLinecap="round" opacity=".55" /></g>
             <g className="loki-cap"><path d="M33 34Q40 -10 80 -10Q108 -9 124 24Q104 12 102 40Q70 26 35 42Z" fill="#3b4a9c" /><ellipse cx="68" cy="34" rx="38" ry="7" fill="#f4f6ff" /><circle cx="124" cy="25" r="8" fill="#f4f6ff" /></g>
             <g className="loki-arm loki-arm-l"><Limb d="M19 84L6 102" />
@@ -90,8 +84,14 @@ export default function LocaMascot({ period }: { period: DayPeriod }) {
                   <rect x="-1" y="111" width="20" height="3" rx="1.5" fill="#fff" stroke="#d4232a" strokeWidth="1.2" />
                 </g></g>
                 <g className="loki-fan"><g className="loki-fanfix">
-                  {[-36, -12, 12, 36].map((r, i) => (
-                    <g key={r} className={i === 2 ? "loki-fan-pick" : undefined}><g transform={`rotate(${r} 9 132)`}><rect x="3" y="108" width="12" height="17" rx="2" fill="#fff" stroke="#2a1a14" strokeWidth=".9" /><rect x="5" y="110" width="8" height="13" rx="1" fill="#d4232a" opacity=".85" /></g></g>
+                  {RIFT.map((c, i) => (
+                    <g key={i} className={i === 2 ? "loki-fan-pick" : undefined}><g transform={`rotate(${[-36, -12, 12, 36][i]} 9 132) translate(9 132) scale(1.3) translate(-9 -132)`}>
+                      <rect x="2.5" y="106" width="13" height="19" rx="1.8" fill="#14121c" stroke="#d9b45a" strokeWidth=".9" />
+                      <rect x="4" y="108.6" width="10" height="8.4" rx=".8" fill={c} />
+                      <path d="M4 114.6l3-3 2.4 2.2 1.6-1.4 3 2.6V117H4z" fill="#000" opacity=".28" />
+                      <rect x="4" y="118" width="10" height="5.4" rx=".6" fill="#efe6d2" />
+                      <circle cx="4.6" cy="107.6" r="2" fill="#d9b45a" stroke="#14121c" strokeWidth=".5" />
+                    </g></g>
                   ))}
                 </g></g>
                 <circle cx="9" cy="125" r="4.6" fill="#fff" stroke="#d4232a" strokeWidth="2" />
@@ -122,8 +122,11 @@ export default function LocaMascot({ period }: { period: DayPeriod }) {
           <g className="loki-cardtable">
             <path d="M30 128H112L122 140H20Z" fill="#6b4630" stroke="#3b2618" strokeWidth="1.6" strokeLinejoin="round" />
             <rect x="20" y="140" width="102" height="36" rx="2" fill="#3b2618" /><path d="M20 146H122" stroke="#2a1a10" strokeWidth="2" />
-            <g stroke="#2a1a14" strokeWidth=".7"><rect x="42" y="130" width="12" height="7" rx="1.2" fill="#fff" transform="rotate(-8 48 133.5)" /><rect x="58" y="131" width="12" height="7" rx="1.2" fill="#fff" transform="rotate(6 64 134.5)" /></g>
-            <path d="M48 132.2c-.8-1.2-2.6-.6-2.2.8.3 1 2.2 2.2 2.2 2.2s1.9-1.2 2.2-2.2c.4-1.4-1.4-2-2.2-.8z" fill="#d4232a" /><path d="M64 132l-2 2.6h4z" fill="#2a1a14" />
+            <rect x="48" y="129.6" width="26" height="8.6" rx="1.2" fill="#14121c" stroke="#d9b45a" strokeWidth=".8" />
+            <rect x="49.6" y="131" width="22.8" height="5.8" rx=".6" fill="url(#loki-bf)" />
+            <g transform="rotate(-8 36 134)"><rect x="31" y="129" width="9" height="11" rx="1.2" fill="#14121c" stroke="#d9b45a" strokeWidth=".7" /><rect x="32.2" y="130.4" width="6.6" height="4.6" rx=".5" fill="#d4232a" /><rect x="32.2" y="135.8" width="6.6" height="3" rx=".4" fill="#efe6d2" /></g>
+            <g transform="rotate(7 85 134)"><rect x="80" y="129" width="9" height="11" rx="1.2" fill="#14121c" stroke="#d9b45a" strokeWidth=".7" /><rect x="81.2" y="130.4" width="6.6" height="4.6" rx=".5" fill="#2b6fd6" /><rect x="81.2" y="135.8" width="6.6" height="3" rx=".4" fill="#efe6d2" /></g>
+            <g stroke="#14121c" strokeWidth=".5"><circle cx="25" cy="136.5" r="2.4" fill="#e0622a" /><circle cx="97" cy="134" r="2.2" fill="#2f9e5b" /><circle cx="101" cy="137.5" r="2.2" fill="#8a3fc7" /></g>
           </g>
           <g className="loki-laptop">
             <rect x="38" y="126" width="64" height="44" rx="5" fill="#d9dde5" stroke="#8a909c" strokeWidth="2" />
