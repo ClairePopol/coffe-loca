@@ -325,8 +325,8 @@ function SmoothScroll() {
  * Any user input (swipe/touch, wheel, click, key) stops it immediately and hands
  * control back. Only drives the page scroll — the hero itself is untouched.
  */
-const HOLD_SECONDS = 4; // client asked for each hero part to stay 3–5s
-const MOVE_SECONDS = 2; // glide between two hero parts
+const HOLD_SECONDS = 5.5; // client wants each hero part to linger (asked for longer than 4s)
+const MOVE_SECONDS = 2.5; // glide between two hero parts
 const EXIT_SECONDS = 2.5; // from the last hero part down to the Cerita section
 const AUTO_SCROLL_START_DELAY = 800;
 
