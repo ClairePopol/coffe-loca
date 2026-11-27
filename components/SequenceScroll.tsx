@@ -169,8 +169,11 @@ export default function SequenceScroll() {
             <motion.div className="hero-copy" style={{ opacity: titleOpacity, y: titleY }}>
               <span className="eyebrow"><i /> MEDAN SPECIALITY COFFEE</span>
               <h1><em><span className="hero-loca">LOCA</span><span className="hero-tion">-tion</span></em><span className="hero-for-row"><em>for</em><span className="hero-for-list"><span>coffee</span><span>food</span><span>hangout</span></span></span></h1>
-              <p className="hero-slogan"><span aria-hidden="true">📍</span> Medan, Jl. T. Amir Hamzah No. 11</p>
-              <a className="hero-direction" href={SITE.mapsUrl} target="_blank" rel="noreferrer">DIRECTION</a>
+              <article className="location-detail hero-address">
+                <span className="location-detail-label"><i>01</i> ALAMAT KAMI</span>
+                <p><strong>{SITE.placeName}</strong><br />{SITE.addressLine}, {SITE.addressCity}</p>
+              </article>
+              <a className="location-cta hero-direction" href={SITE.mapsUrl} target="_blank" rel="noreferrer"><span>DIRECTION</span><i className="arrow-icon" aria-hidden="true" /></a>
               <div className="hero-hours">
                 <div className="hero-hours-copy"><span>JAM OPERASIONAL</span><strong>{SITE.hours.open} – {SITE.hours.close} <small>WIB</small></strong></div>
                 <NeonSign variant="badge" className="status-in-box" />
