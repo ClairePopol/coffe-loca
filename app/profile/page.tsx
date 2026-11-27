@@ -241,46 +241,58 @@ export default function ProfilePage() {
                   {side === "front" ? (
                     <section className="member-card-face member-card-front" aria-label="Kartu member Coffe Loca">
                       <span className="mc-shine" aria-hidden="true" />
-                      <span className="mc-bean" aria-hidden="true"><img src="/white-coffee-bean.png" alt="" /></span>
-                      <header className="mc-top">
-                        <span className="mc-brand"><img src="/white-coffee-bean.png" alt="" /><span>COFFE <b>LOCA</b></span></span>
-                        <span className="mc-tier">{roleLabel(profile.role).toUpperCase()}</span>
-                      </header>
-                      <div className="mc-body">
-                        <div className="mc-identity">
-                          <small>NAMA MEMBER</small>
-                          <strong>{displayName}</strong>
-                          <span className="mc-number">{memberNumber}</span>
+                      <span className="mc-ghost-pin" aria-hidden="true" />
+                      <div className="mc-front-main">
+                        <div className="mc-front-left">
+                          <img className="mc-loca" src="/member-loca.webp" alt="LOCA" width={520} height={626} />
+                          <div className="mc-identity">
+                            <small>NAMA MEMBER</small>
+                            <strong>{displayName}</strong>
+                            <span className="mc-number">{memberNumber}</span>
+                          </div>
                         </div>
-                        <button ref={qrTriggerRef} className="mc-qr" type="button" onClick={(event) => { event.stopPropagation(); setQrOpen(true); }} aria-label="Perbesar QR member">
-                          <QRCodeSVG value={memberCode} size={112} bgColor="#ffffff" fgColor="#141414" level="M" />
-                          <i className="profile-scan-line" />
-                        </button>
+                        <div className="mc-front-right">
+                          <span className="mc-tier">{roleLabel(profile.role).toUpperCase()}</span>
+                          <button ref={qrTriggerRef} className="mc-qr" type="button" onClick={(event) => { event.stopPropagation(); setQrOpen(true); }} aria-label="Perbesar QR member">
+                            <QRCodeSVG value={memberCode} size={112} bgColor="#ffffff" fgColor="#141414" level="M" />
+                            <i className="profile-scan-line" />
+                          </button>
+                          <span className="mc-since">{memberSince ? `SEJAK ${memberSince.toUpperCase()}` : "SCAN DI KASIR"}</span>
+                        </div>
                       </div>
-                      <footer className="mc-bottom"><span>{memberSince ? `SEJAK ${memberSince.toUpperCase()}` : "MEDAN"}</span><span>SCAN DI KASIR</span></footer>
+                      <footer className="mc-address"><span>Jl. T. Amir Hamzah No. 11 (seberang showroom Nissan)</span><i aria-hidden="true" /><span>0818 1881 1081</span></footer>
                     </section>
                   ) : (
                     <section className="member-card-face member-card-back" aria-label={`Kartu stamp: ${stamps} dari ${STAMP_GOAL}, total ${totalStamps} stamp`}>
-                      <header className="mc-top">
-                        <span className="mc-back-title"><small>COFFE LOCA</small>Coffee stamp card</span>
+                      <img className="mc-cup" src="/member-cup.webp" alt="" aria-hidden="true" width={591} height={900} />
+                      <div className="mc-panel">
                         <span className="mc-count"><b>{stamps}</b>/{STAMP_GOAL}</span>
-                      </header>
-                      <div className="mc-stamps">
-                        {Array.from({ length: STAMP_GOAL }, (_, index) => {
-                          const filled = index < stamps;
-                          const free = index === STAMP_GOAL - 1;
-                          return (
-                            <span key={index} className={`mc-stamp${filled ? " is-filled" : ""}${free ? " is-free" : ""}`} style={{ ["--i" as string]: index, ["--tilt" as string]: `${((index * 37) % 21) - 10}deg` }}>
-                              {free ? <b>FREE<br />COFFEE</b> : <img src="/white-coffee-bean.png" alt="" />}
-                            </span>
-                          );
-                        })}
+                        <div className="mc-stamps">
+                          {Array.from({ length: STAMP_GOAL }, (_, index) => {
+                            const filled = index < stamps;
+                            const free = index === STAMP_GOAL - 1;
+                            const label = index === 0 ? "START" : index === 1 ? "LETSGO" : "GO";
+                            return (
+                              <span key={index} className={`mc-stamp${filled ? " is-filled" : ""}${free ? " is-free" : ""}`} style={{ ["--i" as string]: index, ["--tilt" as string]: `${((index * 37) % 31) - 15}deg` }}>
+                                {free ? <b>YOU<br />MADE<br />IT!</b> : <b>{label}</b>}
+                                {filled && <i className="mc-ink" aria-hidden="true" />}
+                              </span>
+                            );
+                          })}
+                        </div>
                       </div>
-                      <footer className="mc-bottom"><span>{remaining === 0 ? `Yey, you made it! 🎉 Kartu penuh — tukar hadiahmu atau lanjut menabung · total ${totalStamps} stamp` : fullCards > 0 ? `${remaining} stamp lagi untuk kartu penuh ke-${fullCards + 1} · total ${totalStamps} stamp` : `${remaining} stamp lagi untuk kopi gratis`}</span><span>1 KOPI = 1 STAMP</span></footer>
+                      <div className="mc-back-text">
+                        <strong className="mc-back-title">COFFEE LOCA</strong>
+                        <span>SIP SIP GET FREE SIP CARD</span>
+                        <span>collect {STAMP_GOAL} loca stamp get</span>
+                        <b>FREE 1 CUP OF COFFEE</b>
+                      </div>
                     </section>
                   )}
                 </div>
               </div>
+
+              <p className="mc-progress">{remaining === 0 ? `Yey, you made it! 🎉 Kartu penuh — tukar hadiahmu atau lanjut menabung · total ${totalStamps} stamp` : fullCards > 0 ? `${remaining} stamp lagi untuk kartu penuh ke-${fullCards + 1} · total ${totalStamps} stamp` : `${remaining} stamp lagi untuk kopi gratis · 1 kopi = 1 stamp`}</p>
 
               <div className="member-card-controls">
                 <button className="btn-ghost mc-flip" type="button" onClick={flip} aria-pressed={flipped}>
