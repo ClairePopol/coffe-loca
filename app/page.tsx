@@ -11,7 +11,7 @@ import { coffeeAndDrinks, comfortFood, snacks, type Dish } from "@/lib/menu";
 import { SITE } from "@/lib/site";
 import { lenisRef } from "@/lib/lenis";
 import { useScrollLock } from "@/lib/useScrollLock";
-import SequenceScroll from "@/components/SequenceScroll";
+import SequenceScroll, { HERO_HOLDS } from "@/components/SequenceScroll";
 import Wordmark from "@/components/Wordmark";
 import LocaMascot from "@/components/LocaMascot";
 import NeonSign from "@/components/NeonSign";
@@ -319,12 +319,15 @@ function SmoothScroll() {
 }
 
 /**
- * Slowly plays the hero scroll animation on its own once the intro screens are gone,
- * ending with the "Kopi enak. Hari yang baik." section fully in view.
+ * Plays the hero scroll animation on its own once the intro screens are gone: it lingers
+ * HOLD_SECONDS on each hero part (title, COFFEE, FOOD, CTA — see HERO_HOLDS), glides to the
+ * next one, and ends with the "Kopi enak. Hari yang baik." section fully in view.
  * Any user input (swipe/touch, wheel, click, key) stops it immediately and hands
  * control back. Only drives the page scroll — the hero itself is untouched.
  */
-const AUTO_SCROLL_SECONDS = 22; // half the previous speed
+const HOLD_SECONDS = 4; // client asked for each hero part to stay 3–5s
+const MOVE_SECONDS = 2; // glide between two hero parts
+const EXIT_SECONDS = 2.5; // from the last hero part down to the Cerita section
 const AUTO_SCROLL_START_DELAY = 800;
 
 function HeroAutoScroll() {
@@ -359,11 +362,34 @@ function HeroAutoScroll() {
       // End with the Cerita section filling the screen (its top at the top of the viewport).
       const end = Math.round(story.getBoundingClientRect().top + window.scrollY);
       if (end <= window.scrollY) { stop(); return; }
+      // Timeline of [seconds, scrollY]: hold (slow drift) inside each part, smooth glide between parts.
+      const stage = document.getElementById("beranda");
+      if (!stage) { stop(); return; }
+      const stageTop = stage.getBoundingClientRect().top + window.scrollY;
+      const stageSpan = stage.offsetHeight - window.innerHeight;
+      const at = (progress: number) => stageTop + progress * stageSpan;
+      const start = window.scrollY;
+      const keys: { t: number; y: number; hold: boolean }[] = [{ t: 0, y: start, hold: false }];
+      let time = 0;
+      HERO_HOLDS.forEach(([from, to], index) => {
+        if (index > 0) keys.push({ t: (time += MOVE_SECONDS), y: Math.max(start, at(from)), hold: false });
+        keys.push({ t: (time += HOLD_SECONDS), y: Math.max(start, at(to)), hold: true });
+      });
+      keys.push({ t: (time += EXIT_SECONDS), y: end, hold: false });
+      const total = time;
+      const smooth = (u: number) => u * u * (3 - 2 * u);
       running = true;
       lenis.scrollTo(end, {
-        duration: AUTO_SCROLL_SECONDS,
-        // Starts moving right away (a slow ease-in over 22s looked like nothing was happening), then settles gently on the Cerita section.
-        easing: (t) => 1 - Math.pow(1 - t, 1.7),
+        duration: total,
+        easing: (t) => {
+          const now = Math.min(1, Math.max(0, t)) * total;
+          let i = 1;
+          while (i < keys.length - 1 && keys[i].t < now) i++;
+          const a = keys[i - 1], b = keys[i];
+          const u = b.t > a.t ? Math.min(1, (now - a.t) / (b.t - a.t)) : 1;
+          const y = a.y + (b.y - a.y) * (b.hold ? u : smooth(u));
+          return (y - start) / (end - start);
+        },
         onComplete: () => { running = false; stop(); },
       });
     };

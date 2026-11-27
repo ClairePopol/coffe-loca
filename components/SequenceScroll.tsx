@@ -7,6 +7,10 @@ import { SITE } from "@/lib/site";
 import NeonSign from "@/components/NeonSign";
 
 const FRAME_COUNT = 161;
+
+/** Scroll-progress ranges (0–1 through the hero) where each part is fully shown: title, COFFEE, FOOD, CTA.
+ *  The auto-play in app/page.tsx (HeroAutoScroll) lingers a few seconds inside each one. */
+export const HERO_HOLDS: [number, number][] = [[0, 0.12], [0.28, 0.39], [0.55, 0.66], [0.86, 0.97]];
 const FRAME_PATH = "/image-sequence/ezgif-frame-";
 const BACKGROUND = "#090502";
 
@@ -148,14 +152,15 @@ export default function SequenceScroll() {
     return () => window.removeEventListener("resize", onResize);
   }, [draw]);
 
-  const titleOpacity = useTransform(easedProgress, [0, 0.06, 0.2], [1, 1, 0]);
-  const titleY = useTransform(easedProgress, [0, 0.2], [0, -30]);
-  const firstOpacity = useTransform(easedProgress, [0.22, 0.3, 0.43], [0, 1, 0]);
-  const firstX = useTransform(easedProgress, [0.22, 0.31, 0.43], [-25, 0, -12]);
-  const secondOpacity = useTransform(easedProgress, [0.48, 0.59, 0.73], [0, 1, 0]);
-  const secondX = useTransform(easedProgress, [0.48, 0.6, 0.73], [25, 0, 12]);
-  const ctaOpacity = useTransform(easedProgress, [0.78, 0.9, 0.99], [0, 1, 0.8]);
-  const ctaY = useTransform(easedProgress, [0.78, 0.9], [22, 0]);
+  // Each hero part stays fully visible over its HERO_HOLDS range (scroll progress), so it doesn't rush by.
+  const titleOpacity = useTransform(easedProgress, [0, 0.14, 0.2], [1, 1, 0]);
+  const titleY = useTransform(easedProgress, [0.12, 0.2], [0, -30]);
+  const firstOpacity = useTransform(easedProgress, [0.21, 0.27, 0.4, 0.45], [0, 1, 1, 0]);
+  const firstX = useTransform(easedProgress, [0.21, 0.27, 0.4, 0.45], [-25, 0, 0, -12]);
+  const secondOpacity = useTransform(easedProgress, [0.48, 0.54, 0.67, 0.73], [0, 1, 1, 0]);
+  const secondX = useTransform(easedProgress, [0.48, 0.54, 0.67, 0.73], [25, 0, 0, 12]);
+  const ctaOpacity = useTransform(easedProgress, [0.77, 0.85, 0.97, 1], [0, 1, 1, 0.85]);
+  const ctaY = useTransform(easedProgress, [0.77, 0.85], [22, 0]);
   const exitWashOpacity = useTransform(easedProgress, [0.84, 0.93, 1], [0, 0.22, 0.72]);
 
   return (
