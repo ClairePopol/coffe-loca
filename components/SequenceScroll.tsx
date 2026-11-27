@@ -211,7 +211,7 @@ export default function SequenceScroll() {
               <RedeemStamps />
             </motion.div>
           </div>
-          <div className="sequence-footer"><img className="sequence-kata" src="/kata.webp" alt="Coffee, food, hangout" width={700} height={270} /></div>
+          <div className="sequence-footer"><img className="sequence-kata" src="/kata.webp" alt="Coffee, food, hangout" width={700} height={211} /></div>
           <div className="sequence-progress" aria-hidden="true"><motion.span style={{ scaleX: easedProgress, transformOrigin: "0% 50%" }} /></div>
         </div>
       </section>
